@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36221.1 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tanuki.Atlyss.Core", "Tanuki.Atlyss.Core\Tanuki.Atlyss.Core.csproj", "{A210D614-B1C7-4260-B7E1-7DF2E73E1C8D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tanuki.Atlyss.API", "Tanuki.Atlyss.API\Tanuki.Atlyss.API.csproj", "{23EAA990-EE53-4712-B72E-375FE536BF91}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tanuki.Atlyss.ExamplePlugin", "Tanuki.Atlyss.ExamplePlugin\Tanuki.Atlyss.ExamplePlugin.csproj", "{653A2C21-7D84-4FBB-94BD-C30FAC5A45E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tanuki.Atlyss.Bootstrap", "Tanuki.Atlyss.Bootstrap\Tanuki.Atlyss.Bootstrap.csproj", "{9C00D52E-10B8-413F-9EE4-BFDE81762442}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A210D614-B1C7-4260-B7E1-7DF2E73E1C8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A210D614-B1C7-4260-B7E1-7DF2E73E1C8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A210D614-B1C7-4260-B7E1-7DF2E73E1C8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A210D614-B1C7-4260-B7E1-7DF2E73E1C8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23EAA990-EE53-4712-B72E-375FE536BF91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23EAA990-EE53-4712-B72E-375FE536BF91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23EAA990-EE53-4712-B72E-375FE536BF91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23EAA990-EE53-4712-B72E-375FE536BF91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{653A2C21-7D84-4FBB-94BD-C30FAC5A45E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{653A2C21-7D84-4FBB-94BD-C30FAC5A45E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{653A2C21-7D84-4FBB-94BD-C30FAC5A45E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{653A2C21-7D84-4FBB-94BD-C30FAC5A45E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C00D52E-10B8-413F-9EE4-BFDE81762442}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C00D52E-10B8-413F-9EE4-BFDE81762442}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C00D52E-10B8-413F-9EE4-BFDE81762442}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C00D52E-10B8-413F-9EE4-BFDE81762442}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {ADB2A11F-8404-4E7E-8BB4-2DC0DB6A3CAE}
+	EndGlobalSection
+EndGlobal
