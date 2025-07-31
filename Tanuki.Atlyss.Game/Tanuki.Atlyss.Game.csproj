@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{653A2C21-7D84-4FBB-94BD-C30FAC5A45E3}</ProjectGuid>
+    <ProjectGuid>{195C12BF-79C2-4476-8340-D2198D1FFC95}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Tanuki.Atlyss.ExamplePlugin</RootNamespace>
-    <AssemblyName>Tanuki.Atlyss.ExamplePlugin</AssemblyName>
+    <RootNamespace>Tanuki.Atlyss.Game</RootNamespace>
+    <AssemblyName>Tanuki.Atlyss.Game</AssemblyName>
     <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -32,43 +32,31 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>D:\Programs\Steam\steamapps\common\ATLYSS\ATLYSS_Data\Managed\Assembly-CSharp.dll</HintPath>
+    <Reference Include="0Harmony">
+      <HintPath>D:\Programs\Steam\steamapps\common\ATLYSS\BepInEx\core\0Harmony.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="BepInEx">
-      <HintPath>D:\Programs\Steam\steamapps\common\ATLYSS\BepInEx\core\BepInEx.dll</HintPath>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>D:\Programs\Steam\steamapps\common\ATLYSS\ATLYSS_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Mirror">
       <HintPath>D:\Programs\Steam\steamapps\common\ATLYSS\ATLYSS_Data\Managed\Mirror.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>D:\Programs\Steam\steamapps\common\ATLYSS\ATLYSS_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>D:\Programs\Steam\steamapps\common\ATLYSS\ATLYSS_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>D:\Programs\Steam\steamapps\common\ATLYSS\ATLYSS_Data\Managed\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\Example.cs" />
+    <Compile Include="Events\ChatBehaviour.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Tanuki.Atlyss.API\Tanuki.Atlyss.API.csproj">
-      <Project>{23eaa990-ee53-4712-b72e-375fe536bf91}</Project>
-      <Name>Tanuki.Atlyss.API</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Tanuki.Atlyss.Core\Tanuki.Atlyss.Core.csproj">
-      <Project>{a210d614-b1c7-4260-b7e1-7df2e73e1c8d}</Project>
-      <Name>Tanuki.Atlyss.Core</Name>
-      <Private>False</Private>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

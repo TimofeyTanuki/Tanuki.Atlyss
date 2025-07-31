@@ -36,14 +36,7 @@
       <HintPath>D:\Programs\Steam\steamapps\common\ATLYSS\BepInEx\core\BepInEx.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
       <HintPath>D:\Programs\Steam\steamapps\common\ATLYSS\ATLYSS_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
@@ -54,6 +47,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\Reload.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -67,6 +61,10 @@
       <Project>{a210d614-b1c7-4260-b7e1-7df2e73e1c8d}</Project>
       <Name>Tanuki.Atlyss.Core</Name>
       <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Tanuki.Atlyss.Game\Tanuki.Atlyss.Game.csproj">
+      <Project>{195c12bf-79c2-4476-8340-d2198d1ffc95}</Project>
+      <Name>Tanuki.Atlyss.Game</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

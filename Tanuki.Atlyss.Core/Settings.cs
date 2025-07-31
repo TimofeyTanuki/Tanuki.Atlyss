@@ -1,6 +1,6 @@
 ﻿namespace Tanuki.Atlyss.Core;
 
-internal sealed class Settings
+public sealed class Settings
 {
-    public static string Language { get; internal set; }
+    public static string Language { get; set; }
 }

@@ -1,11 +1,10 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Tanuki.Atlyss.API.Collections;
 
 public class Translation
 {
-    public Dictionary<string, string> Translations;
+    public Dictionary<string, string> Translations = [];
     public string this[string Key]
     {
         get => Translations[Key];

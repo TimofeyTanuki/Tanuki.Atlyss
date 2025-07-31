@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36221.1 d17.14
+VisualStudioVersion = 17.14.36221.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tanuki.Atlyss.Core", "Tanuki.Atlyss.Core\Tanuki.Atlyss.Core.csproj", "{A210D614-B1C7-4260-B7E1-7DF2E73E1C8D}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tanuki.Atlyss.ExamplePlugin", "Tanuki.Atlyss.ExamplePlugin\Tanuki.Atlyss.ExamplePlugin.csproj", "{653A2C21-7D84-4FBB-94BD-C30FAC5A45E3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tanuki.Atlyss.Bootstrap", "Tanuki.Atlyss.Bootstrap\Tanuki.Atlyss.Bootstrap.csproj", "{9C00D52E-10B8-413F-9EE4-BFDE81762442}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tanuki.Atlyss.Game", "Tanuki.Atlyss.Game\Tanuki.Atlyss.Game.csproj", "{195C12BF-79C2-4476-8340-D2198D1FFC95}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{9C00D52E-10B8-413F-9EE4-BFDE81762442}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C00D52E-10B8-413F-9EE4-BFDE81762442}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C00D52E-10B8-413F-9EE4-BFDE81762442}.Release|Any CPU.Build.0 = Release|Any CPU
+		{195C12BF-79C2-4476-8340-D2198D1FFC95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{195C12BF-79C2-4476-8340-D2198D1FFC95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{195C12BF-79C2-4476-8340-D2198D1FFC95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{195C12BF-79C2-4476-8340-D2198D1FFC95}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

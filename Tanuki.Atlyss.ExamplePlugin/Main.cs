@@ -1,28 +1,28 @@
 ﻿using BepInEx;
-using BepInEx.Logging;
 
 namespace Tanuki.Atlyss.ExamplePlugin;
 
 [BepInPlugin("653a2c21-7d84-4fbb-94bd-c30fac5a45e3", "Tanuki.Atlyss.ExamplePlugin", "1.0.0.0")]
 [BepInProcess("ATLYSS.exe")]
-public class Main : Core.Plugin
+public class Main : Core.Plugins.Plugin
 {
     internal static Main Instance;
-    internal new ManualLogSource Logger;
     public void Awake()
     {
         Instance = this;
-        Logger = base.Logger;
-        base.Logger.LogInfo("Awake()");
+        Logger.LogInfo("Awake()");
+
+        // You can change Settings here
+        // Settings.Language = "your-language-from-cfg"; // By default, the variable of Tanuki.Atlyss.Bootloader configuration is set.
     }
     protected override void Load()
     {
-        base.Logger.LogInfo("Load()");
+        Logger.LogInfo("Load()");
 
-        base.Logger.LogInfo($"Translate: {Translate("Debug")}");
+        Logger.LogInfo($"Translation test: {Translate("Debug")}");
     }
     protected override void Unload()
     {
-        base.Logger.LogInfo("Unload()");
+        Logger.LogInfo("Unload()");
     }
 }
