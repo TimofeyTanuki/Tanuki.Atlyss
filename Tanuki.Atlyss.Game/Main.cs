@@ -5,6 +5,7 @@ namespace Tanuki.Atlyss.Game;
 
 public class Main
 {
+    public const string HarmonyID = "Tanuki.Atlyss.Game";
     public static bool Patched { get; private set; }
     public static void Patch()
     {
@@ -12,6 +13,8 @@ public class Main
             return;
 
         Patched = true;
+        Harmony h = new(HarmonyID);
+        h.patch
         Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
     }
 }

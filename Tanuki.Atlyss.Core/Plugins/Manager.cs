@@ -1,7 +1,5 @@
 ﻿using BepInEx;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Tanuki.Atlyss.API;
 
 namespace Tanuki.Atlyss.Core.Plugins;
@@ -30,8 +28,10 @@ public class Manager
             Plugin.LoadPlugin();
         }
 
+        /*
         Console.WriteLine($"Plugins (x{Plugins.Count}):\n{string.Join(", ", Plugins.Select(x => x.Name))}");
         Console.WriteLine($"Commands (x{Tanuki.Instance.Commands.Commands.Count}):\n{string.Join(", ", Tanuki.Instance.Commands.Commands.Keys.Select(x => x.GetType().FullName))}");
         Console.WriteLine($"Aliases (x{Tanuki.Instance.Commands.Aliases.Count}):\n{string.Join(", ", Tanuki.Instance.Commands.Aliases.Keys)}");
+        */
     }
 }

@@ -15,7 +15,6 @@ public class Plugin : BaseUnityPlugin, IPlugin
     private EPluginState _State = EPluginState.Unloaded;
     public EPluginState State => _State;
     public PluginSettings Settings { get; private set; }
-
     public Translation Translation { get; internal set; }
     public Plugin()
     {

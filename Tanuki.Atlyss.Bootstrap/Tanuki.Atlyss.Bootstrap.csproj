@@ -65,6 +65,7 @@
     <ProjectReference Include="..\Tanuki.Atlyss.Game\Tanuki.Atlyss.Game.csproj">
       <Project>{195c12bf-79c2-4476-8340-d2198d1ffc95}</Project>
       <Name>Tanuki.Atlyss.Game</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

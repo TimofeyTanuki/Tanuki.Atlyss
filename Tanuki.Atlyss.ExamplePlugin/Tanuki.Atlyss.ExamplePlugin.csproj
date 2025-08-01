@@ -43,6 +43,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Mirror">
       <HintPath>D:\Programs\Steam\steamapps\common\ATLYSS\ATLYSS_Data\Managed\Mirror.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>D:\Programs\Steam\steamapps\common\ATLYSS\ATLYSS_Data\Managed\UnityEngine.dll</HintPath>

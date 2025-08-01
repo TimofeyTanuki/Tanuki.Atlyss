@@ -47,6 +47,7 @@
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>D:\Programs\Steam\steamapps\common\ATLYSS\ATLYSS_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>D:\Programs\Steam\steamapps\common\ATLYSS\ATLYSS_Data\Managed\UnityEngine.UI.dll</HintPath>
