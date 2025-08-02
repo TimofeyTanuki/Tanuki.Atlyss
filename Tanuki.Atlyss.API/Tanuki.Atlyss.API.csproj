@@ -36,9 +36,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\Translation.cs" />
-    <Compile Include="Command\ICommand.cs" />
-    <Compile Include="EPluginState.cs" />
-    <Compile Include="IPlugin.cs" />
+    <Compile Include="Commands\ICommand.cs" />
+    <Compile Include="Plugins\EState.cs" />
+    <Compile Include="Plugins\IPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

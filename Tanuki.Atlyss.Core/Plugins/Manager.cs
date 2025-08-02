@@ -1,15 +1,16 @@
 ﻿using BepInEx;
 using System.Collections.Generic;
 using Tanuki.Atlyss.API;
+using Tanuki.Atlyss.API.Plugins;
 
 namespace Tanuki.Atlyss.Core.Plugins;
 
 public class Manager
 {
-    public List<IPlugin> Plugins { get; internal set; } = [];
+    internal readonly List<IPlugin> Plugins = [];
     public void Reload()
     {
-        Plugins.ForEach(x => x.UnloadPlugin(EPluginState.Unloaded));
+        Plugins.ForEach(x => x.UnloadPlugin(EState.Unloaded));
         Plugins.Clear();
         BaseUnityPlugin BaseUnityPlugin;
         IPlugin Plugin;

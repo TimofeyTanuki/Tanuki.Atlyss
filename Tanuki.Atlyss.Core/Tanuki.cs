@@ -2,7 +2,7 @@
 
 public class Tanuki
 {
-    public static Tanuki Instance { get; internal set; }
+    public static Tanuki Instance;
 
     public Commands.Manager Commands;
     public Plugins.Manager Plugins;
@@ -20,9 +20,12 @@ public class Tanuki
             Plugins = new()
         };
 
-        Game.Main.Patch();
+        Game.Fields.GameManager.Initialize();
 
-        Game.Events.ChatBehaviour.Send_ChatMessage.Before += Instance.Commands.OnSendMessage;
+        Game.Main.Initialize();
+        Game.Main.Instance.Patch(typeof(Game.Events.ChatBehaviour.Send_ChatMessage_Prefix));
+
+        Game.Events.ChatBehaviour.Send_ChatMessage_Prefix.OnInvoke += Instance.Commands.OnSendMessage;
     }
     public void Reload()
     {

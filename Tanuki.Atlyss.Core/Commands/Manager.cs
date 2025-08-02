@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Tanuki.Atlyss.API;
 using Tanuki.Atlyss.API.Commands;
 using Tanuki.Atlyss.Core.Plugins;
 

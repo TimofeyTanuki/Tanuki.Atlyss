@@ -55,7 +55,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Events\ChatBehaviour.cs" />
+    <Compile Include="Events\ChatBehaviour\Send_ChatMessage_Prefix.cs" />
+    <Compile Include="Events\ItemObject\Enable_GroundCheckToVelocityZero_Postfix.cs" />
+    <Compile Include="Events\LoadSceneManager\Init_LoadScreenDisable_Postfix.cs" />
+    <Compile Include="Events\ScriptablePlayerRace\Init_ParamsCheck_Prefix.cs" />
+    <Compile Include="Fields\GameManager.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

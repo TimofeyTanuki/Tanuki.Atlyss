@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using Tanuki.Atlyss.API;
 using Tanuki.Atlyss.API.Collections;
+using Tanuki.Atlyss.API.Plugins;
 
 namespace Tanuki.Atlyss.Core.Plugins;
 
@@ -12,16 +13,16 @@ public class Plugin : BaseUnityPlugin, IPlugin
     public Assembly Assembly { get; private set; }
     public string Name { get; private set; }
     public string Directory { get; private set; }
-    private EPluginState _State = EPluginState.Unloaded;
-    public EPluginState State => _State;
-    public PluginSettings Settings { get; private set; }
-    public Translation Translation { get; internal set; }
+    private EState _State = EState.Unloaded;
+    public EState State => _State;
+    public Settings Settings { get; set; }
+    public Translation Translation;
     public Plugin()
     {
         Assembly = GetType().Assembly;
         Name = Assembly.GetName().Name;
         Directory = Path.Combine(Paths.ConfigPath, Name);
-        Settings = new();
+        Settings = new Settings();
         Translation = new();
 
         if (!System.IO.Directory.Exists(Directory))
@@ -46,10 +47,10 @@ public class Plugin : BaseUnityPlugin, IPlugin
         catch (Exception Exception)
         {
             Logger.LogError(Exception);
-            UnloadPlugin(EPluginState.Failure);
+            UnloadPlugin(EState.Failure);
         }
     }
-    public virtual void UnloadPlugin(EPluginState PluginState)
+    public virtual void UnloadPlugin(EState PluginState)
     {
         Tanuki.Instance.Commands.DeregisterCommands(this);
         try
@@ -59,13 +60,13 @@ public class Plugin : BaseUnityPlugin, IPlugin
         catch (Exception Exception)
         {
             Logger.LogError(Exception);
-            UnloadPlugin(EPluginState.Failure);
+            UnloadPlugin(EState.Failure);
         }
         _State = PluginState;
     }
     public void ReloadPlugin()
     {
-        UnloadPlugin(EPluginState.Unloaded);
+        UnloadPlugin(EState.Unloaded);
         LoadPlugin();
     }
     protected virtual void Load()

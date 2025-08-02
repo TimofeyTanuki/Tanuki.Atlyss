@@ -2,5 +2,5 @@
 
 public sealed class Settings
 {
-    public static string Language { get; set; }
+    public static string Language;
 }
