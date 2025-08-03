@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using BepInEx.Logging;
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
 
@@ -6,12 +7,16 @@ namespace Tanuki.Atlyss.Game;
 
 public class Main
 {
+    public static Main Instance;
+
     private readonly Harmony Harmony;
+    private readonly ManualLogSource ManualLogSource;
     private readonly HashSet<Type> Patches;
-    public static Main Instance = null;
+
     private Main()
     {
         Harmony = new("Tanuki.Atlyss.Game");
+        ManualLogSource = new("Tanuki.Atlyss.Game");
         Patches = [];
     }
     public static void Initialize() =>
@@ -23,10 +28,16 @@ public class Main
             return;
 
         if (!(Type.IsSealed && Type.IsAbstract))
-            throw new ArgumentException($"Patch class {Type.FullName} must be static.");
+        {
+            ManualLogSource.LogError($"Patch class {Type.FullName} must be static.");
+            return;
+        }
 
         if (!Type.IsDefined(typeof(HarmonyPatch), false))
-            throw new ArgumentException($"Patch class {Type.FullName} must have HarmonyPatch attribute.");
+        {
+            ManualLogSource.LogError($"Patch class {Type.FullName} must have HarmonyPatch attribute.");
+            return;
+        }
 
         Harmony.CreateClassProcessor(Type).Patch();
         Patches.Add(Type);
