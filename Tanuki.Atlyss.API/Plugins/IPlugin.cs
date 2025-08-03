@@ -6,7 +6,6 @@ public interface IPlugin
 {
     string Name { get; }
     EState State { get; }
-
     void LoadPlugin();
     void UnloadPlugin(EState PluginState);
 }

@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Tanuki.Atlyss.ExamplePlugin")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("BepInEx plugin example built on the Tanuki.Atlyss framework.")]
 [assembly: AssemblyCompany("Tanuki")]
 [assembly: AssemblyProduct("Tanuki.Atlyss.ExamplePlugin")]
 [assembly: AssemblyCopyright("Copyright © Tanuki 2025")]

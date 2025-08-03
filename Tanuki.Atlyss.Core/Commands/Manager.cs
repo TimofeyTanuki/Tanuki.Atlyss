@@ -3,26 +3,28 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Tanuki.Atlyss.API;
 using Tanuki.Atlyss.API.Commands;
-using Tanuki.Atlyss.Core.Plugins;
 
 namespace Tanuki.Atlyss.Core.Commands;
 
 public class Manager
 {
-    public Dictionary<string, ICommand> Aliases = [];
-    public Dictionary<ICommand, CommandConfiguration> Commands = [];
-    public void RegisterCommands(Plugin Plugin)
+    public readonly Dictionary<string, ICommand> Aliases = [];
+    public readonly Dictionary<ICommand, CommandConfiguration> Commands = [];
+    public void RegisterCommands(IPlugin Plugin)
     {
         bool UpdateFile = false;
         Dictionary<string, CommandConfiguration> CommandConfigurations = null;
         ICommand Command;
 
+        Assembly Assembly = Plugin.GetType().Assembly;
+
         // Обнаружение всех команд в сборке плагина.
         List<ICommand> PluginCommands = [];
-        foreach (Type Type in Plugin.Assembly.GetTypes())
+        foreach (Type Type in Assembly.GetTypes())
         {
             if (Type.IsAbstract || Type.IsInterface)
                 continue;
@@ -34,10 +36,25 @@ public class Manager
             PluginCommands.Add(Command);
         }
 
-        if (File.Exists(Plugin.Settings.Command))
-            CommandConfigurations = JsonConvert.DeserializeObject<Dictionary<string, CommandConfiguration>>(File.ReadAllText(Plugin.Settings.Command));
-        else
-            UpdateFile = true;
+        string Directory = System.IO.Path.Combine(BepInEx.Paths.ConfigPath, Assembly.GetName().Name);
+        string Path = System.IO.Path.Combine(Directory, string.Format(Environment.PluginCommandFileTemplate, Tanuki.Instance.Settings.Language, Environment.PluginCommandFileFormat));
+
+        bool Exists = File.Exists(Path);
+        if (!Exists)
+        {
+            foreach (string File in System.IO.Directory.GetFiles(Directory))
+            {
+                if (!File.Contains(Environment.PluginCommandFileFormat))
+                    continue;
+
+                Path = File;
+                Exists = true;
+                break;
+            }
+        }
+
+        if (Exists)
+            CommandConfigurations = JsonConvert.DeserializeObject<Dictionary<string, CommandConfiguration>>(File.ReadAllText(Path));
 
         CommandConfigurations ??= [];
 
@@ -109,15 +126,17 @@ public class Manager
         }
 
         if (UpdateFile)
-            File.WriteAllText(Plugin.Settings.Command, JsonConvert.SerializeObject(CommandConfigurations, Formatting.Indented));
+            File.WriteAllText(Path, JsonConvert.SerializeObject(CommandConfigurations, Formatting.Indented));
     }
-    public void DeregisterCommands(Plugin Plugin)
+    public void DeregisterCommands(IPlugin Plugin)
     {
+        Assembly Assembly = Plugin.GetType().Assembly;
+
         // Удаление зарегистрированных псевдонимов команд
         List<string> RemovedAliases = [];
         foreach (KeyValuePair<string, ICommand> Alias in Aliases)
         {
-            if (Alias.Value.GetType().Assembly != Plugin.Assembly)
+            if (Alias.Value.GetType().Assembly != Assembly)
                 continue;
 
             RemovedAliases.Add(Alias.Key);
@@ -128,7 +147,7 @@ public class Manager
         List<ICommand> RemovedCommands = [];
         foreach (ICommand Command in Commands.Keys)
         {
-            if (Command.GetType().Assembly != Plugin.Assembly)
+            if (Command.GetType().Assembly != Assembly)
                 continue;
 
             RemovedCommands.Add(Command);

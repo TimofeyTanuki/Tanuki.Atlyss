@@ -4,6 +4,7 @@ public class Tanuki
 {
     public static Tanuki Instance;
 
+    public Settings Settings;
     public Commands.Manager Commands;
     public Plugins.Manager Plugins;
 
@@ -13,11 +14,14 @@ public class Tanuki
         if (Instance is not null)
             return;
 
-
         Instance = new()
         {
             Commands = new(),
-            Plugins = new()
+            Plugins = new(),
+            Settings = new()
+            {
+                Language = "default"
+            }
         };
 
         Game.Fields.GameManager.Initialize();

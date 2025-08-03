@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Tanuki.Atlyss.API")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("The application programming interface of the Tanuki.Atlyss framework.")]
 [assembly: AssemblyCompany("Tanuki")]
 [assembly: AssemblyProduct("Tanuki.Atlyss.API")]
 [assembly: AssemblyCopyright("Copyright © Tanuki 2025")]

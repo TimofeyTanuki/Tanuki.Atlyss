@@ -10,19 +10,18 @@ namespace Tanuki.Atlyss.Core.Plugins;
 
 public class Plugin : BaseUnityPlugin, IPlugin
 {
-    public Assembly Assembly { get; private set; }
     public string Name { get; private set; }
-    public string Directory { get; private set; }
     private EState _State = EState.Unloaded;
     public EState State => _State;
-    public Settings Settings { get; set; }
+    protected Assembly Assembly;
+    protected readonly string Directory;
     public Translation Translation;
     public Plugin()
     {
         Assembly = GetType().Assembly;
         Name = Assembly.GetName().Name;
         Directory = Path.Combine(Paths.ConfigPath, Name);
-        Settings = new Settings();
+
         Translation = new();
 
         if (!System.IO.Directory.Exists(Directory))
@@ -30,29 +29,26 @@ public class Plugin : BaseUnityPlugin, IPlugin
     }
     public virtual void LoadPlugin()
     {
-        if (string.IsNullOrEmpty(Settings.Language))
-            Settings.Language = Core.Settings.Language;
-
-        Settings.Translation = Path.Combine(Directory, string.Format(Environment.PluginTranslationFileTemplate, Settings.Language, Environment.PluginTranslationFileFormat));
-
-        LoadTranslation();
-
-        Settings.Command = Path.Combine(Directory, string.Format(Environment.PluginCommandFileTemplate, Settings.Language, Environment.PluginCommandFileFormat));
         Tanuki.Instance.Commands.RegisterCommands(this);
+        LoadTranslation();
 
         try
         {
             Load();
+            return;
         }
         catch (Exception Exception)
         {
             Logger.LogError(Exception);
             UnloadPlugin(EState.Failure);
         }
+
+        _State = EState.Loaded;
     }
     public virtual void UnloadPlugin(EState PluginState)
     {
         Tanuki.Instance.Commands.DeregisterCommands(this);
+
         try
         {
             Unload();
@@ -62,25 +58,16 @@ public class Plugin : BaseUnityPlugin, IPlugin
             Logger.LogError(Exception);
             UnloadPlugin(EState.Failure);
         }
+
         _State = PluginState;
     }
-    public void ReloadPlugin()
-    {
-        UnloadPlugin(EState.Unloaded);
-        LoadPlugin();
-    }
-    protected virtual void Load()
-    {
-
-    }
-    protected virtual void Unload()
-    {
-
-    }
-    public string Translate(string Key, params object[] Placeholder) => Translation.Translate(Key, Placeholder);
+    protected virtual void Load() { }
+    protected virtual void Unload() { }
     private void LoadTranslation()
     {
-        bool Exists = File.Exists(Settings.Translation);
+        string Path = System.IO.Path.Combine(Directory, string.Format(Environment.PluginTranslationFileTemplate, Core.Tanuki.Instance.Settings.Language, Environment.PluginTranslationFileFormat));
+
+        bool Exists = File.Exists(Path);
         if (!Exists)
         {
             foreach (string File in System.IO.Directory.GetFiles(Directory))
@@ -88,7 +75,7 @@ public class Plugin : BaseUnityPlugin, IPlugin
                 if (!File.Contains(Environment.PluginTranslationFileFormat))
                     continue;
 
-                Settings.Translation = File;
+                Path = File;
                 Exists = true;
                 break;
             }
@@ -98,7 +85,7 @@ public class Plugin : BaseUnityPlugin, IPlugin
 
         if (Exists)
         {
-            using FileStream FileStream = File.OpenRead(Settings.Translation);
+            using FileStream FileStream = File.OpenRead(Path);
             using StreamReader StreamReader = new(FileStream);
 
             string Line;
@@ -117,4 +104,6 @@ public class Plugin : BaseUnityPlugin, IPlugin
             }
         }
     }
+    public string Translate(string Key, params object[] Placeholder) =>
+        Translation.Translate(Key, Placeholder);
 }

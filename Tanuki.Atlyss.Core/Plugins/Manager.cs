@@ -7,11 +7,12 @@ namespace Tanuki.Atlyss.Core.Plugins;
 
 public class Manager
 {
-    internal readonly List<IPlugin> Plugins = [];
+    public readonly List<IPlugin> Plugins = [];
     public void Reload()
     {
         Plugins.ForEach(x => x.UnloadPlugin(EState.Unloaded));
         Plugins.Clear();
+
         BaseUnityPlugin BaseUnityPlugin;
         IPlugin Plugin;
         foreach (PluginInfo PluginInfo in BepInEx.Bootstrap.Chainloader.PluginInfos.Values)
@@ -34,5 +35,10 @@ public class Manager
         Console.WriteLine($"Commands (x{Tanuki.Instance.Commands.Commands.Count}):\n{string.Join(", ", Tanuki.Instance.Commands.Commands.Keys.Select(x => x.GetType().FullName))}");
         Console.WriteLine($"Aliases (x{Tanuki.Instance.Commands.Aliases.Count}):\n{string.Join(", ", Tanuki.Instance.Commands.Aliases.Keys)}");
         */
+    }
+    public void Reload(IPlugin Plugin)
+    {
+        Plugin.UnloadPlugin(EState.Unloaded);
+        Plugin.LoadPlugin();
     }
 }

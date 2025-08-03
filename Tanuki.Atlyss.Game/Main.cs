@@ -8,7 +8,7 @@ public class Main
 {
     private readonly Harmony Harmony;
     private readonly HashSet<Type> Patches;
-    public static Main Instance { get; private set; } = null;
+    public static Main Instance = null;
     private Main()
     {
         Harmony = new("Tanuki.Atlyss.Game");

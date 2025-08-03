@@ -8,12 +8,15 @@ namespace Tanuki.Atlyss.Bootstrap;
 [BepInProcess("ATLYSS.exe")]
 public class Main : Plugin
 {
+    internal static Main Instance;
     public Main() =>
         Core.Tanuki.Initialize();
     internal void Awake()
     {
+        Instance = this;
+
         ConfigEntry<string> ConfigEntry = Config.Bind("Settings", "Language", "default", "Default language");
-        Core.Settings.Language = ConfigEntry.Value;
+        Core.Tanuki.Instance.Settings.Language = ConfigEntry.Value;
     }
     internal void Start() =>
         Core.Tanuki.Instance.Reload();
