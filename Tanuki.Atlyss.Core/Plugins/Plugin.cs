@@ -35,12 +35,12 @@ public class Plugin : BaseUnityPlugin, IPlugin
         try
         {
             Load();
-            return;
         }
         catch (Exception Exception)
         {
             Logger.LogError(Exception);
             UnloadPlugin(EState.Failure);
+            return;
         }
 
         _State = EState.Loaded;
@@ -56,7 +56,8 @@ public class Plugin : BaseUnityPlugin, IPlugin
         catch (Exception Exception)
         {
             Logger.LogError(Exception);
-            UnloadPlugin(EState.Failure);
+            _State = EState.Failure;
+            return;
         }
 
         _State = PluginState;

@@ -80,10 +80,9 @@ public class Help : ICommand
 
             if (PluginEntry.Value.Inactive.Count > 0)
                 StringBuilder.AppendLine(Main.Instance.Translate("Commands.Help.Inactive", string.Join(Main.Instance.Translate("Commands.Help.Inactive.Separator"), PluginEntry.Value.Inactive)));
-            else if (PluginEntry.Value.Active.Count != 0)
-                continue;
 
-            StringBuilder.Append(Main.Instance.Translate("Commands.Help.NoEntries"));
+            if (PluginEntry.Value.Active.Count == 0 && PluginEntry.Value.Inactive.Count == 0)
+                StringBuilder.Append(Main.Instance.Translate("Commands.Help.NoEntries"));
         }
 
         ChatBehaviour._current.New_ChatMessage(StringBuilder.ToString());

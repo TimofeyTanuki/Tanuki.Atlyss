@@ -12,7 +12,7 @@ public class Reload : ICommand
         if (Arguments.Length == 0)
         {
             ChatBehaviour._current.New_ChatMessage(Main.Instance.Translate("Commands.Reload.Full"));
-            Core.Tanuki.Instance.Plugins.Reload();
+            Core.Tanuki.Instance.Plugins.ReloadPlugins();
             return;
         }
 
@@ -39,7 +39,7 @@ public class Reload : ICommand
                     )
                 )
             );
-            Plugins.ForEach(Core.Tanuki.Instance.Plugins.Reload);
+            Plugins.ForEach(Core.Tanuki.Instance.Plugins.ReloadPlugin);
             return;
         }
 

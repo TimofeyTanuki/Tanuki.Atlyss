@@ -31,8 +31,11 @@ public class Tanuki
 
         Game.Events.ChatBehaviour.Send_ChatMessage_Prefix.OnInvoke += Instance.Commands.OnSendMessage;
     }
+    public void Load()
+        => Plugins.LoadPlugins();
     public void Reload()
     {
-        Plugins.Reload();
+        Commands.ClearCommands();
+        Plugins.ReloadPlugins();
     }
 }

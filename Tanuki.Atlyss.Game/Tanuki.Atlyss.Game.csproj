@@ -42,6 +42,7 @@
     </Reference>
     <Reference Include="BepInEx">
       <HintPath>D:\Programs\Steam\steamapps\common\ATLYSS\BepInEx\core\BepInEx.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Mirror">
@@ -50,6 +51,10 @@
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>D:\Programs\Steam\steamapps\common\ATLYSS\ATLYSS_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>D:\Programs\Steam\steamapps\common\ATLYSS\ATLYSS_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
@@ -62,6 +67,9 @@
     <Compile Include="Events\ItemObject\Enable_GroundCheckToVelocityZero_Postfix.cs" />
     <Compile Include="Events\LoadSceneManager\Init_LoadScreenDisable_Postfix.cs" />
     <Compile Include="Events\ScriptablePlayerRace\Init_ParamsCheck_Prefix.cs" />
+    <Compile Include="Events\StatusEntity\Subtract_Health_Prefix.cs" />
+    <Compile Include="Extensions\PlayerEquipment.cs" />
+    <Compile Include="Extensions\PlayerMove.cs" />
     <Compile Include="Fields\GameManager.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

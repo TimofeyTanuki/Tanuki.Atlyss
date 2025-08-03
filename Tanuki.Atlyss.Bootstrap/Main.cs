@@ -19,5 +19,5 @@ public class Main : Plugin
         Core.Tanuki.Instance.Settings.Language = ConfigEntry.Value;
     }
     internal void Start() =>
-        Core.Tanuki.Instance.Reload();
+        Core.Tanuki.Instance.Load();
 }

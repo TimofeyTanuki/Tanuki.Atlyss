@@ -11,7 +11,10 @@ public class Main : Core.Plugins.Plugin
     {
         Instance = this;
         Logger.LogInfo("Awake()");
+    }
 
+    protected override void Load()
+    {
         /*
          * Application of necessary patches.
          * They are applied once.
@@ -20,10 +23,7 @@ public class Main : Core.Plugins.Plugin
             typeof(Game.Events.ChatBehaviour.Send_ChatMessage_Prefix),
             typeof(Game.Events.LoadSceneManager.Init_LoadScreenDisable_Postfix)
         );
-    }
 
-    protected override void Load()
-    {
         Logger.LogInfo("Load()");
 
         /*

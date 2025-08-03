@@ -14,13 +14,21 @@ public class Manager
 {
     public readonly Dictionary<string, ICommand> Aliases = [];
     public readonly Dictionary<ICommand, CommandConfiguration> Commands = [];
+    private readonly Dictionary<Type, ICommand> CommandInstances = [];
+
+    public void ClearCommands()
+    {
+        Aliases.Clear();
+        Commands.Clear();
+    }
     public void RegisterCommands(IPlugin Plugin)
     {
         bool UpdateFile = false;
         Dictionary<string, CommandConfiguration> CommandConfigurations = null;
-        ICommand Command;
 
         Assembly Assembly = Plugin.GetType().Assembly;
+        ICommand Command;
+        string CommandName;
 
         // Обнаружение всех команд в сборке плагина.
         List<ICommand> PluginCommands = [];
@@ -32,7 +40,12 @@ public class Manager
             if (!typeof(ICommand).IsAssignableFrom(Type))
                 continue;
 
-            Command = (ICommand)Activator.CreateInstance(Type);
+            if (!CommandInstances.TryGetValue(Type, out Command))
+            {
+                Command = (ICommand)Activator.CreateInstance(Type);
+                CommandInstances.Add(Type, Command);
+            }
+
             PluginCommands.Add(Command);
         }
 
@@ -60,8 +73,11 @@ public class Manager
 
         // Удаление из конфигурации команд, которые отсутствуют в сборке плагина.
         List<string> PluginUnknownCommands = [];
-        foreach (string CommandName in CommandConfigurations.Keys)
+        IEnumerator<string> CommandNames = CommandConfigurations.Keys.GetEnumerator();
+        while (CommandNames.MoveNext())
         {
+            CommandName = CommandNames.Current;
+
             if (PluginCommands.Any(x => x.GetType().Name == CommandName))
                 continue;
 
@@ -73,10 +89,11 @@ public class Manager
         // Дополнение конфигурации командами из сборки плагина.
         if (CommandConfigurations.Count != PluginCommands.Count)
         {
-            string CommandName;
-            foreach (ICommand CommandX in PluginCommands)
+            IEnumerator<ICommand> Commands = PluginCommands.GetEnumerator();
+            while (Commands.MoveNext())
             {
-                CommandName = CommandX.GetType().Name;
+                Command = Commands.Current;
+                CommandName = Command.GetType().Name;
                 if (CommandConfigurations.ContainsKey(CommandName))
                     continue;
 
@@ -88,6 +105,7 @@ public class Manager
                     }
                 );
             }
+
             UpdateFile = true;
         }
 
@@ -106,7 +124,6 @@ public class Manager
                 continue;
             }
 
-            string CommandName;
             for (int i = CommandConfiguration.Value.Names.Count - 1; i >= 0; i--)
             {
                 CommandName = CommandConfiguration.Value.Names[i].ToLower();
@@ -130,6 +147,9 @@ public class Manager
     }
     public void DeregisterCommands(IPlugin Plugin)
     {
+        if (Commands.Count == 0)
+            return;
+
         Assembly Assembly = Plugin.GetType().Assembly;
 
         // Удаление зарегистрированных псевдонимов команд
