@@ -22,18 +22,6 @@ public class Main : Core.Plugins.Plugin
         );
     }
 
-    private void Send_ChatMessage_Prefix_OnInvoke(string Message, ref bool ShouldAllow)
-    {
-        Logger.LogInfo("Send_ChatMessage_Prefix_OnInvoke");
-
-        // Cancel sending a message if it contains a specific word.
-        if (Message.Contains("example"))
-            ShouldAllow = false;
-
-        // Use of applied patches.
-        Game.Events.ChatBehaviour.Send_ChatMessage_Prefix.OnInvoke += Send_ChatMessage_Prefix_OnInvoke;
-    }
-
     protected override void Load()
     {
         Logger.LogInfo("Load()");
@@ -42,12 +30,33 @@ public class Main : Core.Plugins.Plugin
          * Translations file path:
          * BepInEx/config/{Plugin directory}/{Current framework language}.translation.properties
          */
-        Logger.LogInfo($"Translation test: {Translate("Example")}");
+        Logger.LogInfo($"Translation: {Translate("Example")}");
+
+        // Subscribe to events of used patches.
+        Game.Events.ChatBehaviour.Send_ChatMessage_Prefix.OnInvoke += Send_ChatMessage_Prefix_OnInvoke;
+        Game.Events.LoadSceneManager.Init_LoadScreenDisable_Postfix.OnInvoke += Init_LoadScreenDisable_Postfix_OnInvoke;
     }
     protected override void Unload()
     {
         Logger.LogInfo("Unload()");
 
+        /*
+         * Unsubscribe from events.
+         * This is necessary for the plugin to work correctly after reloading.
+         * Command: /reload [plugin]
+         */
         Game.Events.ChatBehaviour.Send_ChatMessage_Prefix.OnInvoke -= Send_ChatMessage_Prefix_OnInvoke;
+        Game.Events.LoadSceneManager.Init_LoadScreenDisable_Postfix.OnInvoke -= Init_LoadScreenDisable_Postfix_OnInvoke;
     }
+
+    private void Send_ChatMessage_Prefix_OnInvoke(string Message, ref bool ShouldAllow)
+    {
+        Logger.LogInfo("Send_ChatMessage_Prefix_OnInvoke");
+
+        // Cancel sending a message if it contains a specific word.
+        if (Message.Contains("example"))
+            ShouldAllow = false;
+    }
+    private void Init_LoadScreenDisable_Postfix_OnInvoke() =>
+        Logger.LogInfo("Init_LoadScreenDisable_Postfix_OnInvoke");
 }
