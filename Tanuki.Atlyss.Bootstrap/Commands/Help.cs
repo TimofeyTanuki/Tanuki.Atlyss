@@ -49,11 +49,11 @@ public class Help : ICommand
             if (PluginEntry.Value.Active.Count == 0 && PluginEntry.Value.Inactive.Count == 0)
                 continue;
 
-            StringBuilder.AppendLine(Main.Instance.Translate("Commands.Help.Header", PluginEntry.Value.Name));
+            StringBuilder.Append(Main.Instance.Translate("Commands.Help.Header", PluginEntry.Value.Name));
 
             if (PluginEntry.Value.Active.Count > 0)
                 foreach (CommandConfiguration Active in PluginEntry.Value.Active.OrderBy(x => x.Names[0]))
-                    StringBuilder.AppendLine(
+                    StringBuilder.Append(
                         Main.Instance.Translate(
                             "Commands.Help.Active.Entry",
                             Active.Names[0],
@@ -81,7 +81,7 @@ public class Help : ICommand
                     );
 
             if (PluginEntry.Value.Inactive.Count > 0)
-                StringBuilder.AppendLine(Main.Instance.Translate("Commands.Help.Inactive", string.Join(Main.Instance.Translate("Commands.Help.Inactive.Separator"), PluginEntry.Value.Inactive)));
+                StringBuilder.Append(Main.Instance.Translate("Commands.Help.Inactive", string.Join(Main.Instance.Translate("Commands.Help.Inactive.Separator"), PluginEntry.Value.Inactive)));
         }
 
         ChatBehaviour._current.New_ChatMessage(StringBuilder.ToString());
