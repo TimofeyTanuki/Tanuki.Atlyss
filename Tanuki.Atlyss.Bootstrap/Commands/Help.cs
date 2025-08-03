@@ -29,7 +29,6 @@ public class Help : ICommand
                     continue;
 
                 Groups.Add(Plugin.GetType().Assembly.GetName().Name, new(Plugin.Name));
-                break;
             }
 
             if (Groups.Count == 0)
@@ -47,6 +46,9 @@ public class Help : ICommand
         StringBuilder StringBuilder = new();
         foreach (KeyValuePair<string, PluginEntry> PluginEntry in Groups)
         {
+            if (PluginEntry.Value.Active.Count == 0 && PluginEntry.Value.Inactive.Count == 0)
+                continue;
+
             StringBuilder.AppendLine(Main.Instance.Translate("Commands.Help.Header", PluginEntry.Value.Name));
 
             if (PluginEntry.Value.Active.Count > 0)
@@ -59,30 +61,27 @@ public class Help : ICommand
                                 string.Empty
                                 :
                                 Main.Instance.Translate("Commands.Help.Active.Entry.Syntax", Active.Syntax),
-                            string.IsNullOrEmpty(Active.Help) ?
-                                string.Empty
-                                :
-                                Main.Instance.Translate("Commands.Help.Active.Entry.Help", Active.Help),
                             Active.Names.Count > 1 ?
                                 Main.Instance.Translate(
                                     "Commands.Help.Active.Entry.Aliases",
                                     string.Join(
-                                        Main.Instance.Translate("Commands.Help.Active.Entry.Alias.Separator"),
+                                        Main.Instance.Translate("Commands.Help.Active.Entry.Aliases.Separator"),
                                         Active.Names
                                             .Skip(1)
-                                            .Select(x => Main.Instance.Translate("Commands.Help.Active.Entry.Alias", x))
+                                            .Select(x => Main.Instance.Translate("Commands.Help.Active.Entry.Aliases.Item", x))
                                     )
                                 )
                                 :
+                                string.Empty,
+                            string.IsNullOrEmpty(Active.Help) ?
                                 string.Empty
+                                :
+                                Main.Instance.Translate("Commands.Help.Active.Entry.Help", Active.Help)
                         )
                     );
 
             if (PluginEntry.Value.Inactive.Count > 0)
                 StringBuilder.AppendLine(Main.Instance.Translate("Commands.Help.Inactive", string.Join(Main.Instance.Translate("Commands.Help.Inactive.Separator"), PluginEntry.Value.Inactive)));
-
-            if (PluginEntry.Value.Active.Count == 0 && PluginEntry.Value.Inactive.Count == 0)
-                StringBuilder.Append(Main.Instance.Translate("Commands.Help.NoEntries"));
         }
 
         ChatBehaviour._current.New_ChatMessage(StringBuilder.ToString());
