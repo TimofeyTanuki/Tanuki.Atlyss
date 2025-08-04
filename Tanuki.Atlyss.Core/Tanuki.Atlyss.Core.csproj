@@ -26,7 +26,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>D:\Programs\Steam\steamapps\common\ATLYSS\BepInEx\plugins\</OutputPath>
+    <OutputPath>D:\Programs\Steam\steamapps\common\ATLYSS\BepInEx\plugins\Tanuki.Atlyss\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -46,6 +46,16 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Tanuki.Atlyss.API, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>D:\Programs\Steam\steamapps\common\ATLYSS\BepInEx\plugins\Tanuki.Atlyss\Tanuki.Atlyss.API.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Tanuki.Atlyss.Game, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>D:\Programs\Steam\steamapps\common\ATLYSS\BepInEx\plugins\Tanuki.Atlyss\Tanuki.Atlyss.Game.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>D:\Programs\Steam\steamapps\common\ATLYSS\ATLYSS_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
@@ -64,18 +74,6 @@
     <Compile Include="Plugins\Plugin.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Tanuki.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Tanuki.Atlyss.API\Tanuki.Atlyss.API.csproj">
-      <Project>{23eaa990-ee53-4712-b72e-375fe536bf91}</Project>
-      <Name>Tanuki.Atlyss.API</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Tanuki.Atlyss.Game\Tanuki.Atlyss.Game.csproj">
-      <Project>{195c12bf-79c2-4476-8340-d2198d1ffc95}</Project>
-      <Name>Tanuki.Atlyss.Game</Name>
-      <Private>False</Private>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
