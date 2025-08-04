@@ -35,7 +35,7 @@ public class Tanuki
         => Plugins.LoadPlugins();
     public void Reload()
     {
-        Commands.ClearCommands();
+        Commands.RemoveAllCommands();
         Plugins.ReloadPlugins();
     }
 }

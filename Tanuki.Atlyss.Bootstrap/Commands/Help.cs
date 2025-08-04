@@ -102,7 +102,6 @@ public class Help : ICommand
                 Entry.Inactive.Add(KeyValuePair.Key.GetType().Name);
                 continue;
             }
-
             Entry.Active.Add(KeyValuePair.Value);
         }
     }

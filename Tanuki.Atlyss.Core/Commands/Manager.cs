@@ -14,13 +14,7 @@ public class Manager
 {
     public readonly Dictionary<string, ICommand> Aliases = [];
     public readonly Dictionary<ICommand, CommandConfiguration> Commands = [];
-    private readonly Dictionary<Type, ICommand> CommandInstances = [];
 
-    public void ClearCommands()
-    {
-        Aliases.Clear();
-        Commands.Clear();
-    }
     public void RegisterCommands(IPlugin Plugin)
     {
         bool UpdateFile = false;
@@ -40,13 +34,7 @@ public class Manager
             if (!typeof(ICommand).IsAssignableFrom(Type))
                 continue;
 
-            if (!CommandInstances.TryGetValue(Type, out Command))
-            {
-                Command = (ICommand)Activator.CreateInstance(Type);
-                CommandInstances.Add(Type, Command);
-            }
-
-            PluginCommands.Add(Command);
+            PluginCommands.Add((ICommand)Activator.CreateInstance(Type));
         }
 
         string Directory = System.IO.Path.Combine(BepInEx.Paths.ConfigPath, Assembly.GetName().Name);
@@ -147,34 +135,28 @@ public class Manager
     }
     public void DeregisterCommands(IPlugin Plugin)
     {
-        if (Commands.Count == 0)
+        Assembly Assembly = Plugin.GetType().Assembly;
+        ICommand[] Commands = [.. this.Commands.Keys.Where(x => x.GetType().Assembly == Assembly)];
+        for (ushort i = 0; i < Commands.Length; i++)
+            RemoveCommand(Commands[i]);
+    }
+    private void RemoveCommand(ICommand Command)
+    {
+        if (!Commands.TryGetValue(Command, out CommandConfiguration CommandConfiguration))
             return;
 
-        Assembly Assembly = Plugin.GetType().Assembly;
+        CommandConfiguration.Names?.ForEach(x => Aliases.Remove(x));
+        Type Type = Command.GetType();
+        if (typeof(IDisposable).IsAssignableFrom(Type))
+            ((IDisposable)Command).Dispose();
 
-        // Удаление зарегистрированных псевдонимов команд
-        List<string> RemovedAliases = [];
-        foreach (KeyValuePair<string, ICommand> Alias in Aliases)
-        {
-            if (Alias.Value.GetType().Assembly != Assembly)
-                continue;
-
-            RemovedAliases.Add(Alias.Key);
-        }
-        RemovedAliases.ForEach(x => Aliases.Remove(x));
-
-        // Удаление команд
-        List<ICommand> RemovedCommands = [];
-        foreach (ICommand Command in Commands.Keys)
-        {
-            if (Command.GetType().Assembly != Assembly)
-                continue;
-
-            RemovedCommands.Add(Command);
-        }
-        RemovedCommands.ForEach(x => Commands.Remove(x));
+        Commands.Remove(Command);
     }
-
+    public void RemoveAllCommands()
+    {
+        foreach (ICommand Command in Commands.Keys)
+            RemoveCommand(Command);
+    }
     private static readonly HashSet<char> Quotes = ['"', '\'', '`'];
     public void OnSendMessage(string Message, ref bool ShouldAllow)
     {
