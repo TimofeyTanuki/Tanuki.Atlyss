@@ -9,5 +9,5 @@ public static class OnStopClient_Prefix
     public delegate void EventHandler();
     public static event EventHandler OnInvoke;
 
-    public static void Prefix() => OnInvoke?.Invoke();
+    internal static void Prefix() => OnInvoke?.Invoke();
 }
