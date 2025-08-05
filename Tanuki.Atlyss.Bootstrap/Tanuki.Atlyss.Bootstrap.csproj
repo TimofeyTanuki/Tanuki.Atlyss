@@ -73,7 +73,9 @@
   <ItemGroup>
     <Compile Include="Commands\Help.cs" />
     <Compile Include="Commands\Reload.cs" />
+    <Compile Include="Configuration.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="Models\Configuration\Settings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

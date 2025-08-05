@@ -1,5 +1,4 @@
 ﻿using BepInEx;
-using BepInEx.Configuration;
 using Tanuki.Atlyss.Core.Plugins;
 
 namespace Tanuki.Atlyss.Bootstrap;
@@ -9,15 +8,39 @@ namespace Tanuki.Atlyss.Bootstrap;
 public class Main : Plugin
 {
     internal static Main Instance;
-    public Main() =>
+    private bool ShouldReloadConfiguration = false;
+    public Main()
+    {
+        Configuration.Initialize();
         Core.Tanuki.Initialize();
+        Core.Tanuki.Instance.Plugins.OnBeforePluginsReload += BeforePluginsReload;
+    }
     internal void Awake()
     {
         Instance = this;
-
-        ConfigEntry<string> ConfigEntry = Config.Bind("Settings", "Language", "default", "Default language");
-        Core.Tanuki.Instance.Settings.Language = ConfigEntry.Value;
+        UpdateConfiguration();
     }
     internal void Start() =>
         Core.Tanuki.Instance.Load();
+    private void BeforePluginsReload()
+    {
+        Config.Reload();
+        UpdateConfiguration();
+
+        ShouldReloadConfiguration = false;
+    }
+    private void UpdateConfiguration()
+    {
+        Configuration.Instance.Load(Config);
+        Core.Tanuki.Instance.Settings.Language = Configuration.Instance.Settings.Language.Value;
+    }
+    public override void LoadPlugin()
+    {
+        if (ShouldReloadConfiguration)
+            BeforePluginsReload();
+
+        base.LoadPlugin();
+    }
+    protected override void Unload() =>
+        ShouldReloadConfiguration = true;
 }
