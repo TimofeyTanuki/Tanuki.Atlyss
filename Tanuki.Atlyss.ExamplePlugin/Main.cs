@@ -4,6 +4,7 @@ using BepInEx.Logging;
 namespace Tanuki.Atlyss.ExamplePlugin;
 
 [BepInPlugin("653a2c21-7d84-4fbb-94bd-c30fac5a45e3", "Tanuki.Atlyss.ExamplePlugin", "1.0.0")]
+[BepInDependency("9c00d52e-10b8-413f-9ee4-bfde81762442", BepInDependency.DependencyFlags.HardDependency)]
 [BepInProcess("ATLYSS.exe")]
 public class Main : Core.Plugins.Plugin
 {
