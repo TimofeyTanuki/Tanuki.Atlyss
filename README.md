@@ -39,7 +39,10 @@ You should use the full names of languages and only lowercase letters. For examp
 ### Other
 Events, patches, fields, and other elements have been moved to the [Tanuki.Atlyss.Game](../../tree/main/Tanuki.Atlyss.Game) project.<br>
 ## Getting Started
+### Quick start
 1. Install [BepInEx](https://docs.bepinex.dev/articles/user_guide/installation/index.html). It is recommended to use the [preconfigured package](https://thunderstore.io/c/atlyss/p/BepInEx/BepInExPack/).
 2. Install the [Tanuki.Atlyss](../../releases) files.
 
 This framework is available on [Thunderstore](https://thunderstore.io/c/atlyss/p/Tanuki/Tanuki_Atlyss/).
+## Anything else?
+You can contact me on my [Discord](https://discord.gg/b9mjYqHxTM) server.
