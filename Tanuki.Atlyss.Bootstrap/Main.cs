@@ -17,6 +17,8 @@ public class Main : Plugin
     }
     internal void Awake()
     {
+        Logger.LogInfo("Tanuki.Atlyss by Timofey Tanuki / tanu.su");
+
         Instance = this;
         UpdateConfiguration();
     }
