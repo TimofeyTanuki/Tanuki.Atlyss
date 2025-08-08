@@ -16,5 +16,5 @@ internal class Configuration
     public Settings Settings;
 
     public void Load(ConfigFile ConfigFile) =>
-        Settings = new Settings(ConfigFile);
+        Settings = new Settings(ref ConfigFile);
 }
