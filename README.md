@@ -20,7 +20,7 @@ Commands support arguments that are passed to them as an array of strings.<br>
 > ```
 > If there are no arguments, an empty array will be passed.
 
-Basic bootloader commands:
+Basic bootstrap commands:
 - `/help [plugin names separated by spaces]` - Display a list of plugin commands.
 - `/reload [plugin names separated by spaces]` - Reload the specified plugins.
 ### Translation
@@ -32,7 +32,7 @@ Commands are translated in a similar way. For commands, json files with aliases,
 `BepInEx/config/{Plugin assembly name}/default.command.properties` - Default command file.<br>
 `BepInEx/config/{Plugin assembly name}/russian.command.properties` - Russian command file.
 
-To change the language of all plugins, you need to replace it in the bootloader configuration.<br>
+To change the language of all plugins, you need to replace it in the bootstrap configuration.<br>
 `BepInEx/config/9c00d52e-10b8-413f-9ee4-bfde81762442.cfg`<br>
 The specified language will be used in all plugins where it is available, otherwise the first one encountered will be used.<br>
 You should use the full names of languages and only lowercase letters. For example: `russian`, `english`, `spanish`.
