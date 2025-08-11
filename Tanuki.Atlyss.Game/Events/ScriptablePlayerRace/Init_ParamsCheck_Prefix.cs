@@ -8,7 +8,8 @@ public static class Init_ParamsCheck_Prefix
     public delegate void EventHandler(PlayerAppearance_Profile PlayerAppearance, ref bool ShouldAllow);
     public static event EventHandler OnInvoke;
 
-    internal static bool Prefix(PlayerAppearance_Profile _aP, ref PlayerAppearance_Profile __result)
+#pragma warning disable IDE0051
+    private static bool Prefix(PlayerAppearance_Profile _aP, ref PlayerAppearance_Profile __result)
     {
         bool ShouldAllow = false;
         OnInvoke?.Invoke(_aP, ref ShouldAllow);
@@ -18,4 +19,5 @@ public static class Init_ParamsCheck_Prefix
 
         return ShouldAllow;
     }
+#pragma warning restore IDE0051
 }

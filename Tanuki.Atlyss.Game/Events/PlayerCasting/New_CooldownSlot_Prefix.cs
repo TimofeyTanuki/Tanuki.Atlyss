@@ -8,10 +8,12 @@ public static class New_CooldownSlot_Prefix
     public delegate void EventHandler(global::PlayerCasting PlayerCasting, ref ScriptableSkill ScriptableSkill, ref bool ShouldAllow);
     public static event EventHandler OnInvoke;
 
-    internal static bool Prefix(global::PlayerCasting __instance, ref ScriptableSkill _setSkill)
+#pragma warning disable IDE0051
+    private static bool Prefix(global::PlayerCasting __instance, ref ScriptableSkill _setSkill)
     {
         bool ShouldAllow = true;
         OnInvoke?.Invoke(__instance, ref _setSkill, ref ShouldAllow);
         return ShouldAllow;
     }
+#pragma warning restore IDE0051
 }

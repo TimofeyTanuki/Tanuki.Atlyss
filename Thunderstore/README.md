@@ -45,4 +45,4 @@ Events, patches, fields, and other elements have been moved to the [Tanuki.Atlys
 
 This framework is available on [Thunderstore](https://thunderstore.io/c/atlyss/p/Tanuki/Tanuki_Atlyss/).
 ## Anything else?
-You can contact me on my [Discord](https://discord.gg/b9mjYqHxTM) server.
+[Contacts](https://tanu.su/)

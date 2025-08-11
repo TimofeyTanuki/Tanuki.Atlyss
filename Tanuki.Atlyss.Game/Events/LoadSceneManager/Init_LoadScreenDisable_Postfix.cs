@@ -8,5 +8,7 @@ public static class Init_LoadScreenDisable_Postfix
     public delegate void EventHandler();
     public static event EventHandler OnInvoke;
 
-    internal static void Postfix() => OnInvoke?.Invoke();
+#pragma warning disable IDE0051
+    private static void Postfix() => OnInvoke?.Invoke();
+#pragma warning restore IDE0051
 }

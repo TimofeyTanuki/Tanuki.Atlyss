@@ -9,5 +9,7 @@ public static class OnStopClient_Prefix
     public delegate void EventHandler();
     public static event EventHandler OnInvoke;
 
-    internal static void Prefix() => OnInvoke?.Invoke();
+#pragma warning disable IDE0051
+    private static void Prefix() => OnInvoke?.Invoke();
+#pragma warning restore IDE0051
 }

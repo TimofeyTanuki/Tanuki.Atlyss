@@ -9,7 +9,8 @@ public static class Send_ChatMessage_Prefix
     public delegate void EventHandler(string Message, ref bool ShouldAllow);
     public static event EventHandler OnInvoke;
 
-    internal static bool Prefix(string _message)
+#pragma warning disable IDE0051
+    private static bool Prefix(string _message)
     {
         if (string.IsNullOrEmpty(_message))
             return true;
@@ -25,4 +26,5 @@ public static class Send_ChatMessage_Prefix
 
         return false;
     }
+#pragma warning restore IDE0051
 }

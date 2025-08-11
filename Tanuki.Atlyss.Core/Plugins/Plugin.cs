@@ -1,7 +1,6 @@
 ﻿using BepInEx;
 using System;
 using System.IO;
-using System.Reflection;
 using Tanuki.Atlyss.API;
 using Tanuki.Atlyss.API.Collections;
 using Tanuki.Atlyss.API.Plugins;
@@ -13,13 +12,11 @@ public class Plugin : BaseUnityPlugin, IPlugin
     public string Name { get; private set; }
     private EState _State = EState.Unloaded;
     public EState State => _State;
-    protected Assembly Assembly;
     protected readonly string Directory;
     public Translation Translation;
     public Plugin()
     {
-        Assembly = GetType().Assembly;
-        Name = Assembly.GetName().Name;
+        Name = GetType().Assembly.GetName().Name;
         Directory = Path.Combine(Paths.ConfigPath, Name);
 
         Translation = new();
