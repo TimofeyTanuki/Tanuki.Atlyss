@@ -5,15 +5,17 @@ namespace Tanuki.Atlyss.ExamplePlugin.Commands;
 internal class DisposableExample : API.Commands.ICommand, IDisposable
 {
     private bool Subscribed = false;
-    public void Execute(string[] Arguments)
+    public bool Execute(string[] Arguments)
     {
         if (Subscribed)
-            return;
+            return false;
 
         Player._mainPlayer._pVisual.Cmd_VanitySparkleEffect();
 
         Subscribed = true;
         Game.Events.LoadSceneManager.Init_LoadScreenDisable_Postfix.OnInvoke += Init_LoadScreenDisable_Postfix_OnInvoke;
+
+        return false;
     }
     private void Init_LoadScreenDisable_Postfix_OnInvoke() =>
         Main.Instance.ManualLogSource.LogInfo("Init_LoadScreenDisable_Postfix_OnInvoke();");

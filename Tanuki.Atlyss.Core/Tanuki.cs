@@ -1,9 +1,12 @@
-﻿namespace Tanuki.Atlyss.Core;
+﻿using BepInEx.Logging;
+
+namespace Tanuki.Atlyss.Core;
 
 public class Tanuki
 {
     public static Tanuki Instance;
 
+    internal readonly ManualLogSource ManualLogSource = Logger.CreateLogSource("Tanuki.Atlyss.Core");
     public Settings Settings = new();
     public Commands.Manager Commands = new();
     public Plugins.Manager Plugins = new();

@@ -15,7 +15,7 @@ public class Help : ICommand
         public List<CommandConfiguration> Active = [];
         public SortedSet<string> Inactive = [];
     }
-    public void Execute(string[] Arguments)
+    public bool Execute(string[] Arguments)
     {
         SortedDictionary<string, PluginEntry> Groups = [];
 
@@ -34,7 +34,7 @@ public class Help : ICommand
             if (Groups.Count == 0)
             {
                 ChatBehaviour._current.New_ChatMessage(Main.Instance.Translate("Commands.Help.PluginsNotFound"));
-                return;
+                return false;
             }
         }
         else
@@ -85,6 +85,8 @@ public class Help : ICommand
         }
 
         ChatBehaviour._current.New_ChatMessage(StringBuilder.ToString());
+
+        return false;
     }
     private void CollectCommands(ref SortedDictionary<string, PluginEntry> Groups)
     {

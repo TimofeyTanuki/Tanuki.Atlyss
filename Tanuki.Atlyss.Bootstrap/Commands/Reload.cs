@@ -7,13 +7,13 @@ namespace Tanuki.Atlyss.Bootstrap.Commands;
 
 public class Reload : ICommand
 {
-    public void Execute(string[] Arguments)
+    public bool Execute(string[] Arguments)
     {
         if (Arguments.Length == 0)
         {
             ChatBehaviour._current.New_ChatMessage(Main.Instance.Translate("Commands.Reload.Full"));
             Core.Tanuki.Instance.Plugins.ReloadPlugins();
-            return;
+            return false;
         }
 
         Arguments = [.. Arguments.Select(x => x.ToLower())];
@@ -40,9 +40,11 @@ public class Reload : ICommand
                 )
             );
             Plugins.ForEach(Core.Tanuki.Instance.Plugins.ReloadPlugin);
-            return;
+            return false;
         }
 
         ChatBehaviour._current.New_ChatMessage(Main.Instance.Translate("Commands.Reload.PluginsNotFound"));
+
+        return false;
     }
 }

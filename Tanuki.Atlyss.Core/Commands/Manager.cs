@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using BepInEx.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -169,8 +170,6 @@ public class Manager
         if (!Aliases.TryGetValue(CommandName, out ICommand Command))
             return;
 
-        ShouldAllow = false;
-
         List<string> Arguments = [];
         StringBuilder Argument = new();
         char? ArgumentOpenQuote = null;
@@ -237,6 +236,15 @@ public class Manager
         if (Argument.Length > 0)
             Arguments.Add(Argument.ToString());
 
-        Command.Execute([.. Arguments]);
+        ShouldAllow = false;
+
+        try
+        {
+            ShouldAllow = Command.Execute([.. Arguments]);
+        }
+        catch (Exception Exception)
+        {
+            Tanuki.Instance.ManualLogSource.LogError(Exception);
+        }
     }
 }
