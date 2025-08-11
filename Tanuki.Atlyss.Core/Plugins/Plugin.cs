@@ -66,7 +66,7 @@ public class Plugin : BaseUnityPlugin, IPlugin
     protected virtual void Unload() { }
     private void LoadTranslation()
     {
-        string Path = System.IO.Path.Combine(Directory, string.Format(Environment.PluginTranslationFileTemplate, Core.Tanuki.Instance.Settings.Language, Environment.PluginTranslationFileFormat));
+        string Path = System.IO.Path.Combine(Directory, string.Format(Environment.PluginTranslationFileTemplate, Tanuki.Instance.Settings.Language, Environment.PluginTranslationFileFormat));
 
         bool Exists = File.Exists(Path);
         if (!Exists)

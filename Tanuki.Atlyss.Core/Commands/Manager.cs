@@ -15,16 +15,18 @@ public class Manager
     public readonly Dictionary<string, ICommand> Aliases = [];
     public readonly Dictionary<ICommand, CommandConfiguration> Commands = [];
 
+    /*
+     * Perhaps this should be optimized, but I don't want to deal with it.
+     * It is used only once during loading, so it does not impact overall performance.
+     */
     public void RegisterCommands(IPlugin Plugin)
     {
         bool UpdateFile = false;
         Dictionary<string, CommandConfiguration> CommandConfigurations = null;
 
         Assembly Assembly = Plugin.GetType().Assembly;
-        ICommand Command;
-        string CommandName;
 
-        // Обнаружение всех команд в сборке плагина.
+        // Search for commands in the assembly
         List<ICommand> PluginCommands = [];
         foreach (Type Type in Assembly.GetTypes())
         {
@@ -59,13 +61,10 @@ public class Manager
 
         CommandConfigurations ??= [];
 
-        // Удаление из конфигурации команд, которые отсутствуют в сборке плагина.
+        // Removing commands that are not present in the assembly from the configuration.
         List<string> PluginUnknownCommands = [];
-        IEnumerator<string> CommandNames = CommandConfigurations.Keys.GetEnumerator();
-        while (CommandNames.MoveNext())
+        foreach (string CommandName in CommandConfigurations.Keys)
         {
-            CommandName = CommandNames.Current;
-
             if (PluginCommands.Any(x => x.GetType().Name == CommandName))
                 continue;
 
@@ -74,14 +73,12 @@ public class Manager
         }
         PluginUnknownCommands.ForEach(x => CommandConfigurations.Remove(x));
 
-        // Дополнение конфигурации командами из сборки плагина.
+        // Add to the configuration with commands from the assembly.
         if (CommandConfigurations.Count != PluginCommands.Count)
         {
-            IEnumerator<ICommand> Commands = PluginCommands.GetEnumerator();
-            while (Commands.MoveNext())
+            foreach (ICommand Command in PluginCommands)
             {
-                Command = Commands.Current;
-                CommandName = Command.GetType().Name;
+                string CommandName = Command.GetType().Name;
                 if (CommandConfigurations.ContainsKey(CommandName))
                     continue;
 
@@ -97,10 +94,10 @@ public class Manager
             UpdateFile = true;
         }
 
-        // Валидация конфигурации.
+        // Validation of configuration, filling in command aliases.
         foreach (KeyValuePair<string, CommandConfiguration> CommandConfiguration in CommandConfigurations)
         {
-            Command = PluginCommands.Where(x => x.GetType().Name == CommandConfiguration.Key).First();
+            ICommand Command = PluginCommands.Where(x => x.GetType().Name == CommandConfiguration.Key).First();
             Commands[Command] = CommandConfiguration.Value;
 
             if (CommandConfiguration.Value.Names is null)
@@ -114,7 +111,7 @@ public class Manager
 
             for (int i = CommandConfiguration.Value.Names.Count - 1; i >= 0; i--)
             {
-                CommandName = CommandConfiguration.Value.Names[i].ToLower();
+                string CommandName = CommandConfiguration.Value.Names[i].ToLower();
 
                 if (CommandName.Length == 0 || CommandName.Contains(' ') || Aliases.ContainsKey(CommandName))
                 {
