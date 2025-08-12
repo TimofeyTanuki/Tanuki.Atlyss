@@ -11,7 +11,7 @@ public static class Init_ParamsCheck_Prefix
 #pragma warning disable IDE0051
     private static bool Prefix(PlayerAppearance_Profile _aP, ref PlayerAppearance_Profile __result)
     {
-        bool ShouldAllow = false;
+        bool ShouldAllow = true;
         OnInvoke?.Invoke(_aP, ref ShouldAllow);
 
         if (!ShouldAllow)
