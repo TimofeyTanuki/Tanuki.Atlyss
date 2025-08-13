@@ -72,7 +72,7 @@
     <Compile Include="Events\PlayerCasting\New_CooldownSlot_Prefix.cs" />
     <Compile Include="Events\Player\OnStartAuthority_Postfix.cs" />
     <Compile Include="Events\ScriptablePlayerRace\Init_ParamsCheck_Prefix.cs" />
-    <Compile Include="Events\StatusEntity\Subtract_Health_Prefix.cs" />
+    <Compile Include="Events\StatusEntity\Take_Damage_Prefix.cs" />
     <Compile Include="Extensions\PlayerEquipment.cs" />
     <Compile Include="Extensions\PlayerMove.cs" />
     <Compile Include="Fields\GameManager.cs" />
