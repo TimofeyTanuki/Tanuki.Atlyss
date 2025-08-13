@@ -69,6 +69,7 @@
     <Compile Include="Events\LoadSceneManager\Init_LoadScreenDisable_Postfix.cs" />
     <Compile Include="Events\AtlyssNetworkManager\OnStartClient_Postfix.cs" />
     <Compile Include="Events\AtlyssNetworkManager\OnStopClient_Prefix.cs" />
+    <Compile Include="Events\PlayerCasting\Cmd_InitSkill_Postfix.cs" />
     <Compile Include="Events\PlayerCasting\New_CooldownSlot_Prefix.cs" />
     <Compile Include="Events\Player\OnStartAuthority_Postfix.cs" />
     <Compile Include="Events\ScriptablePlayerRace\Init_ParamsCheck_Prefix.cs" />
