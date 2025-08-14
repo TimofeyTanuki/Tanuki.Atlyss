@@ -1,6 +1,6 @@
 {
     "name": "Tanuki_Atlyss",
-    "version_number": "2.0.6",
+    "version_number": "2.0.7",
     "website_url": "https://github.com/TimofeyTanuki/Tanuki.Atlyss",
     "description": "A plugin framework based on BepInEx that simplifies the creation of plugins for the game Atlyss. Supports localization, commands, and much more.",
     "dependencies": [
