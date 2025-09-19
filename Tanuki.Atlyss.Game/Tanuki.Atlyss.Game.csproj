@@ -63,6 +63,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Events\ChatBehaviour\OnServerMessage_Postfix.cs" />
     <Compile Include="Events\ChatBehaviour\Send_ChatMessage_Prefix.cs" />
     <Compile Include="Events\GameManager\Cache_ScriptableAssets_Postfix.cs" />
     <Compile Include="Events\ItemObject\Enable_GroundCheckToVelocityZero_Postfix.cs" />
@@ -72,6 +73,8 @@
     <Compile Include="Events\PlayerCasting\Cmd_InitSkill_Postfix.cs" />
     <Compile Include="Events\PlayerCasting\New_CooldownSlot_Prefix.cs" />
     <Compile Include="Events\PlayerMove\Cmd_InitSkill_Postfix.cs" />
+    <Compile Include="Events\Player\DeserializeSyncVars_Postfix.cs" />
+    <Compile Include="Events\Player\Awake_Postfix.cs" />
     <Compile Include="Events\Player\OnStartAuthority_Postfix.cs" />
     <Compile Include="Events\ScriptablePlayerRace\Init_ParamsCheck_Prefix.cs" />
     <Compile Include="Events\StatusEntity\Take_Damage_Prefix.cs" />
