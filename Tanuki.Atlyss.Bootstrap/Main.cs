@@ -3,7 +3,7 @@ using Tanuki.Atlyss.Core.Plugins;
 
 namespace Tanuki.Atlyss.Bootstrap;
 
-[BepInPlugin("9c00d52e-10b8-413f-9ee4-bfde81762442", "Tanuki.Atlyss.Bootstrap", "2.0.10")]
+[BepInPlugin("9c00d52e-10b8-413f-9ee4-bfde81762442", "Tanuki.Atlyss.Bootstrap", "2.0.11")]
 public class Main : Plugin
 {
     internal static Main Instance;

@@ -72,6 +72,7 @@
     <Compile Include="Events\AtlyssNetworkManager\OnStopClient_Prefix.cs" />
     <Compile Include="Events\PlayerCasting\Cmd_InitSkill_Postfix.cs" />
     <Compile Include="Events\PlayerCasting\New_CooldownSlot_Prefix.cs" />
+    <Compile Include="Events\PlayerMove\Client_LocalPlayerControl_Prefix.cs" />
     <Compile Include="Events\PlayerMove\Cmd_InitSkill_Postfix.cs" />
     <Compile Include="Events\PlayerVisual\Apply_NetworkedCharacterDisplay_Prefix.cs" />
     <Compile Include="Events\Player\DeserializeSyncVars_Postfix.cs" />
