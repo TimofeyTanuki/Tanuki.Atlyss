@@ -20,12 +20,17 @@ public class Reload : ICommand
 
         List<IPlugin> Plugins = [];
 
+        string PluginName;
         foreach (IPlugin Plugin in Core.Tanuki.Instance.Plugins.Plugins)
         {
-            if (!Arguments.Any(x => Plugin.Name.ToLower().Contains(x)))
-                continue;
+            foreach (string Argument in Arguments)
+            {
+                PluginName = Plugin.Name.ToLower();
+                if (!PluginName.Contains(Argument))
+                    continue;
 
-            Plugins.Add(Plugin);
+                Plugins.Add(Plugin);
+            }
         }
 
         if (Plugins.Count > 0)
@@ -39,7 +44,10 @@ public class Reload : ICommand
                     )
                 )
             );
-            Plugins.ForEach(Core.Tanuki.Instance.Plugins.ReloadPlugin);
+
+            for (int i = 0; i < Plugins.Count; i++)
+                Core.Tanuki.Instance.Plugins.ReloadPlugin(Plugins[i]);
+
             return false;
         }
 

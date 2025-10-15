@@ -59,7 +59,7 @@ public class Core
                 continue;
             }
 
-            if (this.Patch(Patch))
+            if (!this.Patch(Patch))
             {
                 ManualLogSource.LogError($"Patch \"{Patch.FullName}\" is not annotated.");
                 continue;
@@ -113,7 +113,7 @@ public class Core
             PatchesToRemove.Add(Patch.Key);
         }
 
-        if (PatchesToRemove.Count > 0)
+        if (PatchesToRemove.Count == 0)
             return;
 
         for (int i = 0; i < PatchesToRemove.Count; i++)

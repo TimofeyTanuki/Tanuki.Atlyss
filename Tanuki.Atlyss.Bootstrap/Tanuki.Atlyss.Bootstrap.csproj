@@ -83,5 +83,11 @@
     <Analyzer Include="D:\Programs\Steam\steamapps\common\ATLYSS\BepInEx\plugins\Tanuki.Atlyss\Tanuki.Atlyss.Core.dll" />
     <Analyzer Include="D:\Programs\Steam\steamapps\common\ATLYSS\BepInEx\plugins\Tanuki.Atlyss\Tanuki.Atlyss.Game.dll" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Tanuki.Atlyss.Patching\Tanuki.Atlyss.Patching.csproj">
+      <Project>{97a2ac67-7211-4ac9-bfac-3f83f85910e7}</Project>
+      <Name>Tanuki.Atlyss.Patching</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
