@@ -15,10 +15,6 @@ public class Manager
     public readonly Dictionary<string, ICommand> Aliases = [];
     public readonly Dictionary<ICommand, CommandConfiguration> Commands = [];
 
-    /*
-     * Perhaps this should be optimized, but I don't want to deal with it.
-     * It is used only once during loading, so it does not impact overall performance.
-     */
     public void RegisterCommands(IPlugin Plugin)
     {
         bool UpdateFile = false;
@@ -130,19 +126,34 @@ public class Manager
         if (UpdateFile)
             File.WriteAllText(Path, JsonConvert.SerializeObject(CommandConfigurations, Formatting.Indented));
     }
+    private List<ICommand> FindRegisteredCommands(Assembly Assembly)
+    {
+        List<ICommand> Commands = [];
+
+        foreach (ICommand Command in this.Commands.Keys)
+        {
+            if (Command.GetType().Assembly != Assembly)
+                continue;
+
+            Commands.Add(Command);
+        }
+
+        return Commands;
+    }
     public void DeregisterCommands(IPlugin Plugin)
     {
-        Assembly Assembly = Plugin.GetType().Assembly;
-        ICommand[] Commands = [.. this.Commands.Keys.Where(x => x.GetType().Assembly == Assembly)];
-        for (ushort i = 0; i < Commands.Length; i++)
-            RemoveCommand(Commands[i]);
+        foreach (ICommand Command in FindRegisteredCommands(Plugin.GetType().Assembly))
+            RemoveCommand(Command);
     }
     private void RemoveCommand(ICommand Command)
     {
         if (!Commands.TryGetValue(Command, out CommandConfiguration CommandConfiguration))
             return;
 
-        CommandConfiguration.Names?.ForEach(x => Aliases.Remove(x));
+        if (CommandConfiguration.Names is not null)
+            foreach (string Name in CommandConfiguration.Names)
+                Aliases.Remove(Name);
+
         Type Type = Command.GetType();
         if (typeof(IDisposable).IsAssignableFrom(Type))
             ((IDisposable)Command).Dispose();

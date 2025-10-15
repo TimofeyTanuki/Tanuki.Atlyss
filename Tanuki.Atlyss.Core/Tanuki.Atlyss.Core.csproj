@@ -75,5 +75,12 @@
     <Compile Include="Settings.cs" />
     <Compile Include="Tanuki.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Tanuki.Atlyss.Patching\Tanuki.Atlyss.Patching.csproj">
+      <Project>{97a2ac67-7211-4ac9-bfac-3f83f85910e7}</Project>
+      <Name>Tanuki.Atlyss.Patching</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

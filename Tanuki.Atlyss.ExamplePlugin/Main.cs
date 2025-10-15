@@ -8,12 +8,16 @@ namespace Tanuki.Atlyss.ExamplePlugin;
 public class Main : Core.Plugins.Plugin
 {
     internal static Main Instance;
+
     internal ManualLogSource ManualLogSource;
+    internal Patching.Patcher Patcher;
+
     internal void Awake()
     {
         Instance = this;
         ManualLogSource = Logger;
         ManualLogSource.LogInfo("Awake()");
+        Patcher = new();
     }
 
     protected override void Load()
@@ -22,7 +26,7 @@ public class Main : Core.Plugins.Plugin
          * Application of necessary patches.
          * They are applied once.
          */
-        Game.Main.Instance.Patch(
+        Patcher.Use(
             typeof(Game.Events.ChatBehaviour.Send_ChatMessage_Prefix),
             typeof(Game.Events.LoadSceneManager.Init_LoadScreenDisable_Postfix)
         );
@@ -48,6 +52,31 @@ public class Main : Core.Plugins.Plugin
          * Command: /reload [plugin]
          */
         Game.Events.ChatBehaviour.Send_ChatMessage_Prefix.OnInvoke -= Send_ChatMessage_Prefix_OnInvoke;
+
+
+
+        /*
+         * Remove all patches used by this plugin (patcher).
+         * If a patch is used by other plugins, it will not be removed.
+         */
+        Patcher.UnuseAll();
+
+        /*
+         * ...
+         * or
+         * manual removal of patches.
+         */
+        /*
+        Patcher.Unuse(
+            typeof(Game.Events.ChatBehaviour.Send_ChatMessage_Prefix),
+            typeof(Game.Events.LoadSceneManager.Init_LoadScreenDisable_Postfix)
+        );
+        */
+
+        /*
+         * Removing patches is not performative.
+         * It causes all patches (except those that have been removed) to be repatched.
+         */
     }
 
     private void Send_ChatMessage_Prefix_OnInvoke(string Message, ref bool ShouldAllow)

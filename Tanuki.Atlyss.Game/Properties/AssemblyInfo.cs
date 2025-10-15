@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Tanuki.Atlyss.Game")]
-[assembly: AssemblyDescription("Tanuki.Atlyss framework module for applying patches.")]
+[assembly: AssemblyDescription("Tanuki.Atlyss framework module with a set of event patches, extensions, and game fields.")]
 [assembly: AssemblyCompany("Tanuki")]
 [assembly: AssemblyProduct("Tanuki.Atlyss.Game")]
 [assembly: AssemblyCopyright("Copyright © Tanuki 2025")]

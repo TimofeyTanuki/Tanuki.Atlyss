@@ -84,7 +84,6 @@
     <Compile Include="Extensions\PlayerInventory.cs" />
     <Compile Include="Extensions\PlayerMove.cs" />
     <Compile Include="Fields\GameManager.cs" />
-    <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
