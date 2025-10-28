@@ -4,7 +4,7 @@ using Tanuki.Atlyss.Patching;
 
 namespace Tanuki.Atlyss.Bootstrap;
 
-[BepInPlugin("9c00d52e-10b8-413f-9ee4-bfde81762442", "Tanuki.Atlyss.Bootstrap", "2.1.0")]
+[BepInPlugin("9c00d52e-10b8-413f-9ee4-bfde81762442", "Tanuki.Atlyss.Bootstrap", "2.1.1")]
 public class Main : Plugin
 {
     internal static Main Instance;

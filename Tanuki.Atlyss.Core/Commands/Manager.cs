@@ -175,7 +175,7 @@ public class Manager
         if (ArgumentsIndex < 0)
             ArgumentsIndex = Message.Length;
 
-        string CommandName = Message.Substring(0, ArgumentsIndex).TrimStart('/').ToLower();
+        string CommandName = Message.Substring(1, ArgumentsIndex - 1).ToLower();
 
         if (!Aliases.TryGetValue(CommandName, out ICommand Command))
             return;
