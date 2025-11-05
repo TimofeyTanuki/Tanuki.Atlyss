@@ -1,4 +1,5 @@
 ﻿using BepInEx;
+using System;
 using System.Collections.Generic;
 using Tanuki.Atlyss.API;
 using Tanuki.Atlyss.API.Plugins;
@@ -18,13 +19,14 @@ public class Manager
     {
         BaseUnityPlugin BaseUnityPlugin;
         IPlugin Plugin;
+        Type Type = typeof(IPlugin);
         foreach (PluginInfo PluginInfo in BepInEx.Bootstrap.Chainloader.PluginInfos.Values)
         {
             BaseUnityPlugin = PluginInfo.Instance;
             if (BaseUnityPlugin is null)
                 continue;
 
-            if (!typeof(IPlugin).IsAssignableFrom(BaseUnityPlugin.GetType()))
+            if (!Type.IsAssignableFrom(BaseUnityPlugin.GetType()))
                 continue;
 
             Plugin = (IPlugin)BaseUnityPlugin;

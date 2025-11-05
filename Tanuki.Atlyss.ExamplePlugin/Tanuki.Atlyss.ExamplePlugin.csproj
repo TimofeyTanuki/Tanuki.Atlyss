@@ -69,6 +69,7 @@
   <ItemGroup>
     <Compile Include="Commands\DisposableExample.cs" />
     <Compile Include="Commands\Example.cs" />
+    <Compile Include="LightMain.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
