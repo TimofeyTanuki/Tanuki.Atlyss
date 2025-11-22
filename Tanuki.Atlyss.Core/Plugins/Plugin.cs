@@ -98,7 +98,7 @@ public class Plugin : BaseUnityPlugin, IPlugin
                 if (SplitIndex <= 0)
                     continue;
 
-                Translation.Translations[Line.Substring(0, SplitIndex)] = Line.Substring(SplitIndex + 1);
+                Translation.Translations[Line.Substring(0, SplitIndex)] = Line.Substring(SplitIndex + 1).Replace("\\n", "\n");
             }
         }
     }
