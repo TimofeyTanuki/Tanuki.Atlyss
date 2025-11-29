@@ -12,7 +12,6 @@
     <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -24,7 +23,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>D:\Programs\Steam\steamapps\common\ATLYSS\BepInEx\plugins\Tanuki.Atlyss\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
@@ -63,6 +62,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Events\ChatBehaviour\OnServerMessage_Postfix.cs" />
     <Compile Include="Events\ChatBehaviour\Send_ChatMessage_Prefix.cs" />
     <Compile Include="Events\GameManager\Cache_ScriptableAssets_Postfix.cs" />
