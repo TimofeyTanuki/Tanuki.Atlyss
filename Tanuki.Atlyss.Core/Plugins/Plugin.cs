@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using Tanuki.Atlyss.API;
 using Tanuki.Atlyss.API.Collections;
 using Tanuki.Atlyss.API.Plugins;
@@ -12,20 +13,19 @@ public class Plugin : BaseUnityPlugin, IPlugin
     public string Name { get; private set; }
     private EState _State = EState.Unloaded;
     public EState State => _State;
-    protected readonly string Directory;
+    protected readonly string ConfigurationDirectory;
     public Translation Translation;
     public Plugin()
     {
         Name = GetType().Assembly.GetName().Name;
-        Directory = Path.Combine(Paths.ConfigPath, Name);
-
+        ConfigurationDirectory = Path.Combine(Paths.ConfigPath, Name);
         Translation = new();
-
-        if (!System.IO.Directory.Exists(Directory))
-            System.IO.Directory.CreateDirectory(Directory);
     }
     public virtual void LoadPlugin()
     {
+        if (!Directory.Exists(ConfigurationDirectory))
+            Directory.CreateDirectory(ConfigurationDirectory);
+
         Tanuki.Instance.Commands.RegisterCommands(this);
         LoadTranslation();
 
@@ -63,12 +63,12 @@ public class Plugin : BaseUnityPlugin, IPlugin
     protected virtual void Unload() { }
     private void LoadTranslation()
     {
-        string Path = System.IO.Path.Combine(Directory, string.Format(Environment.PluginTranslationFileTemplate, Tanuki.Instance.Settings.Language, Environment.PluginTranslationFileFormat));
+        string Path = System.IO.Path.Combine(ConfigurationDirectory, string.Format(Environment.PluginTranslationFileTemplate, Tanuki.Instance.Settings.Language, Environment.PluginTranslationFileFormat));
 
         bool Exists = File.Exists(Path);
         if (!Exists)
         {
-            foreach (string File in System.IO.Directory.GetFiles(Directory))
+            foreach (string File in System.IO.Directory.GetFiles(ConfigurationDirectory))
             {
                 if (!File.Contains(Environment.PluginTranslationFileFormat))
                     continue;
@@ -98,7 +98,7 @@ public class Plugin : BaseUnityPlugin, IPlugin
                 if (SplitIndex <= 0)
                     continue;
 
-                Translation.Translations[Line.Substring(0, SplitIndex)] = Line.Substring(SplitIndex + 1).Replace("\\n", "\n");
+                Translation.Translations[Line.Substring(0, SplitIndex)] = Regex.Unescape(Line.Substring(SplitIndex + 1));
             }
         }
     }
