@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace Tanuki.Atlyss.Game.Events.Player;
+namespace Tanuki.Atlyss.Game.Patches.Player;
 
 [HarmonyPatch(typeof(global::Player), "OnStartAuthority", MethodType.Normal)]
 public static class OnStartAuthority_Postfix

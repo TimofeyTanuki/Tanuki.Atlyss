@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace Tanuki.Atlyss.Game.Events.StatusEntity;
+namespace Tanuki.Atlyss.Game.Patches.StatusEntity;
 
 [HarmonyPatch(typeof(global::StatusEntity), "Take_Damage", MethodType.Normal)]
 public static class Take_Damage_Prefix

@@ -3,15 +3,11 @@ using System.Reflection;
 
 namespace Tanuki.Atlyss.Game.Fields;
 
-public class GameManager
+public static class GameManager
 {
-    public static GameManager Instance;
-    private GameManager() { }
-    public static void Initialize() =>
-        Instance ??= new();
 
-    private Dictionary<string, ScriptableItem> _CachedScriptableItems;
-    public Dictionary<string, ScriptableItem> CachedScriptableItems
+    private static Dictionary<string, ScriptableItem> _CachedScriptableItems;
+    public static Dictionary<string, ScriptableItem> CachedScriptableItems
     {
         get
         {
@@ -20,8 +16,8 @@ public class GameManager
         }
     }
 
-    private Dictionary<string, ScriptablePlayerRace> _CachedScriptableRaces;
-    public Dictionary<string, ScriptablePlayerRace> CachedScriptableRaces
+    private static Dictionary<string, ScriptablePlayerRace> _CachedScriptableRaces;
+    public static Dictionary<string, ScriptablePlayerRace> CachedScriptableRaces
     {
         get
         {
@@ -30,8 +26,8 @@ public class GameManager
         }
     }
 
-    private Dictionary<string, ScriptableMapData> _CachedScriptableMapDatas;
-    public Dictionary<string, ScriptableMapData> CachedScriptableMapDatas
+    private static Dictionary<string, ScriptableMapData> _CachedScriptableMapDatas;
+    public static Dictionary<string, ScriptableMapData> CachedScriptableMapDatas
     {
         get
         {

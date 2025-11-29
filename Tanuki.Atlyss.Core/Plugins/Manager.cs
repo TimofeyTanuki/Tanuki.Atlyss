@@ -14,11 +14,19 @@ public class Manager
     public delegate void AfterPluginsReload();
     public event AfterPluginsReload OnAfterPluginsReload;
 
+    public delegate void BeforePluginsLoad();
+    public event BeforePluginsLoad OnBeforePluginsLoad;
+
+    public delegate void AfterPluginsLoad();
+    public event AfterPluginsLoad OnAfterPluginsLoad;
+
     public readonly HashSet<IPlugin> Plugins = [];
     internal void LoadPlugins()
     {
+        if (Plugins.Count > 0)
+            return;
+
         BaseUnityPlugin BaseUnityPlugin;
-        IPlugin Plugin;
         Type Type = typeof(IPlugin);
         foreach (PluginInfo PluginInfo in BepInEx.Bootstrap.Chainloader.PluginInfos.Values)
         {
@@ -29,12 +37,17 @@ public class Manager
             if (!Type.IsAssignableFrom(BaseUnityPlugin.GetType()))
                 continue;
 
-            Plugin = (IPlugin)BaseUnityPlugin;
-
-            if (Plugins.Add(Plugin))
-                Plugin.LoadPlugin();
+            Plugins.Add((IPlugin)BaseUnityPlugin);
         }
+
+        OnBeforePluginsLoad?.Invoke();
+
+        foreach (IPlugin Plugin in Plugins)
+            Plugin.LoadPlugin();
+
+        OnAfterPluginsLoad?.Invoke();
     }
+
     public void ReloadPlugins()
     {
         OnBeforePluginsReload?.Invoke();

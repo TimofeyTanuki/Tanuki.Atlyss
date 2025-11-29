@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace Tanuki.Atlyss.Game.Events.PlayerMove;
+namespace Tanuki.Atlyss.Game.Patches.PlayerMove;
 
 [HarmonyPatch(typeof(global::PlayerMove), "Init_Jump", MethodType.Normal)]
 public static class Init_Jump_Postfix

@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace Tanuki.Atlyss.Game.Events.ScriptablePlayerRace;
+namespace Tanuki.Atlyss.Game.Patches.ScriptablePlayerRace;
 
 [HarmonyPatch(typeof(global::ScriptablePlayerRace), "Init_ParamsCheck", MethodType.Normal)]
 public static class Init_ParamsCheck_Prefix

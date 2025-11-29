@@ -12,8 +12,18 @@ namespace Tanuki.Atlyss.Core.Commands;
 
 public class Manager
 {
+    private static readonly HashSet<char> Quotes = ['"', '\'', '`'];
     public readonly Dictionary<string, ICommand> Aliases = [];
     public readonly Dictionary<ICommand, CommandConfiguration> Commands = [];
+
+    public delegate void CommandRegistered(ICommand Command);
+    public event CommandRegistered OnCommandRegistered;
+
+    public delegate void CommandDeregistered(ICommand Command);
+    public event CommandDeregistered OnCommandDeregistered;
+
+    public delegate void CommandExecuted(ICommand Command, string[] Arguments, bool Success, ref bool ShouldContinue);
+    public event CommandExecuted OnCommandExecuted;
 
     public void RegisterCommands(IPlugin Plugin)
     {
@@ -36,14 +46,14 @@ public class Manager
         }
 
         string Directory = System.IO.Path.Combine(BepInEx.Paths.ConfigPath, Assembly.GetName().Name);
-        string Path = System.IO.Path.Combine(Directory, string.Format(Environment.PluginCommandFileTemplate, Tanuki.Instance.Settings.Language, Environment.PluginCommandFileFormat));
+        string Path = System.IO.Path.Combine(Directory, Environment.FormatPluginCommandsFile(Tanuki.Instance.Settings.Language));
 
         bool Exists = File.Exists(Path);
         if (!Exists)
         {
-            foreach (string File in System.IO.Directory.GetFiles(Directory))
+            foreach (string File in System.IO.Directory.GetFiles(Directory, Environment.FormatPluginCommandsFile("*")))
             {
-                if (!File.Contains(Environment.PluginCommandFileFormat))
+                if (!File.Contains(Environment.PluginCommandsFileFormat))
                     continue;
 
                 Path = File;
@@ -93,34 +103,41 @@ public class Manager
         // Validation of configuration, filling in command aliases.
         foreach (KeyValuePair<string, CommandConfiguration> CommandConfiguration in CommandConfigurations)
         {
+
             ICommand Command = PluginCommands.Where(x => x.GetType().Name == CommandConfiguration.Key).First();
             Commands[Command] = CommandConfiguration.Value;
 
-            if (CommandConfiguration.Value.Names is null)
-                continue;
-
-            if (CommandConfiguration.Value.Names.Count == 0)
+            void ProcessAliases()
             {
-                CommandConfiguration.Value.Names = null;
-                continue;
-            }
+                if (CommandConfiguration.Value.Names is null)
+                    return;
 
-            for (int i = CommandConfiguration.Value.Names.Count - 1; i >= 0; i--)
-            {
-                string CommandName = CommandConfiguration.Value.Names[i].ToLower();
-
-                if (CommandName.Length == 0 || CommandName.Contains(' ') || Aliases.ContainsKey(CommandName))
+                if (CommandConfiguration.Value.Names.Count == 0)
                 {
-                    CommandConfiguration.Value.Names.RemoveAt(i);
-                    UpdateFile = true;
-                    continue;
+                    CommandConfiguration.Value.Names = null;
+                    return;
                 }
 
-                Aliases.Add(CommandName, Command);
+                for (int i = CommandConfiguration.Value.Names.Count - 1; i >= 0; i--)
+                {
+                    string CommandName = CommandConfiguration.Value.Names[i].ToLower();
+
+                    if (CommandName.Length == 0 || CommandName.Contains(' ') || Aliases.ContainsKey(CommandName))
+                    {
+                        CommandConfiguration.Value.Names.RemoveAt(i);
+                        UpdateFile = true;
+                        continue;
+                    }
+
+                    Aliases.Add(CommandName, Command);
+                }
+
+                if (CommandConfiguration.Value.Names.Count == 0)
+                    CommandConfiguration.Value.Names = null;
             }
 
-            if (CommandConfiguration.Value.Names.Count == 0)
-                CommandConfiguration.Value.Names = null;
+            ProcessAliases();
+            OnCommandRegistered?.Invoke(Command);
         }
 
         if (UpdateFile)
@@ -143,9 +160,9 @@ public class Manager
     public void DeregisterCommands(IPlugin Plugin)
     {
         foreach (ICommand Command in FindRegisteredCommands(Plugin.GetType().Assembly))
-            RemoveCommand(Command);
+            DeregisterCommand(Command);
     }
-    private void RemoveCommand(ICommand Command)
+    private void DeregisterCommand(ICommand Command)
     {
         if (!Commands.TryGetValue(Command, out CommandConfiguration CommandConfiguration))
             return;
@@ -159,13 +176,13 @@ public class Manager
             ((IDisposable)Command).Dispose();
 
         Commands.Remove(Command);
+        OnCommandDeregistered?.Invoke(Command);
     }
     public void RemoveAllCommands()
     {
         foreach (ICommand Command in Commands.Keys)
-            RemoveCommand(Command);
+            DeregisterCommand(Command);
     }
-    private static readonly HashSet<char> Quotes = ['"', '\'', '`'];
     public void OnSendMessage(string Message, ref bool ShouldAllow)
     {
         if (!Message.StartsWith("/"))
@@ -180,7 +197,7 @@ public class Manager
         if (!Aliases.TryGetValue(CommandName, out ICommand Command))
             return;
 
-        List<string> Arguments = [];
+        List<string> ArgumentsList = [];
         StringBuilder Argument = new();
         char? ArgumentOpenQuote = null;
         bool ArgumentQuoteEscaped = false;
@@ -208,7 +225,7 @@ public class Manager
                         ArgumentQuoteEscaped = true;
                     else if (Character == ArgumentOpenQuote)
                     {
-                        Arguments.Add(Argument.ToString());
+                        ArgumentsList.Add(Argument.ToString());
                         Argument.Clear();
                         ArgumentOpenQuote = null;
                     }
@@ -222,7 +239,7 @@ public class Manager
                 {
                     if (Argument.Length > 0)
                     {
-                        Arguments.Add(Argument.ToString());
+                        ArgumentsList.Add(Argument.ToString());
                         Argument.Clear();
                     }
                 }
@@ -230,7 +247,7 @@ public class Manager
                 {
                     if (Argument.Length > 0)
                     {
-                        Arguments.Add(Argument.ToString());
+                        ArgumentsList.Add(Argument.ToString());
                         Argument.Clear();
                     }
                     ArgumentOpenQuote = Character;
@@ -244,17 +261,23 @@ public class Manager
             Argument.Append('\\');
 
         if (Argument.Length > 0)
-            Arguments.Add(Argument.ToString());
+            ArgumentsList.Add(Argument.ToString());
 
         ShouldAllow = false;
 
+        string[] Arguments = [.. ArgumentsList];
+
+        bool Success = true;
         try
         {
-            ShouldAllow = Command.Execute([.. Arguments]);
+            ShouldAllow = Command.Execute(Arguments);
         }
         catch (Exception Exception)
         {
+            Success = false;
             Tanuki.Instance.ManualLogSource.LogError(Exception);
         }
+
+        OnCommandExecuted?.Invoke(Command, Arguments, Success, ref ShouldAllow);
     }
 }

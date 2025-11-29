@@ -1,5 +1,7 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
+using System.Linq;
+using Tanuki.Atlyss.API;
 
 namespace Tanuki.Atlyss.ExamplePlugin;
 
@@ -18,6 +20,22 @@ public class Main : Core.Plugins.Plugin
         ManualLogSource = Logger;
         ManualLogSource.LogInfo("Awake()");
         Patcher = new();
+
+        Core.Tanuki.Instance.Plugins.OnBeforePluginsLoad += Plugins_OnBeforePluginsLoad;
+    }
+
+    private void Plugins_OnBeforePluginsLoad()
+    {
+        IPlugin OtherTanukiPlugin = Core.Tanuki.Instance.Plugins.Plugins.Where(x => x.Name == "OtherPluginName").First();
+        if (OtherTanukiPlugin is null)
+            return;
+
+        OtherTanukiPlugin.OnLoaded += OtherTanukiPlugin_OnLoaded;
+    }
+
+    private void OtherTanukiPlugin_OnLoaded()
+    {
+        // Actions after other plugin is loaded
     }
 
     protected override void Load()
@@ -27,8 +45,8 @@ public class Main : Core.Plugins.Plugin
          * They are applied once.
          */
         Patcher.Use(
-            typeof(Game.Events.ChatBehaviour.Send_ChatMessage_Prefix),
-            typeof(Game.Events.LoadSceneManager.Init_LoadScreenDisable_Postfix)
+            typeof(Game.Patches.ChatBehaviour.Send_ChatMessage_Prefix),
+            typeof(Game.Patches.LoadSceneManager.Init_LoadScreenDisable_Postfix)
         );
 
         ManualLogSource.LogInfo("Load()");
@@ -40,7 +58,7 @@ public class Main : Core.Plugins.Plugin
         ManualLogSource.LogInfo($"Translation: {Translate("Example")}");
 
         // Subscribe to events of used patches.
-        Game.Events.ChatBehaviour.Send_ChatMessage_Prefix.OnInvoke += Send_ChatMessage_Prefix_OnInvoke;
+        Game.Patches.ChatBehaviour.Send_ChatMessage_Prefix.OnInvoke += Send_ChatMessage_Prefix_OnInvoke;
     }
     protected override void Unload()
     {
@@ -51,7 +69,7 @@ public class Main : Core.Plugins.Plugin
          * This is necessary for the plugin to work correctly after reloading.
          * Command: /reload [plugin]
          */
-        Game.Events.ChatBehaviour.Send_ChatMessage_Prefix.OnInvoke -= Send_ChatMessage_Prefix_OnInvoke;
+        Game.Patches.ChatBehaviour.Send_ChatMessage_Prefix.OnInvoke -= Send_ChatMessage_Prefix_OnInvoke;
 
 
 

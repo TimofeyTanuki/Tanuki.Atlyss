@@ -29,13 +29,13 @@ public class Main : Plugin
         Core.Tanuki.Instance.Load();
     protected override void Load()
     {
-        Patcher.Use(typeof(Game.Events.ChatBehaviour.Send_ChatMessage_Prefix));
-        Game.Events.ChatBehaviour.Send_ChatMessage_Prefix.OnInvoke += Core.Tanuki.Instance.Commands.OnSendMessage;
+        Patcher.Use(typeof(Game.Patches.ChatBehaviour.Send_ChatMessage_Prefix));
+        Game.Patches.ChatBehaviour.Send_ChatMessage_Prefix.OnInvoke += Core.Tanuki.Instance.Commands.OnSendMessage;
     }
     protected override void Unload()
     {
         ShouldReloadConfiguration = true;
-        Game.Events.ChatBehaviour.Send_ChatMessage_Prefix.OnInvoke -= Core.Tanuki.Instance.Commands.OnSendMessage;
+        Game.Patches.ChatBehaviour.Send_ChatMessage_Prefix.OnInvoke -= Core.Tanuki.Instance.Commands.OnSendMessage;
     }
     private void BeforePluginsReload()
     {

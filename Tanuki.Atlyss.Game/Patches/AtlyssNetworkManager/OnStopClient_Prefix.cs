@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace Tanuki.Atlyss.Game.Events.AtlyssNetworkManager;
+namespace Tanuki.Atlyss.Game.Patches.AtlyssNetworkManager;
 
 
 [HarmonyPatch(typeof(global::AtlyssNetworkManager), "OnStopClient", MethodType.Normal)]

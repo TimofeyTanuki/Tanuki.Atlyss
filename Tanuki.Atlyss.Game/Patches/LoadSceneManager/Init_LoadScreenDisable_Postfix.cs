@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace Tanuki.Atlyss.Game.Events.LoadSceneManager;
+namespace Tanuki.Atlyss.Game.Patches.LoadSceneManager;
 
 [HarmonyPatch(typeof(global::LoadSceneManager), "Init_LoadScreenDisable", MethodType.Normal)]
 public static class Init_LoadScreenDisable_Postfix

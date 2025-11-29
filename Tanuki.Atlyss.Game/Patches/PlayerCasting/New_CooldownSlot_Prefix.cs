@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace Tanuki.Atlyss.Game.Events.PlayerCasting;
+namespace Tanuki.Atlyss.Game.Patches.PlayerCasting;
 
 [HarmonyPatch(typeof(global::PlayerCasting), "New_CooldownSlot", MethodType.Normal)]
 public static class New_CooldownSlot_Prefix

@@ -13,7 +13,7 @@ internal class DisposableExample : API.Commands.ICommand, IDisposable
         Player._mainPlayer._pVisual.Cmd_VanitySparkleEffect();
 
         Subscribed = true;
-        Game.Events.LoadSceneManager.Init_LoadScreenDisable_Postfix.OnInvoke += Init_LoadScreenDisable_Postfix_OnInvoke;
+        Game.Patches.LoadSceneManager.Init_LoadScreenDisable_Postfix.OnInvoke += Init_LoadScreenDisable_Postfix_OnInvoke;
 
         return false;
     }
@@ -26,5 +26,5 @@ internal class DisposableExample : API.Commands.ICommand, IDisposable
      * Use the System.IDisposable interface.
      */
     public void Dispose() =>
-        Game.Events.LoadSceneManager.Init_LoadScreenDisable_Postfix.OnInvoke -= Init_LoadScreenDisable_Postfix_OnInvoke;
+        Game.Patches.LoadSceneManager.Init_LoadScreenDisable_Postfix.OnInvoke -= Init_LoadScreenDisable_Postfix_OnInvoke;
 }

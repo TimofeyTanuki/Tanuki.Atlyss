@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using Mirror;
 
-namespace Tanuki.Atlyss.Game.Events.Player;
+namespace Tanuki.Atlyss.Game.Patches.Player;
 
 [HarmonyPatch(typeof(global::Player), "DeserializeSyncVars", MethodType.Normal)]
 public static class DeserializeSyncVars_Postfix

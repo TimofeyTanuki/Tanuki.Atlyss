@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace Tanuki.Atlyss.Game.Events.PlayerVisual;
+namespace Tanuki.Atlyss.Game.Patches.PlayerVisual;
 
 [HarmonyPatch(typeof(global::PlayerVisual), "Apply_NetworkedCharacterDisplay", MethodType.Normal)]
 public static class Apply_NetworkedCharacterDisplay_Prefix

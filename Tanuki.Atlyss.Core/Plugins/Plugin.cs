@@ -1,7 +1,8 @@
 ﻿using BepInEx;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
 using Tanuki.Atlyss.API;
 using Tanuki.Atlyss.API.Collections;
 using Tanuki.Atlyss.API.Plugins;
@@ -13,18 +14,25 @@ public class Plugin : BaseUnityPlugin, IPlugin
     public string Name { get; private set; }
     private EState _State = EState.Unloaded;
     public EState State => _State;
+
+    public event IPlugin.Load OnLoad;
+    public event IPlugin.Loaded OnLoaded;
+    public event IPlugin.Unload OnUnload;
+    public event IPlugin.Unloaded OnUnloaded;
+
     protected readonly string ConfigurationDirectory;
     public Translation Translation;
+
     public Plugin()
     {
         Name = GetType().Assembly.GetName().Name;
         ConfigurationDirectory = Path.Combine(Paths.ConfigPath, Name);
         Translation = new();
     }
+
     public virtual void LoadPlugin()
     {
-        if (!Directory.Exists(ConfigurationDirectory))
-            Directory.CreateDirectory(ConfigurationDirectory);
+        OnLoad?.Invoke();
 
         Tanuki.Instance.Commands.RegisterCommands(this);
         LoadTranslation();
@@ -41,9 +49,11 @@ public class Plugin : BaseUnityPlugin, IPlugin
         }
 
         _State = EState.Loaded;
+        OnLoaded?.Invoke();
     }
     public virtual void UnloadPlugin(EState PluginState)
     {
+        OnUnload?.Invoke();
         Tanuki.Instance.Commands.DeregisterCommands(this);
 
         try
@@ -58,49 +68,36 @@ public class Plugin : BaseUnityPlugin, IPlugin
         }
 
         _State = PluginState;
+        OnUnloaded?.Invoke();
     }
     protected virtual void Load() { }
     protected virtual void Unload() { }
     private void LoadTranslation()
     {
-        string Path = System.IO.Path.Combine(ConfigurationDirectory, string.Format(Environment.PluginTranslationFileTemplate, Tanuki.Instance.Settings.Language, Environment.PluginTranslationFileFormat));
+        if (!Directory.Exists(ConfigurationDirectory))
+            Directory.CreateDirectory(ConfigurationDirectory);
+
+        string Path = System.IO.Path.Combine(ConfigurationDirectory, Environment.FormatPluginTranslationsFile(Tanuki.Instance.Settings.Language));
 
         bool Exists = File.Exists(Path);
         if (!Exists)
         {
-            foreach (string File in System.IO.Directory.GetFiles(ConfigurationDirectory))
+            string[] Files = Directory.GetFiles(ConfigurationDirectory, Environment.FormatPluginTranslationsFile("*"));
+            if (Files.Length > 0)
             {
-                if (!File.Contains(Environment.PluginTranslationFileFormat))
-                    continue;
-
-                Path = File;
+                Path = Files[0];
                 Exists = true;
-                break;
             }
         }
-
-        Translation.Translations.Clear();
 
         if (Exists)
         {
-            using FileStream FileStream = File.OpenRead(Path);
-            using StreamReader StreamReader = new(FileStream);
-
-            string Line;
-            int SplitIndex = 0;
-            while ((Line = StreamReader.ReadLine()) != null)
-            {
-                if (Line.StartsWith("#"))
-                    continue;
-
-                SplitIndex = Line.IndexOf('=');
-
-                if (SplitIndex <= 0)
-                    continue;
-
-                Translation.Translations[Line.Substring(0, SplitIndex)] = Regex.Unescape(Line.Substring(SplitIndex + 1));
-            }
+            Translation.Translations = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(Path));
+            if (Translation.Translations is not null)
+                return;
         }
+
+        Translation.Translations = [];
     }
     public string Translate(string Key, params object[] Placeholder) =>
         Translation.Translate(Key, Placeholder);

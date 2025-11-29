@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace Tanuki.Atlyss.Game.Events.ChatBehaviour;
+namespace Tanuki.Atlyss.Game.Patches.ChatBehaviour;
 
 
 [HarmonyPatch(typeof(global::ChatBehaviour), "Send_ChatMessage", MethodType.Normal)]

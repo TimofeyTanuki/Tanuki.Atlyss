@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace Tanuki.Atlyss.Game.Events.PlayerMove;
+namespace Tanuki.Atlyss.Game.Patches.PlayerMove;
 
 [HarmonyPatch(typeof(global::PlayerMove), "Client_LocalPlayerControl", MethodType.Normal)]
 public static class Client_LocalPlayerControl_Prefix

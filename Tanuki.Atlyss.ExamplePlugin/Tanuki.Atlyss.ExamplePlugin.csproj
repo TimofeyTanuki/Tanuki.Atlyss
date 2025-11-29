@@ -45,6 +45,7 @@
       <HintPath>D:\Programs\Steam\steamapps\common\ATLYSS\ATLYSS_Data\Managed\Mirror.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="System" />
     <Reference Include="Tanuki.Atlyss.API">
       <HintPath>D:\Programs\Steam\steamapps\common\ATLYSS\BepInEx\plugins\Tanuki.Atlyss\Tanuki.Atlyss.API.dll</HintPath>
       <Private>False</Private>

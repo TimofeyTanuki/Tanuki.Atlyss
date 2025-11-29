@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace Tanuki.Atlyss.Game.Events.PlayerCasting;
+namespace Tanuki.Atlyss.Game.Patches.PlayerCasting;
 
 [HarmonyPatch(typeof(global::PlayerCasting), "Cmd_InitSkill", MethodType.Normal)]
 public static class Cmd_InitSkill_Postfix

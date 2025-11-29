@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace Tanuki.Atlyss.Game.Events.ItemObject;
+namespace Tanuki.Atlyss.Game.Patches.ItemObject;
 
 [HarmonyPatch(typeof(global::ItemObject), "Enable_GroundCheckToVelocityZero", MethodType.Normal)]
 public static class Enable_GroundCheckToVelocityZero_Postfix
