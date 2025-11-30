@@ -27,10 +27,14 @@ public class Manager
 
     public void RegisterCommands(IPlugin Plugin)
     {
+        Assembly Assembly = Plugin.GetType().Assembly;
+        string Directory = System.IO.Path.Combine(BepInEx.Paths.ConfigPath, Assembly.GetName().Name);
+
+        if (!System.IO.Directory.Exists(Directory))
+            System.IO.Directory.CreateDirectory(Directory);
+
         bool UpdateFile = false;
         Dictionary<string, CommandConfiguration> CommandConfigurations = null;
-
-        Assembly Assembly = Plugin.GetType().Assembly;
 
         // Search for commands in the assembly
         List<ICommand> PluginCommands = [];
@@ -42,10 +46,19 @@ public class Manager
             if (!typeof(ICommand).IsAssignableFrom(Type))
                 continue;
 
-            PluginCommands.Add((ICommand)Activator.CreateInstance(Type));
+            ICommand Command;
+            try
+            {
+                Command = (ICommand)Activator.CreateInstance(Type);
+            }
+            catch (Exception Exception)
+            {
+                Tanuki.Instance.ManualLogSource.LogError(Exception);
+                continue;
+            }
+            PluginCommands.Add(Command);
         }
 
-        string Directory = System.IO.Path.Combine(BepInEx.Paths.ConfigPath, Assembly.GetName().Name);
         string Path = System.IO.Path.Combine(Directory, Environment.FormatPluginCommandsFile(Tanuki.Instance.Settings.Language));
 
         bool Exists = File.Exists(Path);
@@ -173,7 +186,16 @@ public class Manager
 
         Type Type = Command.GetType();
         if (typeof(IDisposable).IsAssignableFrom(Type))
-            ((IDisposable)Command).Dispose();
+        {
+            try
+            {
+                ((IDisposable)Command).Dispose();
+            }
+            catch (Exception Exception)
+            {
+                Tanuki.Instance.ManualLogSource.LogError(Exception);
+            }
+        }
 
         Commands.Remove(Command);
         OnCommandDeregistered?.Invoke(Command);
