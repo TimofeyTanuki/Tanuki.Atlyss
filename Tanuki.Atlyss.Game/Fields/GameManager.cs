@@ -35,4 +35,14 @@ public static class GameManager
             return _CachedScriptableMapDatas;
         }
     }
+
+    private static Dictionary<string, ScriptableQuest> _CachedScriptableQuests;
+    public static Dictionary<string, ScriptableQuest> CachedScriptableQuests
+    {
+        get
+        {
+            _CachedScriptableQuests ??= (Dictionary<string, ScriptableQuest>)global::GameManager._current.GetType().GetField("_cachedScriptableQuests", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(global::GameManager._current);
+            return _CachedScriptableQuests;
+        }
+    }
 }
