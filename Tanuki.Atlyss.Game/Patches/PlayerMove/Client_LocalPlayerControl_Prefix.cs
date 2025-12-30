@@ -5,10 +5,10 @@ namespace Tanuki.Atlyss.Game.Patches.PlayerMove;
 [HarmonyPatch(typeof(global::PlayerMove), "Client_LocalPlayerControl", MethodType.Normal)]
 public static class Client_LocalPlayerControl_Prefix
 {
+    public static bool ShouldAllow;
+
     public delegate void EventHandler(global::PlayerMove PlayerMove, ref bool ShouldAllow);
     public static event EventHandler OnInvoke;
-
-    public static bool ShouldAllow;
 
 #pragma warning disable IDE0051
     private static bool Prefix(global::PlayerMove __instance)

@@ -13,13 +13,13 @@ namespace Tanuki.Atlyss.ExamplePlugin;
 public class LightMain : BaseUnityPlugin, IPlugin
 {
     internal static LightMain Instance;
-    internal ManualLogSource ManualLogSource;
-
     public string Name => "Tanuki.Atlyss.ExamplePlugin";
+    internal ManualLogSource ManualLogSource;
     public event IPlugin.Load OnLoad;
     public event IPlugin.Loaded OnLoaded;
     public event IPlugin.Unload OnUnload;
     public event IPlugin.Unloaded OnUnloaded;
+
     public EState State => EState.Unloaded;
 
     internal void Awake()

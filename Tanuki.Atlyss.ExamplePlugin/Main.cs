@@ -10,7 +10,6 @@ namespace Tanuki.Atlyss.ExamplePlugin;
 public class Main : Core.Plugins.Plugin
 {
     internal static Main Instance;
-
     internal ManualLogSource ManualLogSource;
     internal Patching.Patcher Patcher;
 

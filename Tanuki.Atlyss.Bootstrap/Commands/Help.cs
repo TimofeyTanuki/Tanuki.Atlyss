@@ -15,6 +15,7 @@ public class Help : ICommand
         public List<CommandConfiguration> Active = [];
         public SortedSet<string> Inactive = [];
     }
+
     public bool Execute(string[] Arguments)
     {
         SortedDictionary<string, PluginEntry> Groups = [];
@@ -88,6 +89,7 @@ public class Help : ICommand
 
         return false;
     }
+
     private void CollectCommands(ref SortedDictionary<string, PluginEntry> Groups)
     {
         string Assembly;

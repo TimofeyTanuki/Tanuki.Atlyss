@@ -156,6 +156,7 @@ public class Manager
         if (UpdateFile)
             File.WriteAllText(Path, JsonConvert.SerializeObject(CommandConfigurations, Formatting.Indented));
     }
+
     private List<ICommand> FindRegisteredCommands(Assembly Assembly)
     {
         List<ICommand> Commands = [];
@@ -170,11 +171,13 @@ public class Manager
 
         return Commands;
     }
+
     public void DeregisterCommands(IPlugin Plugin)
     {
         foreach (ICommand Command in FindRegisteredCommands(Plugin.GetType().Assembly))
             DeregisterCommand(Command);
     }
+
     private void DeregisterCommand(ICommand Command)
     {
         if (!Commands.TryGetValue(Command, out CommandConfiguration CommandConfiguration))
@@ -200,11 +203,13 @@ public class Manager
         Commands.Remove(Command);
         OnCommandDeregistered?.Invoke(Command);
     }
+
     public void RemoveAllCommands()
     {
         foreach (ICommand Command in Commands.Keys)
             DeregisterCommand(Command);
     }
+
     public void OnSendMessage(string Message, ref bool ShouldAllow)
     {
         if (!Message.StartsWith("/"))

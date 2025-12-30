@@ -8,7 +8,6 @@ namespace Tanuki.Atlyss.Patching;
 public class Core
 {
     public static Core Instance;
-
     private readonly Harmony Harmony;
     private readonly ManualLogSource ManualLogSource;
     private readonly Dictionary<Type, HashSet<Patcher>> Patches;
@@ -25,6 +24,7 @@ public class Core
 
     private bool Patch(Type Patch) =>
         Harmony.CreateClassProcessor(Patch).Patch() is not null;
+
     private void Repatch()
     {
         Harmony.UnpatchSelf();
@@ -32,11 +32,13 @@ public class Core
         foreach (Type Patch in Patches.Keys)
             this.Patch(Patch);
     }
+
     public void UnpatchAll()
     {
         Harmony.UnpatchSelf();
         Patches.Clear();
     }
+
     public void Use(Patcher Patcher, params Type[] Patches)
     {
         if (Patcher is null)
@@ -68,6 +70,7 @@ public class Core
             this.Patches.Add(Patch, [Patcher]);
         }
     }
+
     public void Unuse(Patcher Patcher, params Type[] Patches)
     {
         if (Patcher is null)
@@ -97,6 +100,7 @@ public class Core
 
         Repatch();
     }
+
     public void UnuseAll(Patcher Patcher)
     {
         List<Type> PatchesToRemove = [];

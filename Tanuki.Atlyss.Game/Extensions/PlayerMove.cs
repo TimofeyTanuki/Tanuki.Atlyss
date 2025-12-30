@@ -10,6 +10,7 @@ public static class PlayerMove
         PlayerMove.transform.SetPositionAndRotation(Position, Rotation);
         PlayerMove._playerController.enabled = true;
     }
+
     public static void Teleport(this global::PlayerMove PlayerMove, Vector3 Position) =>
         Teleport(PlayerMove, Position, PlayerMove.transform.rotation);
 }

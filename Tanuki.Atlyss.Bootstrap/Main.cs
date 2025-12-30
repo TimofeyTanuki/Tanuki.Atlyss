@@ -18,6 +18,7 @@ public class Main : Plugin
         Core.Tanuki.Initialize();
         Core.Tanuki.Instance.Plugins.OnBeforePluginsReload += BeforePluginsReload;
     }
+
     internal void Awake()
     {
         Logger.LogInfo("Tanuki.Atlyss by Timofey Tanuki / tanu.su");
@@ -25,18 +26,22 @@ public class Main : Plugin
         Instance = this;
         UpdateConfiguration();
     }
+
     internal void Start() =>
         Core.Tanuki.Instance.Load();
+
     protected override void Load()
     {
         Patcher.Use(typeof(Game.Patches.ChatBehaviour.Send_ChatMessage_Prefix));
         Game.Patches.ChatBehaviour.Send_ChatMessage_Prefix.OnInvoke += Core.Tanuki.Instance.Commands.OnSendMessage;
     }
+
     protected override void Unload()
     {
         ShouldReloadConfiguration = true;
         Game.Patches.ChatBehaviour.Send_ChatMessage_Prefix.OnInvoke -= Core.Tanuki.Instance.Commands.OnSendMessage;
     }
+
     private void BeforePluginsReload()
     {
         Config.Reload();
@@ -44,11 +49,13 @@ public class Main : Plugin
 
         ShouldReloadConfiguration = false;
     }
+
     private void UpdateConfiguration()
     {
         Configuration.Instance.Load(Config);
         Core.Tanuki.Instance.Settings.Language = Configuration.Instance.Settings.Language.Value;
     }
+
     public override void LoadPlugin()
     {
         if (ShouldReloadConfiguration)

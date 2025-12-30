@@ -20,5 +20,6 @@ public interface IPlugin
     EState State { get; }
 
     void LoadPlugin();
+
     void UnloadPlugin(EState PluginState);
 }

@@ -5,6 +5,7 @@ namespace Tanuki.Atlyss.ExamplePlugin.Commands;
 internal class DisposableExample : API.Commands.ICommand, IDisposable
 {
     private bool Subscribed = false;
+
     public bool Execute(string[] Arguments)
     {
         if (Subscribed)
@@ -17,6 +18,7 @@ internal class DisposableExample : API.Commands.ICommand, IDisposable
 
         return false;
     }
+
     private void Init_LoadScreenDisable_Postfix_OnInvoke() =>
         Main.Instance.ManualLogSource.LogInfo("Init_LoadScreenDisable_Postfix_OnInvoke();");
 
