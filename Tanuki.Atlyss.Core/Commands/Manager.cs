@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using BepInEx;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -28,7 +29,8 @@ public class Manager
     public void RegisterCommands(IPlugin Plugin)
     {
         Assembly Assembly = Plugin.GetType().Assembly;
-        string Directory = System.IO.Path.Combine(BepInEx.Paths.ConfigPath, Assembly.GetName().Name);
+        string[] Directories = System.IO.Directory.GetDirectories(Paths.ConfigPath, Plugin.Name, SearchOption.AllDirectories);
+        string Directory = Directories.Length > 0 ? Directories[0] : System.IO.Path.Combine(Paths.ConfigPath, Plugin.Name);
 
         if (!System.IO.Directory.Exists(Directory))
             System.IO.Directory.CreateDirectory(Directory);

@@ -26,7 +26,9 @@ public class Plugin : BaseUnityPlugin, IPlugin
     public Plugin()
     {
         Name = GetType().Assembly.GetName().Name;
-        ConfigurationDirectory = Path.Combine(Paths.ConfigPath, Name);
+        string[] Directories = Directory.GetDirectories(Paths.ConfigPath, Name, SearchOption.AllDirectories);
+        ConfigurationDirectory = Directories.Length > 0 ? Directories[0] : Path.Combine(Paths.ConfigPath, Name);
+
         Translation = new();
     }
 
@@ -51,6 +53,7 @@ public class Plugin : BaseUnityPlugin, IPlugin
         _State = EState.Loaded;
         OnLoaded?.Invoke();
     }
+
     public virtual void UnloadPlugin(EState PluginState)
     {
         OnUnload?.Invoke();
@@ -70,8 +73,11 @@ public class Plugin : BaseUnityPlugin, IPlugin
         _State = PluginState;
         OnUnloaded?.Invoke();
     }
+
     protected virtual void Load() { }
+
     protected virtual void Unload() { }
+
     private void LoadTranslation()
     {
         if (!Directory.Exists(ConfigurationDirectory))
@@ -99,6 +105,7 @@ public class Plugin : BaseUnityPlugin, IPlugin
 
         Translation.Translations = [];
     }
+
     public string Translate(string Key, params object[] Placeholder) =>
         Translation.Translate(Key, Placeholder);
 }
