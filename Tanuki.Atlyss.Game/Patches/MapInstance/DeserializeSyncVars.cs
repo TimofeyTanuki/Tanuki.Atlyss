@@ -48,11 +48,15 @@ public static class DeserializeSyncVars
         if (Delegates is null)
             return;
 
+        int Position = reader.Position;
+
         foreach (Delegate Delegate in OnAfter.GetInvocationList())
         {
             reader.Position = __state.Position;
             ((After)Delegate)(__instance, reader, initialState, __state.Cancelled);
         }
+
+        reader.Position = Position;
     }
 #pragma warning restore IDE0051
 }
