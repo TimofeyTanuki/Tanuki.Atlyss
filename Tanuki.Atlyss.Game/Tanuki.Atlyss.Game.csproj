@@ -70,6 +70,7 @@
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Accessors\GameManager.cs" />
+    <Compile Include="Accessors\GameWorldManager.cs" />
     <Compile Include="Accessors\MapInstance.cs" />
     <Compile Include="Patches\ChatBehaviour\OnServerMessage_Postfix.cs" />
     <Compile Include="Patches\ChatBehaviour\Send_ChatMessage_Prefix.cs" />
