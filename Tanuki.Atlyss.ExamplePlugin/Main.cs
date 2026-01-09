@@ -45,7 +45,7 @@ public class Main : Core.Plugins.Plugin
          */
         Patcher.Use(
             typeof(Game.Patches.ChatBehaviour.Send_ChatMessage_Prefix),
-            typeof(Game.Patches.LoadSceneManager.Init_LoadScreenDisable_Postfix)
+            typeof(Game.Patches.LoadSceneManager.DeserializeSyncVars_Postfix)
         );
 
         ManualLogSource.LogInfo("Load()");

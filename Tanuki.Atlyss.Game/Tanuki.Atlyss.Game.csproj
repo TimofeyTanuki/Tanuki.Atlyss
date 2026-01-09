@@ -69,13 +69,18 @@
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Accessors\GameManager.cs" />
+    <Compile Include="Accessors\MapInstance.cs" />
     <Compile Include="Patches\ChatBehaviour\OnServerMessage_Postfix.cs" />
     <Compile Include="Patches\ChatBehaviour\Send_ChatMessage_Prefix.cs" />
     <Compile Include="Patches\GameManager\Cache_ScriptableAssets_Postfix.cs" />
+    <Compile Include="Patches\GameWorldManager\Server_DayNightCycleRuntime_Prefix.cs" />
     <Compile Include="Patches\ItemObject\Enable_GroundCheckToVelocityZero_Postfix.cs" />
     <Compile Include="Patches\LoadSceneManager\Init_LoadScreenDisable_Postfix.cs" />
     <Compile Include="Patches\AtlyssNetworkManager\OnStartClient_Postfix.cs" />
     <Compile Include="Patches\AtlyssNetworkManager\OnStopClient_Prefix.cs" />
+    <Compile Include="Patches\MapInstance\DeserializeSyncVars.cs" />
+    <Compile Include="Patches\MapInstance\Handle_InstanceRuntime_Prefix.cs" />
     <Compile Include="Patches\PlayerCasting\Cmd_InitSkill_Postfix.cs" />
     <Compile Include="Patches\PlayerCasting\New_CooldownSlot_Prefix.cs" />
     <Compile Include="Patches\PlayerMove\Client_LocalPlayerControl_Prefix.cs" />
