@@ -4,9 +4,6 @@ namespace Tanuki.Atlyss.Game.Extensions;
 
 public static class Player
 {
-    private static global::Player[] GetPlayers() =>
-        UnityEngine.Object.FindObjectsOfType<global::Player>();
-
     public enum NicknameType
     {
         Default,
@@ -28,9 +25,19 @@ public static class Player
 
     extension(global::Player)
     {
+        public static global::Player GetByAutoRecognition(
+            string Input,
+            NicknameType NicknameType = NicknameType.Any,
+            bool NicknameStrictLength = false,
+            StringComparison NicknameStrictComparsion = StringComparison.InvariantCultureIgnoreCase
+        ) =>
+            uint.TryParse(Input, out uint NetID) ? GetByNetID(NetID) :
+            ulong.TryParse(Input, out ulong SteamID) ? GetBySteamID(SteamID) :
+            GetByNickname(Input, NicknameType, NicknameStrictLength, NicknameStrictComparsion);
+
         public static global::Player GetByNetID(uint NetID)
         {
-            foreach (global::Player Player in GetPlayers())
+            foreach (global::Player Player in Managers.Player.Instance.Players.Values)
                 if (Player.netId == NetID)
                     return Player;
 
@@ -41,7 +48,7 @@ public static class Player
         {
             string Match = SteamID.ToString();
 
-            foreach (global::Player Player in GetPlayers())
+            foreach (global::Player Player in Managers.Player.Instance.Players.Values)
                 if (Player._steamID == Match)
                     return Player;
 
@@ -67,7 +74,7 @@ public static class Player
 
         public static global::Player GetByDefaultNickname(string Nickname, bool StrictLength, StringComparison StringComparsion)
         {
-            foreach (global::Player Player in GetPlayers())
+            foreach (global::Player Player in Managers.Player.Instance.Players.Values)
                 if (NicknameMatches(Player._nickname, Nickname, StrictLength, StringComparsion))
                     return Player;
 
@@ -76,7 +83,7 @@ public static class Player
 
         public static global::Player GetByGlobalNickname(string Nickname, bool StrictLength, StringComparison StringComparsion)
         {
-            foreach (global::Player Player in GetPlayers())
+            foreach (global::Player Player in Managers.Player.Instance.Players.Values)
                 if (NicknameMatches(Player._globalNickname, Nickname, StrictLength, StringComparsion))
                     return Player;
 
@@ -85,7 +92,7 @@ public static class Player
 
         public static global::Player GetByAnyNickname(string Nickname, bool StrictLength, StringComparison StringComparsion)
         {
-            foreach (global::Player Player in GetPlayers())
+            foreach (global::Player Player in Managers.Player.Instance.Players.Values)
                 if (NicknameMatches(Player._nickname, Nickname, StrictLength, StringComparsion) ||
                     NicknameMatches(Player._globalNickname, Nickname, StrictLength, StringComparsion))
                     return Player;

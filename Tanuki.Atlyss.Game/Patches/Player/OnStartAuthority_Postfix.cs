@@ -2,13 +2,13 @@
 
 namespace Tanuki.Atlyss.Game.Patches.Player;
 
-[HarmonyPatch(typeof(global::Player), "OnStartAuthority", MethodType.Normal)]
+[HarmonyPatch(typeof(global::Player), nameof(global::Player.OnStartAuthority), MethodType.Normal)]
 public static class OnStartAuthority_Postfix
 {
-    public delegate void EventHandler();
+    public delegate void EventHandler(global::Player Player);
     public static event EventHandler OnInvoke;
 
 #pragma warning disable IDE0051
-    private static void Postfix() => OnInvoke?.Invoke();
+    private static void Postfix(global::Player __instance) => OnInvoke?.Invoke(__instance);
 #pragma warning restore IDE0051
 }

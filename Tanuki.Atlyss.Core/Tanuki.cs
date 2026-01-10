@@ -24,6 +24,7 @@ public class Tanuki
             return;
 
         Patching.Core.Initialize();
+        Game.Managers.Player.Initialize();
         Instance = new();
     }
 

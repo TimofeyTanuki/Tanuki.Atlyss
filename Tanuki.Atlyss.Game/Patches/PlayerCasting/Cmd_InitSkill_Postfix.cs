@@ -2,7 +2,7 @@
 
 namespace Tanuki.Atlyss.Game.Patches.PlayerCasting;
 
-[HarmonyPatch(typeof(global::PlayerCasting), "Cmd_InitSkill", MethodType.Normal)]
+[HarmonyPatch(typeof(global::PlayerCasting), nameof(global::PlayerCasting.Cmd_InitSkill), MethodType.Normal)]
 public static class Cmd_InitSkill_Postfix
 {
     public delegate void EventHandler(global::PlayerCasting PlayerCasting);

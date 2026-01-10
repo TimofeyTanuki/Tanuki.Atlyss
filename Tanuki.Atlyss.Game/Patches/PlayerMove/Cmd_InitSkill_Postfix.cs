@@ -2,7 +2,7 @@
 
 namespace Tanuki.Atlyss.Game.Patches.PlayerMove;
 
-[HarmonyPatch(typeof(global::PlayerMove), "Init_Jump", MethodType.Normal)]
+[HarmonyPatch(typeof(global::PlayerMove), nameof(global::PlayerMove.Init_Jump), MethodType.Normal)]
 public static class Init_Jump_Postfix
 {
     public delegate void EventHandler(global::PlayerMove PlayerMove, float Force, float ForwardForce, float GravityMultiply, bool UseAnim);

@@ -3,7 +3,7 @@
 namespace Tanuki.Atlyss.Game.Patches.AtlyssNetworkManager;
 
 
-[HarmonyPatch(typeof(global::AtlyssNetworkManager), "OnStartClient", MethodType.Normal)]
+[HarmonyPatch(typeof(global::AtlyssNetworkManager), nameof(global::AtlyssNetworkManager.OnStartClient), MethodType.Normal)]
 public static class OnStartClient_Postfix
 {
     public delegate void EventHandler();

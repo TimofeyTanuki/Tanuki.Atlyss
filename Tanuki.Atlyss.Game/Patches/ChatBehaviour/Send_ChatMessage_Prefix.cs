@@ -3,7 +3,7 @@
 namespace Tanuki.Atlyss.Game.Patches.ChatBehaviour;
 
 
-[HarmonyPatch(typeof(global::ChatBehaviour), "Send_ChatMessage", MethodType.Normal)]
+[HarmonyPatch(typeof(global::ChatBehaviour), nameof(global::ChatBehaviour.Send_ChatMessage), MethodType.Normal)]
 public static class Send_ChatMessage_Prefix
 {
     public delegate void EventHandler(string Message, ref bool ShouldAllow);

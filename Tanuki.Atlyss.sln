@@ -28,6 +28,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tanuki.Atlyss.Bootstrap", "
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tanuki.Atlyss.Game", "Tanuki.Atlyss.Game\Tanuki.Atlyss.Game.csproj", "{195C12BF-79C2-4476-8340-D2198D1FFC95}"
+	ProjectSection(ProjectDependencies) = postProject
+		{97A2AC67-7211-4AC9-BFAC-3F83F85910E7} = {97A2AC67-7211-4AC9-BFAC-3F83F85910E7}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tanuki.Atlyss.Patching", "Tanuki.Atlyss.Patching\Tanuki.Atlyss.Patching.csproj", "{97A2AC67-7211-4AC9-BFAC-3F83F85910E7}"
 EndProject

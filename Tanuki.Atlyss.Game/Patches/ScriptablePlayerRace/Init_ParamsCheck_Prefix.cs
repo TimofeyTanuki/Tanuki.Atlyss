@@ -2,7 +2,7 @@
 
 namespace Tanuki.Atlyss.Game.Patches.ScriptablePlayerRace;
 
-[HarmonyPatch(typeof(global::ScriptablePlayerRace), "Init_ParamsCheck", MethodType.Normal)]
+[HarmonyPatch(typeof(global::ScriptablePlayerRace), nameof(global::ScriptablePlayerRace.Init_ParamsCheck), MethodType.Normal)]
 public static class Init_ParamsCheck_Prefix
 {
     public delegate void EventHandler(PlayerAppearance_Profile PlayerAppearance, ref bool ShouldAllow);

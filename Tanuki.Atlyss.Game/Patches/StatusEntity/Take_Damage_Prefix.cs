@@ -2,7 +2,7 @@
 
 namespace Tanuki.Atlyss.Game.Patches.StatusEntity;
 
-[HarmonyPatch(typeof(global::StatusEntity), "Take_Damage", MethodType.Normal)]
+[HarmonyPatch(typeof(global::StatusEntity), nameof(global::StatusEntity.Take_Damage), MethodType.Normal)]
 public static class Take_Damage_Prefix
 {
     public delegate void EventHandler(global::StatusEntity StatusEntity, ref DamageStruct _dmgStruct, ref bool ShouldAllow);

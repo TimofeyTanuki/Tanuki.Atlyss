@@ -2,7 +2,7 @@
 
 namespace Tanuki.Atlyss.Game.Patches.PlayerVisual;
 
-[HarmonyPatch(typeof(global::PlayerVisual), "Apply_NetworkedCharacterDisplay", MethodType.Normal)]
+[HarmonyPatch(typeof(global::PlayerVisual), nameof(global::PlayerVisual.Apply_NetworkedCharacterDisplay), MethodType.Normal)]
 public static class Apply_NetworkedCharacterDisplay_Prefix
 {
     public delegate void EventHandler(global::PlayerVisual PlayerVisual);

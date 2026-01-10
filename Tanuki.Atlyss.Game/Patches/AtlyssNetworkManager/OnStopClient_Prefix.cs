@@ -3,7 +3,7 @@
 namespace Tanuki.Atlyss.Game.Patches.AtlyssNetworkManager;
 
 
-[HarmonyPatch(typeof(global::AtlyssNetworkManager), "OnStopClient", MethodType.Normal)]
+[HarmonyPatch(typeof(global::AtlyssNetworkManager), nameof(global::AtlyssNetworkManager.OnStopClient), MethodType.Normal)]
 public static class OnStopClient_Prefix
 {
     public delegate void EventHandler();

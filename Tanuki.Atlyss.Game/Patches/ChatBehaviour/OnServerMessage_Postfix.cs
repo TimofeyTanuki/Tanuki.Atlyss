@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿/*
+using HarmonyLib;
 
 namespace Tanuki.Atlyss.Game.Patches.ChatBehaviour;
 
@@ -12,3 +13,4 @@ public static class OnServerMessage_Postfix
     private static void Postfix(ServerMessage _message) => OnInvoke?.Invoke(_message);
 #pragma warning restore IDE0051
 }
+*/
