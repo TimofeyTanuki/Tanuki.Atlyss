@@ -36,7 +36,7 @@ To change the language of all plugins, you need to replace it in the bootstrap c
 The specified language will be used in all plugins where it is available, otherwise the first one encountered will be used.<br>
 You should use the full names of languages and only lowercase letters. For example: `russian`, `english`, `spanish`.
 ### Other
-Patches, fields, and extensions are located in [Tanuki.Atlyss.Game](https://github.com/TimofeyTanuki/Tanuki.Atlyss/tree/main/Tanuki.Atlyss.Game) project.<br>
+Patches, accessors, and extensions are located in [Tanuki.Atlyss.Game](https://github.com/TimofeyTanuki/Tanuki.Atlyss/tree/main/Tanuki.Atlyss.Game) project.<br>
 Examples of using this framework can be found in the [Tanuki.ExamplePlugin](https://github.com/TimofeyTanuki/Tanuki.Atlyss/tree/main/Tanuki.Atlyss.ExamplePlugin) project.
 ## Getting Started
 ### Thunderstore
