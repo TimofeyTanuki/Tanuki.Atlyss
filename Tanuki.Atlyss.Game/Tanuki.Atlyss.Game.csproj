@@ -72,6 +72,7 @@
     <Compile Include="Accessors\GameManager.cs" />
     <Compile Include="Accessors\GameWorldManager.cs" />
     <Compile Include="Accessors\MapInstance.cs" />
+    <Compile Include="Extensions\Player.cs" />
     <Compile Include="Patches\ChatBehaviour\OnServerMessage_Postfix.cs" />
     <Compile Include="Patches\ChatBehaviour\Send_ChatMessage_Prefix.cs" />
     <Compile Include="Patches\GameManager\Cache_ScriptableAssets_Postfix.cs" />

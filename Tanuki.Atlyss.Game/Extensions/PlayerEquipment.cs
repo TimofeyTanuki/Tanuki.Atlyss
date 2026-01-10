@@ -2,6 +2,9 @@
 
 public static class PlayerEquipment
 {
-    public static EquipData UsableWeapon(this global::PlayerEquipment PlayerEquipment) =>
-        PlayerEquipment._equips[Player._mainPlayer._pCombat._isUsingAltWeapon ? "Alt Weapon" : "Weapon"];
+    extension(global::PlayerEquipment PlayerEquipment)
+    {
+        public EquipData UsableWeapon =>
+            PlayerEquipment._equips[global::Player._mainPlayer._pCombat._isUsingAltWeapon ? "Alt Weapon" : "Weapon"];
+    }
 }

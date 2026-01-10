@@ -2,26 +2,27 @@
 
 public static class PlayerInventory
 {
-    public static ItemData GetItem(this global::PlayerInventory PlayerInventory, int Slot, bool IsEquipped, ItemType ItemType)
+    extension(global::PlayerInventory PlayerInventory)
     {
-        ScriptableItem ScriptableItem;
-        foreach (ItemData ItemData in PlayerInventory._heldItems)
+        public ItemData GetItem(int Slot, bool IsEquipped, ItemType ItemType)
         {
-            if (ItemData._slotNumber != Slot)
-                continue;
+            foreach (ItemData ItemData in PlayerInventory._heldItems)
+            {
+                if (ItemData._slotNumber != Slot ||
+                    ItemData._isEquipped != IsEquipped)
+                    continue;
 
-            if (ItemData._isEquipped != IsEquipped)
-                continue;
+                ScriptableItem ScriptableItem = GameManager._current.Locate_Item(ItemData._itemName);
+                if (!ScriptableItem)
+                    continue;
 
-            ScriptableItem = GameManager._current.Locate_Item(ItemData._itemName);
-            if (ScriptableItem is null)
-                continue;
+                if (ScriptableItem._itemType != ItemType)
+                    continue;
 
-            if (ScriptableItem._itemType != ItemType)
-                continue;
+                return ItemData;
+            }
 
-            return ItemData;
+            return null;
         }
-        return null;
     }
 }
