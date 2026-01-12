@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="$(GameDataManagedDir)Assembly-CSharp.dll" Private="False" />
+    <Reference Include="$(GameDataManagedDir)UnityEngine.dll" Private="False" />
+    <Reference Include="$(GameDataManagedDir)UnityEngine.CoreModule.dll" Private="False" />
+    <Reference Include="$(GameDataManagedDir)UnityEngine.PhysicsModule.dll" Private="False" />
+    <Reference Include="$(GameDataManagedDir)UnityEngine.UI.dll" Private="False" />
+    <Reference Include="$(GameDataManagedDir)Mirror.dll" Private="False" />
+    <Reference Include="$(BepInExCoreDir)BepInEx.dll" Private="False" />
+    <Reference Include="$(BepInExCoreDir)0Harmony.dll" Private="False" />
+  </ItemGroup>
+
+</Project>

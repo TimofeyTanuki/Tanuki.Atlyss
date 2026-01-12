@@ -1,0 +1,5 @@
+﻿<Project>
+
+  <Import Project="$(SolutionDir)Solution/AssemblyInfoClass/OverrideVersion.targets" />
+
+</Project>

@@ -1,0 +1,16 @@
+<Project>
+
+  <PropertyGroup>
+    <GameRootDir>..\ATLYSS\</GameRootDir>
+    <BepInExRootDir>..\ATLYSS\BepInEx\</BepInExRootDir>
+
+    <BepInExPluginsDir>$(BepInExRoot)plugins\</BepInExPluginsDir>
+    <BepInExCoreDir>$(BepInExRoot)core\</BepInExCoreDir>
+    <GameDataManagedDir>$(GameRootDir)ATLYSS_Data\Managed\</GameDataManagedDir>
+
+    <BepInExPluginDir>$(BepInExPluginsDir)Tanuki_Tanuki_Atlyss\</BepInExPluginDir>
+  
+
+</PropertyGroup>
+
+</Project>

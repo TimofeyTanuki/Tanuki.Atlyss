@@ -1,0 +1,14 @@
+<Project>
+
+  <PropertyGroup>
+    <GameRootDir>D:\Programs\Steam\steamapps\common\ATLYSS\</GameRootDir>
+    <BepInExRootDir>D:\Programs\Steam\steamapps\common\ATLYSS\BepInEx\</BepInExRootDir>
+
+    <BepInExPluginsDir>$(BepInExRootDir)plugins\</BepInExPluginsDir>
+    <BepInExCoreDir>$(BepInExRootDir)core\</BepInExCoreDir>
+    <GameDataManagedDir>$(GameRootDir)ATLYSS_Data\Managed\</GameDataManagedDir>
+
+    <BepInExPluginDir>$(BepInExPluginsDir)Tanuki_Tanuki_Atlyss\</BepInExPluginDir>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+  </Folder>
+  <Folder Name="/Solution Items/Solution/">
+    <File Path="Solution/Build.props" />
+    <File Path="Solution/Output.props" />
+    <File Path="Solution/Paths.props" />
+  </Folder>
+  <Folder Name="/Solution Items/Solution/AssemblyInfoClass/">
+    <File Path="Solution/AssemblyInfoClass/OverrideVersion.targets" />
+  </Folder>
+  <Project Path="Tanuki.Atlyss.API/Tanuki.Atlyss.API.csproj" />
+  <Project Path="Tanuki.Atlyss.Bootstrap/Tanuki.Atlyss.Bootstrap.csproj" Id="3d537979-dc53-45a4-a191-c4bc5ffbb326" />
+  <Project Path="Tanuki.Atlyss.Core/Tanuki.Atlyss.Core.csproj" />
+  <Project Path="Tanuki.Atlyss.Game/Tanuki.Atlyss.Game.csproj" Id="fa20b2f6-b65b-4c0d-ad41-a0f78e8d0f57" />
+</Solution>
