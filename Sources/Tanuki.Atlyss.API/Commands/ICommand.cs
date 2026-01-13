@@ -2,5 +2,8 @@
 
 public interface ICommand
 {
-    bool Execute(string[] Arguments);
+    public EAllowedCaller AllowedCaller { get; }
+    public EExecutionSide ExecutionSide { get; }
+
+    public bool Execute(Context Context);
 }

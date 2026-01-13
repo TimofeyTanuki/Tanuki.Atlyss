@@ -1,12 +1,11 @@
 ﻿using BepInEx.Configuration;
-using Tanuki.Atlyss.Bootstrap.Models.Configuration;
 
-namespace Tanuki.Atlyss.Bootstrap;
+namespace Tanuki.Atlyss.Core;
 
 internal class Configuration
 {
     public static Configuration Instance = null!;
-    public Settings Settings = null!;
+    public Models.Configuration.Settings General = null!;
 
     private Configuration() { }
 
@@ -14,5 +13,5 @@ internal class Configuration
         Instance ??= new();
 
     public void Load(ConfigFile ConfigFile) =>
-        Settings = new Settings(ref ConfigFile);
+        General = new Models.Configuration.Settings(ref ConfigFile);
 }

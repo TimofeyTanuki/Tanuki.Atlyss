@@ -8,7 +8,7 @@ using Tanuki.Atlyss.API.Plugins;
 
 namespace Tanuki.Atlyss.Core.Plugins;
 
-public class Plugin : BaseUnityPlugin, IPlugin
+public abstract class Plugin : BaseUnityPlugin, IPlugin
 {
     public string Name { get; private set; }
     private EState _State = EState.Unloaded;
@@ -35,8 +35,8 @@ public class Plugin : BaseUnityPlugin, IPlugin
     {
         OnLoad?.Invoke();
 
-        Tanuki.Instance.Commands.RegisterCommands(this);
         LoadTranslation();
+        Tanuki.Instance.Commands.RegisterAssembly(GetType().Assembly, Path.Combine(ConfigurationDirectory, Environment.FormatPluginCommandsFile(Tanuki.Instance.Settings.Language)));
 
         try
         {
@@ -56,7 +56,7 @@ public class Plugin : BaseUnityPlugin, IPlugin
     public virtual void UnloadPlugin(EState PluginState)
     {
         OnUnload?.Invoke();
-        Tanuki.Instance.Commands.DeregisterCommands(this);
+        Tanuki.Instance.Commands.DeregisterAssembly(GetType().Assembly);
 
         try
         {
