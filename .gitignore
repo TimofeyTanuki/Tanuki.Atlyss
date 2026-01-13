@@ -2,8 +2,7 @@
 **/[Bb]in/*
 **/[Oo]bj/*
 
-Solution/Paths.props
+Sources/Solution/Paths.props
 
-Thunderstore/B
-Solution/Paths.propsepInEx
+Thunderstore/BepInEx
 Thunderstore/*.zip
