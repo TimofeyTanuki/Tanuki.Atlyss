@@ -4,5 +4,5 @@
 
 Sources/Solution/Paths.props
 
-Thunderstore/BepInEx
+Thunderstore/BepInEx/plugins
 Thunderstore/*.zip

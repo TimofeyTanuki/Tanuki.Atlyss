@@ -1,0 +1,18 @@
+{
+  "Tanuki.Atlyss.Bootstrap.Commands.Reload": {
+    "Names": [
+      "reload",
+      "tanuki-reload"
+    ],
+    "Help": "Перезагрузить указанные плагины.",
+    "Syntax": "[названия через пробел]"
+  },
+  "Tanuki.Atlyss.Bootstrap.Commands.Help": {
+    "Names": [
+      "help",
+      "tanuki-help"
+    ],
+    "Help": "Отобразить список команд плагинов.",
+    "Syntax": "[названия через пробел]"
+  }
+}

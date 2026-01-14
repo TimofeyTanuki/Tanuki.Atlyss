@@ -105,7 +105,7 @@ public class Help : ICommand
                 CommandNamesCount > 1 ?
                 Main.Instance.Translate("Commands.Help.Active.Entry.AdditionalNames.Item", string.Join(AdditionalNamesSeparator, AdditionalNames)) : string.Empty;
 
-            StringBuilder.AppendLine(
+            StringBuilder.Append(
                 Main.Instance.Translate(
                     "Commands.Help.Active.Entry",
                     CommandConfiguration.Names[0],

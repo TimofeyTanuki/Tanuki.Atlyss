@@ -42,19 +42,14 @@ internal class Network
 
         Console.WriteLine("Pooler created!!!");
 
+
+        // Move this to core bcs MonoBehavour uk
+        /*
         SteamNetworkMessagesPoller = new SteamNetworkMessagesPoller(8);
-
-        Console.WriteLine("DA1");
-
         UnityEngine.Object.DontDestroyOnLoad(SteamNetworkMessagesPoller);
-
-        Console.WriteLine("DA2");
-
         SteamNetworkMessagesPoller.OnSteamNetworkingMessageReceived += SteamNetworkMessagesPoller_OnSteamNetworkingMessageReceived;
-        Console.WriteLine("DA3");
-
-        SteamNetworkMessagesPoller.enabled = true; // TEST ONLY, disable by default, only if network msg listeners 1+
-        Console.WriteLine("DA4");
+        SteamNetworkMessagesPoller.enabled = true;
+        */
     }
 
     private void SteamNetworkMessagesPoller_OnSteamNetworkingMessageReceived(System.Buffers.IMemoryOwner<byte> Message, int MessageLength, SteamNetworkingMessage_t SteamNetworkingMessage)
