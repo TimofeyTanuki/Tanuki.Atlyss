@@ -7,9 +7,9 @@
   "Commands.Help.Active.Entry": "  <color=#58b3e0>/{0}</color>{1}{2}{3}\n",
   "Commands.Help.Active.Entry.Syntax": " <color=#557aad>{0}</color>",
   "Commands.Help.Active.Entry.Help": "\n    <color=#6bad66>{0}</color>",
-  "Commands.Help.Active.Entry.Aliases": " <color=#676a6b>• </color><color=#30637a>{0}</color>",
-  "Commands.Help.Active.Entry.Aliases.Item": "/{0}",
-  "Commands.Help.Active.Entry.Aliases.Separator": " ",
+  "Commands.Help.Active.Entry.AdditionalNames": " <color=#676a6b>• </color><color=#30637a>{0}</color>",
+  "Commands.Help.Active.Entry.AdditionalNames.Item": "/{0}",
+  "Commands.Help.Active.Entry.AdditionalNames.Separator": " ",
   "Commands.Help.Inactive": "  <color=#cc9b64>Неактивные команды: {0}.</color>",
   "Commands.Help.PluginsNotFound": "<color=#e04141>Плагины не найдены.</color>"
 }

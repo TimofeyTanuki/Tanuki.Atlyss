@@ -103,7 +103,7 @@ public class Help : ICommand
 
             string CommandAdditionalNames =
                 CommandNamesCount > 1 ?
-                Main.Instance.Translate("Commands.Help.Active.Entry.AdditionalNames.Item", string.Join(AdditionalNamesSeparator, AdditionalNames)) : string.Empty;
+                Main.Instance.Translate("Commands.Help.Active.Entry.AdditionalNames", string.Join(AdditionalNamesSeparator, AdditionalNames)) : string.Empty;
 
             StringBuilder.Append(
                 Main.Instance.Translate(
