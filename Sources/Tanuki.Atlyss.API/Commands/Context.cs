@@ -2,5 +2,5 @@
 
 public class Context()
 {
-    public string[] Arguments = null!;
+    public string[]? Arguments;
 }

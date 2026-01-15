@@ -6,6 +6,7 @@
     <File Path="Solution/Build.props" />
     <File Path="Solution/Output.props" />
     <File Path="Solution/Paths.props" />
+    <File Path="Solution/Paths.props.template" />
   </Folder>
   <Folder Name="/Solution Items/Solution/AssemblyInfoClass/">
     <File Path="Solution/AssemblyInfoClass/OverrideVersion.targets" />

@@ -46,24 +46,19 @@ internal sealed class SteamNetworkMessagesPoller(int BufferSize) : MonoBehaviour
         int MessagesCount;
         try
         {
-
-
             MessagesCount = SteamNetworkingMessages.ReceiveMessagesOnChannel(LocalChannel, MessagesBuffer, MessagesBuffer.Length);
         }
         catch
         {
-            Console.WriteLine("D1");
+            // log
             return;
         }
 
         for (int Index = 0; Index < MessagesCount; Index++)
         {
-            Console.WriteLine("D2");
             SteamNetworkingMessage_t SteamNetworkingMessage = Marshal.PtrToStructure<SteamNetworkingMessage_t>(MessagesBuffer[Index]);
-            Console.WriteLine("D3");
             IMemoryOwner<byte> MemoryOwner = MessageBuffer.Rent(SteamNetworkingMessage.m_cbSize);
 
-            Console.WriteLine("D4");
             try
             {
                 unsafe

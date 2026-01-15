@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using Tanuki.Atlyss.API.Commands;
-using Tanuki.Atlyss.API.Plugins;
 using Tanuki.Atlyss.Core.Models;
 
 namespace Tanuki.Atlyss.Core.Commands;
@@ -13,9 +13,9 @@ public class Help : ICommand
     public EAllowedCaller AllowedCaller => EAllowedCaller.Player;
     public EExecutionSide ExecutionSide => EExecutionSide.Client;
 
-    public bool Execute(Context Context)
+    public bool Execute(ICaller Caller, Context Context)
     {
-        string[] Arguments = Context.Arguments;
+        string[] Arguments = Context.Arguments ?? [];
 
         StringBuilder
             Message = new(),
@@ -25,18 +25,19 @@ public class Help : ICommand
 
         List<string> AdditionalNames = [];
 
-        foreach (KeyValuePair<Type, IPlugin> Plugin in Tanuki.Instance.Plugins.PluginEntries)
+        foreach (KeyValuePair<Assembly, HashSet<Type>> AssemblyCommands in Tanuki.Instance.Commands.AssemblyCommands)
         {
-            Assembly Assembly = Plugin.Key.Assembly;
+            Assembly Assembly = AssemblyCommands.Key;
 
-            if (!Tanuki.Instance.Commands.AssemblyCommands.TryGetValue(Assembly, out HashSet<Type> CommandTypes))
-                continue;
+            string SectionName =
+                Tanuki.Instance.Plugins.AssemblyPlugins.TryGetValue(Assembly, out HashSet<Type> AssemblyPlugins) ?
+                Tanuki.Instance.Plugins.PluginEntries[AssemblyPlugins.First()].Name : Assembly.GetName().Name;
 
             bool SkipPlugin = Arguments.Length != 0;
 
             foreach (string Argument in Arguments)
             {
-                if (Plugin.Value.Name.IndexOf(Argument, StringComparison.InvariantCultureIgnoreCase) < 0)
+                if (SectionName.IndexOf(Argument, StringComparison.InvariantCultureIgnoreCase) < 0)
                     continue;
 
                 SkipPlugin = false;
@@ -48,13 +49,13 @@ public class Help : ICommand
 
             MessageSection.Clear();
 
-            ushort InactiveCommandsCount = BuildMessageSection(MessageSection, CommandTypes, AdditionalNames, AdditionalNamesSeparator);
+            ushort InactiveCommandsCount = BuildMessageSection(MessageSection, AssemblyCommands.Value, AdditionalNames, AdditionalNamesSeparator);
 
             if (MessageSection.Length == 0 &&
                 InactiveCommandsCount == 0)
                 continue;
 
-            Message.Append(Main.Instance.Translate("Commands.Help.Header", Plugin.Value.Name));
+            Message.Append(Main.Instance.Translate("Commands.Help.Header", SectionName));
 
             Message.Append(MessageSection);
 

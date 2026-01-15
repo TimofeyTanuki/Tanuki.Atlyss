@@ -6,10 +6,6 @@ namespace Tanuki.Atlyss.Core;
 /*
  * GLOBAL TODO
  *
- *
- * LANGUAGES PRIORITY Language = default -> Language = default,english,russian,...
- *
- *
  * KILL CommandsLegacy.cs
  *
  *
@@ -30,7 +26,7 @@ namespace Tanuki.Atlyss.Core;
  *
  *   if command found --> check execution side
  *     client -> execute
- *     server -> send hashcode to server
+ *     server -> send hashcode to server + command name from chat (if hash code not found -> check name)
  *
  *
  * LISTEN CHAT ON HOST FOR NON TANUKI USERS
@@ -54,13 +50,19 @@ namespace Tanuki.Atlyss.Core;
  * random foxyjumpscare plugin is ready but i want to sync it with host so need networking :(
  */
 
-[BepInPlugin(AssemblyInfo.GUID, AssemblyInfo.Name, AssemblyInfo.Version)]
+[BepInPlugin(PluginInfo.GUID, PluginInfo.NAME, PluginInfo.VERSION)]
 public class Main : Plugins.Plugin
 {
     internal static Main Instance = null!;
     private bool ConfigurationRefreshRequirement = false;
 
     internal ManualLogSource ManualLogSource = null!;
+
+    public Main()
+    {
+        Name = PluginInfo.NAME;
+        Configuration.Initialize();
+    }
 
     private void Initialize()
     {
@@ -84,40 +86,36 @@ public class Main : Plugins.Plugin
             ConfigurationRefreshRequirement = false;
         }
 
-        Tanuki.Instance.Settings.Language = Configuration.Instance.General.Language.Value;
+        Tanuki.Instance.Settings.Refresh();
     }
 
-    public Main()
-    {
-        Configuration.Initialize();
-    }
-
-    internal void Awake()
+    public void Awake()
     {
         Instance = this;
         ManualLogSource = Logger;
 
         Configuration.Instance.Load(Config);
 
-        Initialize();
 
         Logger.LogInfo("Tanuki.Atlyss by Timofey Tanuki / tanu.su");
     }
 
     internal void Start()
     {
+        Initialize();
+        Network.Tanuki.Initialize();
+        Network.Tanuki.Instance.Steam.CreateCallbacks();
+
         Tanuki.Instance.Plugins.Refresh();
         Tanuki.Instance.Plugins.LoadPlugins();
-
-        Managers.Commands Commands = Tanuki.Instance.Commands;
     }
 
     protected override void Load() =>
-        Game.Patches.ChatBehaviour.Send_ChatMessage.OnPrefix += Tanuki.Instance.CommandsLegacy.OnSendMessage;
+        Game.Patches.ChatBehaviour.Send_ChatMessage.OnPrefix += Tanuki.Instance.Chat.OnPlayerChatted;
 
     protected override void Unload()
     {
         ConfigurationRefreshRequirement = true;
-        Game.Patches.ChatBehaviour.Send_ChatMessage.OnPrefix -= Tanuki.Instance.CommandsLegacy.OnSendMessage;
+        Game.Patches.ChatBehaviour.Send_ChatMessage.OnPrefix -= Tanuki.Instance.Chat.OnPlayerChatted;
     }
 }

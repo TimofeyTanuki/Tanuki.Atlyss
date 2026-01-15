@@ -1,21 +1,36 @@
-﻿using BepInEx;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Tanuki.Atlyss.API.Plugins;
 
 namespace Tanuki.Atlyss.Core.Managers;
 
-public class Plugins
+public sealed class Plugins
 {
     private readonly Dictionary<Type, IPlugin> _PluginEntries = [];
+    private readonly Dictionary<Assembly, HashSet<Type>> _AssemblyPlugins = [];
+
+    /// <summary>
+    /// Provides a lookup of <see cref="IPlugin"/> by their <see cref="Type"/>.
+    /// </summary>
     public IReadOnlyDictionary<Type, IPlugin> PluginEntries => _PluginEntries;
+
+    /// <summary>
+    /// Provides a <see cref="HashSet{T}"/> of plugins by their <see cref="Assembly"/>.
+    /// </summary>
+    /// <remarks>
+    /// Modifying <see cref="HashSet{T}"/> values isn't recommended, as they're managed by <see cref="Plugins"/>.
+    /// </remarks>
+    public IReadOnlyDictionary<Assembly, HashSet<Type>> AssemblyPlugins => _AssemblyPlugins;
 
     public delegate void BeforePluginsLoad();
     public event BeforePluginsLoad? OnBeforePluginsLoad;
 
+    internal Plugins() { }
+
     internal void Refresh()
     {
-        foreach (PluginInfo PluginInfo in BepInEx.Bootstrap.Chainloader.PluginInfos.Values)
+        foreach (BepInEx.PluginInfo PluginInfo in BepInEx.Bootstrap.Chainloader.PluginInfos.Values)
         {
             if (!PluginInfo.Instance)
                 continue;
@@ -29,6 +44,16 @@ public class Plugins
                 continue;
 
             _PluginEntries.Add(PluginType, Plugin);
+
+            Assembly PluginAssembly = PluginType.Assembly;
+
+            if (!_AssemblyPlugins.TryGetValue(PluginAssembly, out HashSet<Type> AssemblyPlugins))
+            {
+                AssemblyPlugins = [];
+                _AssemblyPlugins[PluginAssembly] = AssemblyPlugins;
+            }
+
+            AssemblyPlugins.Add(PluginType);
         }
     }
 

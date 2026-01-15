@@ -1,9 +1,9 @@
 ﻿namespace Tanuki.Atlyss.Core;
 
-internal static class AssemblyInfo
+internal static class PluginInfo
 {
     public const string
-        Name = "Tanuki.Atlyss",
+        NAME = "Tanuki.Atlyss",
         GUID = "9c00d52e10b8413f9ee4bfde81762442",
-        Version = "3.0.0";
+        VERSION = "3.0.0";
 }

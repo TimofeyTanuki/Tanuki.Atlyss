@@ -4,7 +4,7 @@ namespace Tanuki.Atlyss.Core.Models.Configuration;
 
 internal class Settings(ref ConfigFile ConfigFile)
 {
-    private const string Section = "General";
+    private const string Section = "Settings";
 
-    public ConfigEntry<string> Language = ConfigFile.Bind(Section, "Language", "default");
+    public ConfigEntry<string> PreferredLanguages = ConfigFile.Bind(Section, "PreferredLanguages", "neutral, english, russian", "List of preferred languages by priority.");
 }

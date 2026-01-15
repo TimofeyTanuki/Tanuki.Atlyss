@@ -1,42 +1,76 @@
 ﻿using BepInEx;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using Tanuki.Atlyss.API.Collections;
 using Tanuki.Atlyss.API.Plugins;
+using Tanuki.Atlyss.Core.Models;
 
 namespace Tanuki.Atlyss.Core.Plugins;
 
 public abstract class Plugin : BaseUnityPlugin, IPlugin
 {
-    public string Name { get; private set; }
+    public virtual string Name { get; protected set; }
     private EState _State = EState.Unloaded;
     public EState State => _State;
 
-    public event IPlugin.Load? OnLoad;
-    public event IPlugin.Loaded? OnLoaded;
-    public event IPlugin.Unload? OnUnload;
-    public event IPlugin.Unloaded? OnUnloaded;
+    protected string ConfigurationDirectory = null!;
 
-    protected readonly string ConfigurationDirectory;
-    public Translation Translation;
+    public JsonTranslationSet Translation;
 
-    public Plugin()
+    public event Action? OnLoad;
+    public event Action? OnLoaded;
+    public event Action? OnUnload;
+    public event Action? OnUnloaded;
+
+    protected Plugin()
     {
         Name = GetType().Assembly.GetName().Name;
-        string[] Directories = Directory.GetDirectories(Paths.ConfigPath, Name, SearchOption.AllDirectories);
-        ConfigurationDirectory = Directories.Length > 0 ? Directories[0] : Path.Combine(Paths.ConfigPath, Name);
-
-        Translation = new();
+        Translation = [];
     }
+
+    private void ProcessTranslationSet()
+    {
+        Translation.Clear();
+
+        string Path = Helpers.LanguageFileSelector.GetPreferredFile(Tanuki.Instance.Settings.PreferredLanguageOrder, ConfigurationDirectory, ".translations.json");
+
+        if (!File.Exists(Path))
+            return;
+
+        try
+        {
+            Translation.LoadFromFile(Path);
+        }
+        catch (Exception Exception)
+        {
+            Logger.LogError($"Failed to load translation set from file \"{Path}\".\nException message:\n{Exception.Message}\nStack trace:\n{Exception.StackTrace}");
+        }
+    }
+
+    private void PrepareConfigurationDirectory()
+    {
+        if (string.IsNullOrEmpty(ConfigurationDirectory))
+        {
+            string[] SuitableDirectories = Directory.GetDirectories(Paths.ConfigPath, Name, SearchOption.AllDirectories);
+            ConfigurationDirectory = SuitableDirectories.Length > 0 ? SuitableDirectories[0] : Path.Combine(Paths.ConfigPath, Name);
+        }
+
+        if (!Directory.Exists(ConfigurationDirectory))
+            Directory.CreateDirectory(ConfigurationDirectory);
+    }
+
+    protected virtual void Load() { }
+
+    protected virtual void Unload() { }
 
     public virtual void LoadPlugin()
     {
         OnLoad?.Invoke();
 
-        LoadTranslation();
-        Tanuki.Instance.Commands.RegisterAssembly(GetType().Assembly, Path.Combine(ConfigurationDirectory, Environment.FormatPluginCommandsFile(Tanuki.Instance.Settings.Language)));
+        PrepareConfigurationDirectory();
+
+        ProcessTranslationSet();
+
+        Tanuki.Instance.Commands.RegisterAssembly(GetType().Assembly, Helpers.LanguageFileSelector.GetPreferredFile(Tanuki.Instance.Settings.PreferredLanguageOrder, ConfigurationDirectory, ".commands.json"));
 
         try
         {
@@ -73,37 +107,6 @@ public abstract class Plugin : BaseUnityPlugin, IPlugin
         OnUnloaded?.Invoke();
     }
 
-    protected virtual void Load() { }
-
-    protected virtual void Unload() { }
-
-    private void LoadTranslation()
-    {
-        if (!Directory.Exists(ConfigurationDirectory))
-            Directory.CreateDirectory(ConfigurationDirectory);
-
-        string Path = System.IO.Path.Combine(ConfigurationDirectory, Environment.FormatPluginTranslationsFile(Tanuki.Instance.Settings.Language));
-
-        bool Exists = File.Exists(Path);
-        if (!Exists)
-        {
-            string[] Files = Directory.GetFiles(ConfigurationDirectory, Environment.FormatPluginTranslationsFile("*"));
-            if (Files.Length > 0)
-            {
-                Path = Files[0];
-                Exists = true;
-            }
-        }
-
-        if (Exists)
-        {
-            Translation.Translations = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(Path)) ?? [];
-            return;
-        }
-
-        Translation.Translations = [];
-    }
-
-    public string Translate(string Key, params object[] Placeholder) =>
+    public virtual string Translate(string Key, params object[] Placeholder) =>
         Translation.Translate(Key, Placeholder);
 }

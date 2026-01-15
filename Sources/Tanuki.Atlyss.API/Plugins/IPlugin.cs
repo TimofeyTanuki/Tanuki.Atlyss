@@ -1,18 +1,13 @@
-﻿namespace Tanuki.Atlyss.API.Plugins;
+﻿using System;
+
+namespace Tanuki.Atlyss.API.Plugins;
 
 public interface IPlugin
 {
-    public delegate void Load();
-    public event Load? OnLoad;
-
-    public delegate void Loaded();
-    public event Loaded? OnLoaded;
-
-    public delegate void Unload();
-    public event Unload? OnUnload;
-
-    public delegate void Unloaded();
-    public event Unloaded? OnUnloaded;
+    public event Action? OnLoad;
+    public event Action? OnLoaded;
+    public event Action? OnUnload;
+    public event Action? OnUnloaded;
 
     string Name { get; }
     EState State { get; }

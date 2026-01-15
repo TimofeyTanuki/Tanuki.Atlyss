@@ -9,7 +9,7 @@ using Tanuki.Atlyss.Core.Models;
 
 namespace Tanuki.Atlyss.Core.Managers;
 
-public class Commands
+public sealed class Commands
 {
     public delegate void CommandInstanceCreated(Type Type);
     public event CommandInstanceCreated? OnCommandInstanceCreated;
@@ -27,24 +27,21 @@ public class Commands
     /// <summary>
     /// Provides a lookup of a command <see cref="Type"/> by their active names.
     /// </summary>
-    /// <remarks>
-    /// Moodifying its values isn't recommended, as they're managed by <see cref="Commands"/>
-    /// </remarks>
     public IReadOnlyDictionary<string, Type> CommandNames => _CommandNames;
 
     /// <summary>
     /// Provides a lookup of <see cref="CommandEntry"/> by their command <see cref="Type"/>.
     /// </summary>
     /// <remarks>
-    /// Moodifying its values isn't recommended, as they're managed by <see cref="Commands"/>
+    /// Modifying <see cref="CommandEntry"/> isn't recommended, as they're managed by <see cref="Commands"/>.
     /// </remarks>
     public IReadOnlyDictionary<Type, CommandEntry> CommandEntries => _CommandEntries;
 
     /// <summary>
-    /// Provides the command grouped by their <see cref="Assembly"/>
+    /// Provides a list of commands by their <see cref="Assembly"/>.
     /// </summary>
     /// <remarks>
-    /// Moodifying its values isn't recommended, as they're managed by <see cref="Commands"/>
+    /// Modifying <see cref="HashSet{T}"/> values isn't recommended, as they're managed by <see cref="Commands"/>.
     /// </remarks>
     public IReadOnlyDictionary<Assembly, HashSet<Type>> AssemblyCommands => _AssemblyCommands;
 
@@ -78,7 +75,7 @@ public class Commands
         }
         catch (Exception Exception)
         {
-            Main.Instance.ManualLogSource.LogMessage($"Failed to save the updated configuration file \"{ConfigurationFile}\".\nException message:\n{Exception.Message}\nStack trace:\n{Exception.StackTrace}");
+            Main.Instance.ManualLogSource.LogError($"Failed to save the updated configuration file \"{ConfigurationFile}\".\nException message:\n{Exception.Message}\nStack trace:\n{Exception.StackTrace}");
             return;
         }
     }
@@ -98,7 +95,7 @@ public class Commands
 
             if (CommandConfiguration is null)
             {
-                Main.Instance.ManualLogSource.LogMessage($"Command entry for {CommandType.FullName} has been restored.");
+                Main.Instance.ManualLogSource.LogInfo($"Command entry for {CommandType.FullName} has been restored.");
 
                 CommandConfiguration = CreateCommandConfiguration(CommandType);
                 CommandConfigurations[CommandConfigurationKey] = CommandConfiguration;
@@ -123,7 +120,7 @@ public class Commands
 
                     if (string.IsNullOrEmpty(NormalizedCommandName))
                     {
-                        Main.Instance.ManualLogSource.LogMessage($"Removed empty command name from {CommandType.FullName}");
+                        Main.Instance.ManualLogSource.LogInfo($"Removed empty command name from {CommandType.FullName}");
 
                         CommandConfiguration.Names.RemoveAt(CommandNameIndex);
 
@@ -134,7 +131,7 @@ public class Commands
 
                     if (CommandName != NormalizedCommandName)
                     {
-                        Main.Instance.ManualLogSource.LogMessage($"Command {CommandType.FullName} name normalized: {CommandName} -> {NormalizedCommandName}.");
+                        Main.Instance.ManualLogSource.LogInfo($"Command {CommandType.FullName} name normalized: {CommandName} -> {NormalizedCommandName}.");
 
                         CommandConfiguration.Names[CommandNameIndex] = NormalizedCommandName;
 
@@ -158,7 +155,7 @@ public class Commands
 
         foreach (KeyValuePair<string, Type> NewPluginCommandType in PluginCommandTypes)
         {
-            Main.Instance.ManualLogSource.LogMessage($"Command entry for {NewPluginCommandType.Key} has been created.");
+            Main.Instance.ManualLogSource.LogInfo($"Command entry for {NewPluginCommandType.Key} has been created.");
 
             CommandConfigurationItem CommandConfiguration = CreateCommandConfiguration(NewPluginCommandType.Value);
             CommandConfigurations.Add(NewPluginCommandType.Key, CommandConfiguration);
@@ -226,6 +223,7 @@ public class Commands
             }
 
             AssemblyCommands.Add(AssemblyType);
+
             PluginCommandTypes.Add(AssemblyType.FullName, AssemblyType);
 
             // TODO: ADD HASH CODE FOR NETWORKING
@@ -254,8 +252,6 @@ public class Commands
             return;
 
         TrySaveConfiguration(CommandConfiguration, ConfigurationFile);
-
-
     }
 
     public void DeregisterCommand(Type CommandType)

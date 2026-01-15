@@ -3,13 +3,13 @@
   <Target Name="AssemblyInfoClass_OverrideVersion" BeforeTargets="BeforeBuild">
 
     <PropertyGroup>
-      <AssemblyInfo>$(ProjectDir)AssemblyInfo.cs</AssemblyInfo>
-      <PluginInfoContent>$([System.IO.File]::ReadAllText('$(AssemblyInfo)'))</PluginInfoContent>
-      <UpdatedPluginInfoContent>$([System.Text.RegularExpressions.Regex]::Replace($(PluginInfoContent), '(Version\s*=\s*")([^"]*)(")', '${1}$(Version)${3}'))</UpdatedPluginInfoContent>
+      <File>$(ProjectDir)PluginInfo.cs</File>
+      <PluginInfoContent>$([System.IO.File]::ReadAllText('$(File)'))</PluginInfoContent>
+      <UpdatedPluginInfoContent>$([System.Text.RegularExpressions.Regex]::Replace($(PluginInfoContent), '(VERSION\s*=\s*")([^"]*)(")', '${1}$(Version)${3}'))</UpdatedPluginInfoContent>
     </PropertyGroup>
 
     <WriteLinesToFile
-      File="$(AssemblyInfo)"
+      File="$(File)"
       Lines="$(UpdatedPluginInfoContent)"
       Overwrite="true"
       Encoding="UTF-8" />
