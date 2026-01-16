@@ -4,100 +4,37 @@ namespace Tanuki.Atlyss.Game.Extensions;
 
 public static class Player
 {
-    public enum NicknameType
+    public enum ENicknameType
     {
         Default,
         Global,
         Any
     }
 
-    private static bool NicknameMatches(string Nickname, string Match, bool StrictLength, StringComparison StringComparsion)
-    {
-        if (Nickname.IndexOf(Match, StringComparsion) < 0)
-            return false;
-
-        if (StrictLength &&
-            Match.Length != Nickname.Length)
-            return false;
-
-        return true;
-    }
-
     extension(global::Player)
     {
         public static global::Player? GetByAutoRecognition(
-            string Input,
-            NicknameType NicknameType = NicknameType.Any,
-            bool NicknameStrictLength = false,
-            StringComparison NicknameStrictComparsion = StringComparison.InvariantCultureIgnoreCase
+            string input,
+            ENicknameType nicknameType = ENicknameType.Any,
+            bool nicknameStrictLength = false,
+            StringComparison nicknameStrictComparsion = StringComparison.InvariantCultureIgnoreCase
         ) =>
-            uint.TryParse(Input, out uint NetID) ? GetByNetID(NetID) :
-            ulong.TryParse(Input, out ulong SteamID) ? GetBySteamID(SteamID) :
-            GetByNickname(Input, NicknameType, NicknameStrictLength, NicknameStrictComparsion);
+            uint.TryParse(input, out uint netId) ? Providers.Player.Instance.GetByNetID(netId) :
+            ulong.TryParse(input, out ulong steamId) ? Providers.Player.Instance.GetBySteamId(steamId) :
+            GetByNickname(input, nicknameType, nicknameStrictLength, nicknameStrictComparsion);
 
-        public static global::Player? GetByNetID(uint NetID)
-        {
-            foreach (global::Player Player in Managers.Player.Instance.Players.Values)
-                if (Player.netId == NetID)
-                    return Player;
-
-            return null;
-        }
-
-        public static global::Player? GetBySteamID(ulong SteamID)
-        {
-            string Match = SteamID.ToString();
-
-            foreach (global::Player Player in Managers.Player.Instance.Players.Values)
-                if (Player._steamID == Match)
-                    return Player;
-
-            return null;
-        }
-
-        public static global::Player? GetByNickname(string Nickname, NicknameType NicknameType = NicknameType.Any, bool StrictLength = false, StringComparison StringComparsion = StringComparison.InvariantCultureIgnoreCase)
-        {
-            switch (NicknameType)
+        public static global::Player? GetByNickname(
+            string nickname,
+            ENicknameType nicknameType = ENicknameType.Any,
+            bool strictLength = false,
+            StringComparison stringComparsion = StringComparison.InvariantCultureIgnoreCase
+        ) =>
+            nicknameType switch
             {
-                case NicknameType.Default:
-                    return GetByDefaultNickname(Nickname, StrictLength, StringComparsion);
-                case NicknameType.Global:
-                    return GetByGlobalNickname(Nickname, StrictLength, StringComparsion);
-                case NicknameType.Any:
-                    return GetByAnyNickname(Nickname, StrictLength, StringComparsion);
-                default:
-                    break;
-            }
-
-            return null;
-        }
-
-        public static global::Player? GetByDefaultNickname(string Nickname, bool StrictLength, StringComparison StringComparsion)
-        {
-            foreach (global::Player Player in Managers.Player.Instance.Players.Values)
-                if (NicknameMatches(Player._nickname, Nickname, StrictLength, StringComparsion))
-                    return Player;
-
-            return null;
-        }
-
-        public static global::Player? GetByGlobalNickname(string Nickname, bool StrictLength, StringComparison StringComparsion)
-        {
-            foreach (global::Player Player in Managers.Player.Instance.Players.Values)
-                if (NicknameMatches(Player._globalNickname, Nickname, StrictLength, StringComparsion))
-                    return Player;
-
-            return null;
-        }
-
-        public static global::Player? GetByAnyNickname(string Nickname, bool StrictLength, StringComparison StringComparsion)
-        {
-            foreach (global::Player Player in Managers.Player.Instance.Players.Values)
-                if (NicknameMatches(Player._nickname, Nickname, StrictLength, StringComparsion) ||
-                    NicknameMatches(Player._globalNickname, Nickname, StrictLength, StringComparsion))
-                    return Player;
-
-            return null;
-        }
+                ENicknameType.Default => Providers.Player.Instance.GetByDefaultNickname(nickname, strictLength, stringComparsion),
+                ENicknameType.Global => Providers.Player.Instance.GetByGlobalNickname(nickname, strictLength, stringComparsion),
+                ENicknameType.Any => Providers.Player.Instance.GetByAnyNickname(nickname, strictLength, stringComparsion),
+                _ => null,
+            };
     }
 }

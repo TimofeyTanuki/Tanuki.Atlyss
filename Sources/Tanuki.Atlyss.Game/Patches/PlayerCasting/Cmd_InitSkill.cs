@@ -1,26 +1,29 @@
 ﻿using HarmonyLib;
-using Tanuki.Atlyss.Game.Patches.Player;
+using System;
 
 namespace Tanuki.Atlyss.Game.Patches.PlayerCasting;
 
 [HarmonyPatch(typeof(global::PlayerCasting), nameof(global::PlayerCasting.Cmd_InitSkill), MethodType.Normal)]
-public class Cmd_InitSkill
+public sealed class Cmd_InitSkill
 {
-    public delegate void Postfix(global::PlayerCasting PlayerCasting);
-    private static Postfix? _OnPostfix;
+    private static Action<global::PlayerCasting>? onPostfix;
 
-    public static event Postfix OnPostfix
+    public static event Action<global::PlayerCasting> OnPostfix
     {
-        add => Managers.Patches.Subscribe<Awake, Postfix>(ref _OnPostfix, value);
-        remove => Managers.Patches.Unsubscribe(ref _OnPostfix, value);
+        add
+        {
+            if (Managers.Patches.EnsurePatched<Cmd_InitSkill>())
+                onPostfix += value;
+        }
+        remove => onPostfix -= value;
     }
 
     [HarmonyPostfix]
-    private static void PostfixMethod(global::PlayerCasting __instance)
+    private static void Postfix(global::PlayerCasting __instance)
     {
-        if (_OnPostfix is null)
+        if (onPostfix is null)
             return;
 
-        _OnPostfix.Invoke(__instance);
+        onPostfix.Invoke(__instance);
     }
 }

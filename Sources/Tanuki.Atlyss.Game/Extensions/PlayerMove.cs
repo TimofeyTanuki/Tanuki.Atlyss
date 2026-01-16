@@ -4,16 +4,16 @@ namespace Tanuki.Atlyss.Game.Extensions;
 
 public static class PlayerMove
 {
-    extension(global::PlayerMove PlayerMove)
+    extension(global::PlayerMove instance)
     {
-        public void Teleport(Vector3 Position, Quaternion Rotation)
+        public void Teleport(Vector3 position, Quaternion rotation)
         {
-            PlayerMove._playerController.enabled = false;
-            PlayerMove.transform.SetPositionAndRotation(Position, Rotation);
-            PlayerMove._playerController.enabled = true;
+            instance._playerController.enabled = false;
+            instance.transform.SetPositionAndRotation(position, rotation);
+            instance._playerController.enabled = true;
         }
 
         public void Teleport(Vector3 Position) =>
-            PlayerMove.Teleport(Position, PlayerMove.transform.rotation);
+            instance.Teleport(Position, instance.transform.rotation);
     }
 }

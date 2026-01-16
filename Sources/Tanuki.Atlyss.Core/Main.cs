@@ -43,50 +43,21 @@ namespace Tanuki.Atlyss.Core;
  *       immortality
  *       health
  *
- *
- * EAT & SLEEP
- *
- *
  * random foxyjumpscare plugin is ready but i want to sync it with host so need networking :(
  */
 
 [BepInPlugin(PluginInfo.GUID, PluginInfo.NAME, PluginInfo.VERSION)]
-public class Main : Plugins.Plugin
+internal sealed class Main : Bases.Plugin
 {
     internal static Main Instance = null!;
-    private bool ConfigurationRefreshRequirement = false;
+    private bool reloadConfiguration = false;
 
-    internal ManualLogSource ManualLogSource = null!;
+    public ManualLogSource ManualLogSource { get; internal set; } = null!;
 
     public Main()
     {
         Name = PluginInfo.NAME;
         Configuration.Initialize();
-    }
-
-    private void Initialize()
-    {
-        if (Tanuki.Instance is not null)
-            return;
-
-        Tanuki.Instance = new();
-
-        Tanuki.Instance.Plugins.OnBeforePluginsLoad += OnBeforePluginsLoad;
-
-        Game.Managers.Player.Initialize();
-    }
-
-    private void OnBeforePluginsLoad()
-    {
-        if (ConfigurationRefreshRequirement)
-        {
-            Config.Reload();
-            Configuration.Instance.Load(Config);
-
-            ConfigurationRefreshRequirement = false;
-        }
-
-        Tanuki.Instance.Settings.Refresh();
     }
 
     public void Awake()
@@ -96,26 +67,42 @@ public class Main : Plugins.Plugin
 
         Configuration.Instance.Load(Config);
 
-
         Logger.LogInfo("Tanuki.Atlyss by Timofey Tanuki / tanu.su");
     }
 
     internal void Start()
     {
-        Initialize();
-        Network.Tanuki.Initialize();
-        Network.Tanuki.Instance.Steam.CreateCallbacks();
+        Tanuki.Instance = new();
+        Tanuki.Instance.Managers.Plugins.OnBeforePluginsLoad += HandleSettingsRefresh;
 
-        Tanuki.Instance.Plugins.Refresh();
-        Tanuki.Instance.Plugins.LoadPlugins();
+        Game.Providers.Player.Initialize();
+
+        //Network.Tanuki.Initialize();
+        //Network.Tanuki.Instance.Steam.CreateCallbacks();
+
+        Tanuki.Instance.Registers.Plugins.Refresh();
+        Tanuki.Instance.Managers.Plugins.LoadPlugins();
+    }
+
+    private void HandleSettingsRefresh()
+    {
+        if (reloadConfiguration)
+        {
+            Config.Reload();
+            Configuration.Instance.Load(Config);
+
+            reloadConfiguration = false;
+        }
+
+        Tanuki.Instance.Managers.Settings.Refresh();
     }
 
     protected override void Load() =>
-        Game.Patches.ChatBehaviour.Send_ChatMessage.OnPrefix += Tanuki.Instance.Chat.OnPlayerChatted;
+        Game.Patches.ChatBehaviour.Send_ChatMessage.OnPrefix += Tanuki.Instance.Managers.Chat.OnPlayerChatted;
 
     protected override void Unload()
     {
-        ConfigurationRefreshRequirement = true;
-        Game.Patches.ChatBehaviour.Send_ChatMessage.OnPrefix -= Tanuki.Instance.Chat.OnPlayerChatted;
+        reloadConfiguration = true;
+        Game.Patches.ChatBehaviour.Send_ChatMessage.OnPrefix -= Tanuki.Instance.Managers.Chat.OnPlayerChatted;
     }
 }

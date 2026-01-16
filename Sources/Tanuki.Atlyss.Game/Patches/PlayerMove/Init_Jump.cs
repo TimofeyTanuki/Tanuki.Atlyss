@@ -1,25 +1,29 @@
 ﻿using HarmonyLib;
+using System;
 
 namespace Tanuki.Atlyss.Game.Patches.PlayerMove;
 
 [HarmonyPatch(typeof(global::PlayerMove), nameof(global::PlayerMove.Init_Jump), MethodType.Normal)]
-public class Init_Jump
+public sealed class Init_Jump
 {
-    public delegate void Postfix(global::PlayerMove PlayerMove, float Force, float ForwardForce, float GravityMultiply, bool UseAnimation);
-    private static Postfix? _OnPostfix;
+    private static Action<global::PlayerMove, float, float, float, bool>? onPostfix;
 
-    public static event Postfix OnPostfix
+    public static event Action<global::PlayerMove, float, float, float, bool> OnPostfix
     {
-        add => Managers.Patches.Subscribe<Init_Jump, Postfix>(ref _OnPostfix, value);
-        remove => Managers.Patches.Unsubscribe(ref _OnPostfix, value);
+        add
+        {
+            if (Managers.Patches.EnsurePatched<Init_Jump>())
+                onPostfix += value;
+        }
+        remove => onPostfix -= value;
     }
 
     [HarmonyPostfix]
-    private static void PostfixMethod(global::PlayerMove __instance, float _force, float _forwardForce, float _gravityMultiply, bool _useAnim)
+    private static void Postfix(global::PlayerMove __instance, float _force, float _forwardForce, float _gravityMultiply, bool _useAnim)
     {
-        if (_OnPostfix is null)
+        if (onPostfix is null)
             return;
 
-        _OnPostfix.Invoke(__instance, _force, _forwardForce, _gravityMultiply, _useAnim);
+        onPostfix.Invoke(__instance, _force, _forwardForce, _gravityMultiply, _useAnim);
     }
 }

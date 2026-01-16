@@ -1,25 +1,29 @@
 ﻿using HarmonyLib;
+using System;
 
 namespace Tanuki.Atlyss.Game.Patches.NetworkBehaviour;
 
 [HarmonyPatch(typeof(Mirror.NetworkBehaviour), nameof(Mirror.NetworkBehaviour.OnStartClient), MethodType.Normal)]
-public class OnStartClient
+public sealed class OnStartClient
 {
-    public delegate void Postfix(Mirror.NetworkBehaviour NetworkBehaviour);
-    private static Postfix? _OnPostfix;
+    private static Action<Mirror.NetworkBehaviour>? onPostfix;
 
-    public static event Postfix OnPostfix
+    public static event Action<Mirror.NetworkBehaviour> OnPostfix
     {
-        add => Managers.Patches.Subscribe<OnStartClient, Postfix>(ref _OnPostfix, value);
-        remove => Managers.Patches.Unsubscribe(ref _OnPostfix, value);
+        add
+        {
+            if (Managers.Patches.EnsurePatched<OnStartClient>())
+                onPostfix += value;
+        }
+        remove => onPostfix -= value;
     }
 
     [HarmonyPostfix]
-    private static void PostfixMethod(Mirror.NetworkBehaviour __instance)
+    private static void Postfix(Mirror.NetworkBehaviour __instance)
     {
-        if (_OnPostfix is null)
+        if (onPostfix is null)
             return;
 
-        _OnPostfix.Invoke(__instance);
+        onPostfix.Invoke(__instance);
     }
 }

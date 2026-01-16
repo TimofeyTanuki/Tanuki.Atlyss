@@ -3,30 +3,36 @@
 namespace Tanuki.Atlyss.Game.Patches.ScriptablePlayerRace;
 
 [HarmonyPatch(typeof(global::ScriptablePlayerRace), nameof(global::ScriptablePlayerRace.Init_ParamsCheck), MethodType.Normal)]
-public class Init_ParamsCheck
+public sealed class Init_ParamsCheck
 {
-    public delegate void Prefix(PlayerAppearance_Profile PlayerAppearance, ref bool ShouldAllow);
-    private static Prefix? _OnPrefix;
+    public delegate void PrefixHandler(PlayerAppearance_Profile appearanceProfile, ref bool runOriginal);
 
-    public static event Prefix OnPrefix
+    private static PrefixHandler? onPrefix;
+
+    public static event PrefixHandler OnPrefix
     {
-        add => Managers.Patches.Subscribe<Init_ParamsCheck, Prefix>(ref _OnPrefix, value);
-        remove => Managers.Patches.Unsubscribe(ref _OnPrefix, value);
+        add
+        {
+            if (Managers.Patches.EnsurePatched<Init_ParamsCheck>())
+                onPrefix += value;
+        }
+        remove => onPrefix -= value;
     }
 
     [HarmonyPrefix]
-    private static bool PrefixMethod(PlayerAppearance_Profile _aP, ref PlayerAppearance_Profile __result)
+    private static bool Prefix(PlayerAppearance_Profile _aP, ref PlayerAppearance_Profile __result)
     {
-        if (_OnPrefix is null)
+        if (onPrefix is null)
             return true;
 
-        bool ShouldAllow = true;
-        _OnPrefix.Invoke(_aP, ref ShouldAllow);
+        bool runOriginal = true;
 
-        if (ShouldAllow)
+        onPrefix.Invoke(_aP, ref runOriginal);
+
+        if (runOriginal)
             return true;
 
         __result = _aP;
-        return ShouldAllow;
+        return runOriginal;
     }
 }

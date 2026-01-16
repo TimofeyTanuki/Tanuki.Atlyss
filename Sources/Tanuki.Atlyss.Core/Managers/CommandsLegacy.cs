@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using Tanuki.Atlyss.API.Commands;
-using Tanuki.Atlyss.Core.Models;
 
 namespace Tanuki.Atlyss.Core.Managers;
 
@@ -14,6 +10,7 @@ public class CommandsLegacy
 
     public void OnSendMessage(string Message, ref bool ShouldAllow)
     {
+        /*
         Main.Instance.ManualLogSource.LogDebug($"OnSendMessage: {Message}");
 
         if (!Message.StartsWith("/"))
@@ -25,7 +22,7 @@ public class CommandsLegacy
 
         string CommandName = Message[1..ArgumentsIndex].ToLower();
 
-        Dictionary<string, Type> names = (Dictionary<string, Type>)typeof(Commands).GetField("_CommandNames", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(Tanuki.Instance.Commands);
+        Dictionary<string, Type> names = (Dictionary<string, Type>)typeof(Commands).GetField("_CommandMap", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(Tanuki.Instance.CommandRegistry);
 
         if (!names.TryGetValue(CommandName, out Type Type))
             return;
@@ -102,8 +99,8 @@ public class CommandsLegacy
 
         // Search local command then send to server if Tanuki.Network on server
 
-        Dictionary<Type, CommandEntry> Commands = (Dictionary<Type, CommandEntry>)typeof(Commands).GetField("_CommandEntries", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(Tanuki.Instance.Commands);
-        ICommand Command = Commands[Type].Command;
+        Dictionary<Type, Entry> Commands = (Dictionary<Type, Entry>)typeof(Commands).GetField("_CommandEntries", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(Tanuki.Instance.CommandRegistry);
+        ICommand Command = Commands[Type].command;
 
         try
         {
@@ -116,5 +113,6 @@ public class CommandsLegacy
         {
             Main.Instance.ManualLogSource.LogError($"Error executing command \"{Command.GetType().FullName}\"\nException:\n{Exception}");
         }
+        */
     }
 }

@@ -3,120 +3,122 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Tanuki.Atlyss.API.Commands;
-using Tanuki.Atlyss.Core.Models;
+using Tanuki.Atlyss.API.Tanuki.Commands;
 
 namespace Tanuki.Atlyss.Core.Commands;
 
-public class Help : ICommand
+public sealed class Help : ICommand
 {
-    public EAllowedCaller AllowedCaller => EAllowedCaller.Player;
-    public EExecutionSide ExecutionSide => EExecutionSide.Client;
+    private readonly Registers.Plugins pluginRegistry = Tanuki.Instance.Registers.Plugins;
+    private readonly Registers.Commands commandRegistry = Tanuki.Instance.Registers.Commands;
 
-    public bool Execute(ICaller Caller, Context Context)
+    public ICallerPolicy CallerPolicy => new Policies.Commands.Caller.MainPlayer();
+    public IExecutionPolicy ExecutionPolicy => new Policies.Commands.Execution.Player();
+
+    public bool Execute(IContext context)
     {
-        string[] Arguments = Context.Arguments ?? [];
+        IReadOnlyList<string> arguments = context.Arguments;
 
         StringBuilder
-            Message = new(),
-            MessageSection = new();
+            message = new(),
+            messageSection = new();
 
-        string AdditionalNamesSeparator = Main.Instance.Translate("Commands.Help.Active.Entry.AdditionalNames.Separator");
+        string additionalNamesSeparator = Main.Instance.Translate("Commands.Help.Active.Entry.AdditionalNames.Separator");
 
-        List<string> AdditionalNames = [];
+        List<string> additionalNames = [];
 
-        foreach (KeyValuePair<Assembly, HashSet<Type>> AssemblyCommands in Tanuki.Instance.Commands.AssemblyCommands)
+        foreach (KeyValuePair<Assembly, HashSet<Type>> assemblyCommands in commandRegistry.AssemblyCommands)
         {
-            Assembly Assembly = AssemblyCommands.Key;
+            Assembly assembly = assemblyCommands.Key;
 
-            string SectionName =
-                Tanuki.Instance.Plugins.AssemblyPlugins.TryGetValue(Assembly, out HashSet<Type> AssemblyPlugins) ?
-                Tanuki.Instance.Plugins.PluginEntries[AssemblyPlugins.First()].Name : Assembly.GetName().Name;
+            string sectionName =
+                pluginRegistry.AssemblyPlugins.TryGetValue(assembly, out HashSet<Type> AssemblyPlugins) ?
+                pluginRegistry.PluginInterfaces[AssemblyPlugins.First()].Name : assembly.GetName().Name;
 
-            bool SkipPlugin = Arguments.Length != 0;
+            bool skip = arguments.Count != 0;
 
-            foreach (string Argument in Arguments)
+            foreach (string argument in arguments)
             {
-                if (SectionName.IndexOf(Argument, StringComparison.InvariantCultureIgnoreCase) < 0)
+                if (sectionName.IndexOf(argument, StringComparison.OrdinalIgnoreCase) < 0)
                     continue;
 
-                SkipPlugin = false;
+                skip = false;
                 break;
             }
 
-            if (SkipPlugin)
+            if (skip)
                 continue;
 
-            MessageSection.Clear();
+            messageSection.Clear();
 
-            ushort InactiveCommandsCount = BuildMessageSection(MessageSection, AssemblyCommands.Value, AdditionalNames, AdditionalNamesSeparator);
+            ushort inactiveCommands = BuildMessageSection(messageSection, assemblyCommands.Value, additionalNames, additionalNamesSeparator);
 
-            if (MessageSection.Length == 0 &&
-                InactiveCommandsCount == 0)
+            if (messageSection.Length == 0 &&
+                inactiveCommands == 0)
                 continue;
 
-            Message.Append(Main.Instance.Translate("Commands.Help.Header", SectionName));
+            message.Append(Main.Instance.Translate("Commands.Help.Header", sectionName));
 
-            Message.Append(MessageSection);
+            message.Append(messageSection);
 
-            if (InactiveCommandsCount > 0)
-                Message.Append(Main.Instance.Translate("Commands.Help.Inactive", InactiveCommandsCount));
+            if (inactiveCommands > 0)
+                message.Append(Main.Instance.Translate("Commands.Help.Inactive", inactiveCommands));
         }
 
-        if (Message.Length == 0)
+        if (message.Length == 0)
         {
             ChatBehaviour._current.New_ChatMessage(Main.Instance.Translate("Commands.Help.PluginsNotFound"));
             return false;
         }
 
-        ChatBehaviour._current.New_ChatMessage(Message.ToString());
+        ChatBehaviour._current.New_ChatMessage(message.ToString());
 
         return false;
     }
 
-    private static ushort BuildMessageSection(StringBuilder StringBuilder, IEnumerable<Type> CommandTypes, List<string> AdditionalNames, string AdditionalNamesSeparator)
+    private ushort BuildMessageSection(StringBuilder stringBuilder, IEnumerable<Type> commands, List<string> additionalNames, string additionalNamesSeparator)
     {
-        ushort InactiveCommandsCount = 0;
+        ushort inactiveCommands = 0;
 
-        foreach (Type CommandType in CommandTypes)
+        foreach (Type command in commands)
         {
-            CommandConfigurationItem CommandConfiguration = Tanuki.Instance.Commands.CommandEntries[CommandType].Configuration;
+            Serialization.Commands.Configuration configuration = commandRegistry.CommandConfigurations[command];
 
-            if (CommandConfiguration.Names.Count == 0)
+            if (configuration.names.Count == 0)
             {
-                InactiveCommandsCount++;
+                inactiveCommands++;
                 continue;
             }
 
-            AdditionalNames.Clear();
+            additionalNames.Clear();
 
-            int CommandNamesCount = CommandConfiguration.Names.Count;
-            for (int i = 1; i < CommandNamesCount; i++)
-                AdditionalNames.Add(Main.Instance.Translate("Commands.Help.Active.Entry.AdditionalNames.Item", CommandConfiguration.Names[i]));
+            int commandNamesCount = configuration.names.Count;
+            for (int index = 1; index < commandNamesCount; index++)
+                additionalNames.Add(Main.Instance.Translate("Commands.Help.Active.Entry.AdditionalNames.Item", configuration.names[index]));
 
-            string CommandSyntax =
-                string.IsNullOrEmpty(CommandConfiguration.Syntax) ?
-                string.Empty : Main.Instance.Translate("Commands.Help.Active.Entry.Syntax", CommandConfiguration.Syntax);
+            string commandSyntax =
+                string.IsNullOrEmpty(configuration.syntax) ?
+                string.Empty : Main.Instance.Translate("Commands.Help.Active.Entry.Syntax", configuration.syntax);
 
-            string CommandHelp =
-                string.IsNullOrEmpty(CommandConfiguration.Help) ?
-                string.Empty : Main.Instance.Translate("Commands.Help.Active.Entry.Help", CommandConfiguration.Help);
+            string commandHelp =
+                string.IsNullOrEmpty(configuration.help) ?
+                string.Empty : Main.Instance.Translate("Commands.Help.Active.Entry.Help", configuration.help);
 
-            string CommandAdditionalNames =
-                CommandNamesCount > 1 ?
-                Main.Instance.Translate("Commands.Help.Active.Entry.AdditionalNames", string.Join(AdditionalNamesSeparator, AdditionalNames)) : string.Empty;
+            string commandAdditionalNames =
+                commandNamesCount > 1 ?
+                Main.Instance.Translate("Commands.Help.Active.Entry.AdditionalNames", string.Join(additionalNamesSeparator, additionalNames)) : string.Empty;
 
-            StringBuilder.Append(
+            stringBuilder.Append(
                 Main.Instance.Translate(
                     "Commands.Help.Active.Entry",
-                    CommandConfiguration.Names[0],
-                    CommandSyntax,
-                    CommandAdditionalNames,
-                    CommandHelp
+                    configuration.names[0],
+                    commandSyntax,
+                    commandAdditionalNames,
+                    commandHelp
                 )
             );
         }
 
-        return InactiveCommandsCount;
+        return inactiveCommands;
     }
 }

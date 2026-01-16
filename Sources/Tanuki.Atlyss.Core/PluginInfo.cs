@@ -1,6 +1,6 @@
 ﻿namespace Tanuki.Atlyss.Core;
 
-internal static class PluginInfo
+public static class PluginInfo
 {
     public const string
         NAME = "Tanuki.Atlyss",

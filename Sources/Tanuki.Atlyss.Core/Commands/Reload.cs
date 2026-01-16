@@ -1,50 +1,53 @@
 ﻿using System.Collections.Generic;
-using Tanuki.Atlyss.API.Commands;
-using Tanuki.Atlyss.API.Plugins;
+using Tanuki.Atlyss.API.Tanuki.Commands;
+using Tanuki.Atlyss.API.Tanuki.Plugins;
 
 namespace Tanuki.Atlyss.Core.Commands;
 
-public class Reload : ICommand
+public sealed class Reload : ICommand
 {
-    public EAllowedCaller AllowedCaller => EAllowedCaller.Player;
-    public EExecutionSide ExecutionSide => EExecutionSide.Client;
+    private readonly Registers.Plugins pluginRegistry = Tanuki.Instance.Registers.Plugins;
+    private readonly Managers.Plugins pluginManager = Tanuki.Instance.Managers.Plugins;
 
-    public bool Execute(Context Context)
+    public ICallerPolicy CallerPolicy => new Policies.Commands.Caller.MainPlayer();
+    public IExecutionPolicy ExecutionPolicy => new Policies.Commands.Execution.Player();
+
+    public bool Execute(IContext context)
     {
-        string[] Arguments = Context.Arguments;
+        IReadOnlyList<string> arguments = context.Arguments;
 
-        if (Arguments.Length == 0)
+        if (arguments.Count == 0)
         {
             ChatBehaviour._current.New_ChatMessage(Main.Instance.Translate("Commands.Reload.Full"));
-            Tanuki.Instance.Plugins.ReloadPlugins();
+            pluginManager.ReloadPlugins();
             return false;
         }
 
-        List<IPlugin> Plugins = [];
-        List<string> PluginNames = [];
+        List<IPlugin> plugins = [];
+        List<string> pluginNames = [];
 
-        foreach (IPlugin Plugin in Tanuki.Instance.Plugins.PluginEntries.Values)
+        foreach (IPlugin plugin in pluginRegistry.PluginInterfaces.Values)
         {
-            string PluginName = Plugin.Name;
-            bool Skip = true;
+            string pluginName = plugin.Name;
+            bool skip = true;
 
-            foreach (string Argument in Arguments)
+            foreach (string Argument in arguments)
             {
-                if (PluginName.IndexOf(Argument, System.StringComparison.InvariantCultureIgnoreCase) < 0)
+                if (pluginName.IndexOf(Argument, System.StringComparison.OrdinalIgnoreCase) < 0)
                     continue;
 
-                Skip = false;
+                skip = false;
                 break;
             }
 
-            if (Skip)
+            if (skip)
                 continue;
 
-            Plugins.Add(Plugin);
-            PluginNames.Add(PluginName);
+            plugins.Add(plugin);
+            pluginNames.Add(pluginName);
         }
 
-        if (Plugins.Count == 0)
+        if (plugins.Count == 0)
         {
             ChatBehaviour._current.New_ChatMessage(Main.Instance.Translate("Commands.Reload.PluginsNotFound"));
             return false;
@@ -55,13 +58,13 @@ public class Reload : ICommand
                 "Commands.Reload.Plugins",
                 string.Join(
                     Main.Instance.Translate("Commands.Reload.Plugins.Separator"),
-                    PluginNames
+                    pluginNames
                 )
             )
         );
 
-        foreach (IPlugin Plugin in Plugins)
-            Tanuki.Instance.Plugins.ReloadPlugin(Plugin);
+        foreach (IPlugin plugin in plugins)
+            pluginManager.ReloadPlugin(plugin);
 
         return false;
     }

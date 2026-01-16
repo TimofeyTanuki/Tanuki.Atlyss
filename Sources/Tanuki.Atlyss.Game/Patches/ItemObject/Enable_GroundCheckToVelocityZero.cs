@@ -1,26 +1,30 @@
 ﻿using HarmonyLib;
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Tanuki.Atlyss.Game.Patches.ItemObject;
 
 [HarmonyPatch(typeof(global::ItemObject), "Enable_GroundCheckToVelocityZero", MethodType.Normal)]
-public class Enable_GroundCheckToVelocityZero
+public sealed class Enable_GroundCheckToVelocityZero
 {
-    public delegate void Postfix(global::ItemObject ItemObject);
-    private static Postfix? _OnPostfix;
+    private static Action<global::ItemObject>? onPostfix;
 
-    public static event Postfix OnPostfix
+    public static event Action<global::ItemObject> OnPostfix
     {
-        add => Managers.Patches.Subscribe<Enable_GroundCheckToVelocityZero, Postfix>(ref _OnPostfix, value);
-        remove => Managers.Patches.Unsubscribe(ref _OnPostfix, value);
+        add
+        {
+            if (Managers.Patches.EnsurePatched<Enable_GroundCheckToVelocityZero>())
+                onPostfix += value;
+        }
+        remove => onPostfix -= value;
     }
 
     [HarmonyPostfix, SuppressMessage("CodeQuality", "IDE0051")]
-    private static void PostfixMethod(global::ItemObject __instance)
+    private static void Postfix(global::ItemObject __instance)
     {
-        if (_OnPostfix is null)
+        if (onPostfix is null)
             return;
 
-        _OnPostfix.Invoke(__instance);
+        onPostfix.Invoke(__instance);
     }
 }

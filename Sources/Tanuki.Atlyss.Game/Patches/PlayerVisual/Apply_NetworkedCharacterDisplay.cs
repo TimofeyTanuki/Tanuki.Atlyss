@@ -3,25 +3,30 @@
 namespace Tanuki.Atlyss.Game.Patches.PlayerVisual;
 
 [HarmonyPatch(typeof(global::PlayerVisual), nameof(global::PlayerVisual.Apply_NetworkedCharacterDisplay), MethodType.Normal)]
-public class Apply_NetworkedCharacterDisplay
+public sealed class Apply_NetworkedCharacterDisplay
 {
-    public delegate void Prefix(global::PlayerVisual PlayerVisual, ref bool ShouldAllow);
-    private static Prefix? _OnPrefix;
+    public delegate void PrefixHandler(global::PlayerVisual instance, ref bool runOriginal);
 
-    public static event Prefix OnPrefix
+    private static PrefixHandler? onPrefix;
+
+    public static event PrefixHandler OnPrefix
     {
-        add => Managers.Patches.Subscribe<Apply_NetworkedCharacterDisplay, Prefix>(ref _OnPrefix, value);
-        remove => Managers.Patches.Unsubscribe(ref _OnPrefix, value);
+        add
+        {
+            if (Managers.Patches.EnsurePatched<Apply_NetworkedCharacterDisplay>())
+                onPrefix += value;
+        }
+        remove => onPrefix -= value;
     }
 
     [HarmonyPrefix]
-    private static bool PrefixMethod(global::PlayerVisual __instance)
+    private static bool Prefix(global::PlayerVisual __instance)
     {
-        if (_OnPrefix is null)
+        if (onPrefix is null)
             return true;
 
-        bool ShouldAllow = true;
-        _OnPrefix.Invoke(__instance, ref ShouldAllow);
-        return ShouldAllow;
+        bool runOriginal = true;
+        onPrefix.Invoke(__instance, ref runOriginal);
+        return runOriginal;
     }
 }

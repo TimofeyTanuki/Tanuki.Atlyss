@@ -1,25 +1,29 @@
 ﻿using HarmonyLib;
+using System;
 
 namespace Tanuki.Atlyss.Game.Patches.NetworkBehaviour;
 
 [HarmonyPatch(typeof(Mirror.NetworkBehaviour), nameof(Mirror.NetworkBehaviour.OnStopClient), MethodType.Normal)]
-public class OnStopClient
+public sealed class OnStopClient
 {
-    public delegate void Prefix(Mirror.NetworkBehaviour NetworkBehaviour);
-    private static Prefix? _OnPrefix;
+    private static Action<Mirror.NetworkBehaviour>? onPrefix;
 
-    public static event Prefix OnPrefix
+    public static event Action<Mirror.NetworkBehaviour> OnPrefix
     {
-        add => Managers.Patches.Subscribe<OnStopClient, Prefix>(ref _OnPrefix, value);
-        remove => Managers.Patches.Unsubscribe(ref _OnPrefix, value);
+        add
+        {
+            if (Managers.Patches.EnsurePatched<OnStopClient>())
+                onPrefix += value;
+        }
+        remove => onPrefix -= value;
     }
 
     [HarmonyPrefix]
-    private static void PrefixMethod(Mirror.NetworkBehaviour __instance)
+    private static void Prefix(Mirror.NetworkBehaviour __instance)
     {
-        if (_OnPrefix is null)
+        if (onPrefix is null)
             return;
 
-        _OnPrefix.Invoke(__instance);
+        onPrefix.Invoke(__instance);
     }
 }

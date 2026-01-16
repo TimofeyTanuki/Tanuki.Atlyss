@@ -1,26 +1,30 @@
 ﻿using HarmonyLib;
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Tanuki.Atlyss.Game.Patches.MapInstance;
 
 [HarmonyPatch(typeof(global::MapInstance), "Handle_InstanceRuntime", MethodType.Normal)]
-public class Handle_InstanceRuntime
+public sealed class Handle_InstanceRuntime
 {
-    public delegate void Postfix(global::MapInstance MapInstance);
-    private static Postfix? _OnPostfix;
+    private static Action<global::MapInstance>? onPostfix;
 
-    public static event Postfix OnPostfix
+    public static event Action<global::MapInstance> OnPostfix
     {
-        add => Managers.Patches.Subscribe<Handle_InstanceRuntime, Postfix>(ref _OnPostfix, value);
-        remove => Managers.Patches.Unsubscribe(ref _OnPostfix, value);
+        add
+        {
+            if (Managers.Patches.EnsurePatched<Handle_InstanceRuntime>())
+                onPostfix += value;
+        }
+        remove => onPostfix -= value;
     }
 
     [HarmonyPostfix, SuppressMessage("CodeQuality", "IDE0051")]
     private static void PostfixMethod(global::MapInstance __instance)
     {
-        if (_OnPostfix is null)
+        if (onPostfix is null)
             return;
 
-        _OnPostfix.Invoke(__instance);
+        onPostfix.Invoke(__instance);
     }
 }

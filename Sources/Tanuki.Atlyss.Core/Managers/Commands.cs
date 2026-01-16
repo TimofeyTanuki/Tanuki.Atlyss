@@ -1,323 +1,92 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using Tanuki.Atlyss.API.Commands;
-using Tanuki.Atlyss.Core.Models;
+using Tanuki.Atlyss.API.Tanuki.Commands;
+using Tanuki.Atlyss.Core.Contexts.Commands;
 
 namespace Tanuki.Atlyss.Core.Managers;
 
 public sealed class Commands
 {
-    public delegate void CommandInstanceCreated(Type Type);
-    public event CommandInstanceCreated? OnCommandInstanceCreated;
+    private readonly Parsers.Commands parser = new(['"', '\'', '`']);
+    private readonly Registers.Commands register;
+    private readonly Data.Settings.Commands settings;
 
-    public delegate void CommandEntryCreated(Type Type);
-    public event CommandEntryCreated? OnCommandEntryCreated;
+    private Func<Type, ICommand> CommandFactory => type => (ICommand)Activator.CreateInstance(type);
 
-    public delegate void CommandEntryRemoved(Type Type);
-    public event CommandEntryRemoved? OnCommandEntryRemoved;
-
-    private readonly Dictionary<string, Type> _CommandNames = [];
-    private readonly Dictionary<Type, CommandEntry> _CommandEntries = [];
-    private readonly Dictionary<Assembly, HashSet<Type>> _AssemblyCommands = [];
-
-    /// <summary>
-    /// Provides a lookup of a command <see cref="Type"/> by their active names.
-    /// </summary>
-    public IReadOnlyDictionary<string, Type> CommandNames => _CommandNames;
-
-    /// <summary>
-    /// Provides a lookup of <see cref="CommandEntry"/> by their command <see cref="Type"/>.
-    /// </summary>
-    /// <remarks>
-    /// Modifying <see cref="CommandEntry"/> isn't recommended, as they're managed by <see cref="Commands"/>.
-    /// </remarks>
-    public IReadOnlyDictionary<Type, CommandEntry> CommandEntries => _CommandEntries;
-
-    /// <summary>
-    /// Provides a list of commands by their <see cref="Assembly"/>.
-    /// </summary>
-    /// <remarks>
-    /// Modifying <see cref="HashSet{T}"/> values isn't recommended, as they're managed by <see cref="Commands"/>.
-    /// </remarks>
-    public IReadOnlyDictionary<Assembly, HashSet<Type>> AssemblyCommands => _AssemblyCommands;
-
-    private readonly Func<Type, ICommand> CommandFactory = Type => (ICommand)Activator.CreateInstance(Type);
-
-    internal Commands() { }
-
-    private Dictionary<string, CommandConfigurationItem>? TryReadConfiguration(string ConfigurationFile)
+    internal Commands(Registers.Commands register, Data.Settings.Commands settings)
     {
-        if (File.Exists(ConfigurationFile))
-        {
-            try
-            {
-                return JsonConvert.DeserializeObject<Dictionary<string, CommandConfigurationItem>>(File.ReadAllText(ConfigurationFile)) ?? [];
-            }
-            catch (Exception Exception)
-            {
-                Main.Instance.ManualLogSource.LogError($"Unable to read the configuration file \"{ConfigurationFile}\".\nException message:\n{Exception.Message}\nStack trace:\n{Exception.StackTrace}");
-                return null;
-            }
-        }
-
-        return [];
+        this.register = register;
+        this.settings = settings;
     }
 
-    private void TrySaveConfiguration(Dictionary<string, CommandConfigurationItem> CommandConfiguration, string ConfigurationFile)
+    private void ProcessCommand(Type commandType, ICaller caller, EExecutionSide executionSide, IReadOnlyList<string> arguments)
     {
+        Main.Instance.ManualLogSource.LogInfo("ProcessCommand");
+
+        ICommand command;
+
         try
         {
-            File.WriteAllText(ConfigurationFile, JsonConvert.SerializeObject(CommandConfiguration, Formatting.Indented));
+            command = CommandFactory(commandType);
         }
         catch (Exception Exception)
         {
-            Main.Instance.ManualLogSource.LogError($"Failed to save the updated configuration file \"{ConfigurationFile}\".\nException message:\n{Exception.Message}\nStack trace:\n{Exception.StackTrace}");
+            Main.Instance.ManualLogSource.LogError($"Failed to create an instance of the command {commandType.FullName}.\nException message:\n{Exception.Message}\nStack trace:\n{Exception.StackTrace}");
             return;
         }
-    }
 
-    private uint UpdateCommand(Dictionary<string, Type> PluginCommandTypes, Dictionary<string, CommandConfigurationItem> CommandConfigurations)
-    {
-        uint Changes = 0;
-
-        foreach (string CommandConfigurationKey in CommandConfigurations.Keys.ToArray())
-        {
-            if (!PluginCommandTypes.TryGetValue(CommandConfigurationKey, out Type CommandType))
-                continue;
-
-            PluginCommandTypes.Remove(CommandConfigurationKey);
-
-            CommandConfigurationItem CommandConfiguration = CommandConfigurations[CommandConfigurationKey];
-
-            if (CommandConfiguration is null)
-            {
-                Main.Instance.ManualLogSource.LogInfo($"Command entry for {CommandType.FullName} has been restored.");
-
-                CommandConfiguration = CreateCommandConfiguration(CommandType);
-                CommandConfigurations[CommandConfigurationKey] = CommandConfiguration;
-
-                Changes++;
-            }
-            else
-            {
-                if (CommandConfiguration.Names is null)
-                {
-                    CommandConfiguration.Names = [];
-
-                    Changes++;
-
-                    continue;
-                }
-
-                for (int CommandNameIndex = CommandConfiguration.Names.Count - 1; CommandNameIndex >= 0; CommandNameIndex--)
-                {
-                    string? CommandName = CommandConfiguration.Names[CommandNameIndex];
-                    string NormalizedCommandName = NormalizeCommandName(CommandName);
-
-                    if (string.IsNullOrEmpty(NormalizedCommandName))
-                    {
-                        Main.Instance.ManualLogSource.LogInfo($"Removed empty command name from {CommandType.FullName}");
-
-                        CommandConfiguration.Names.RemoveAt(CommandNameIndex);
-
-                        Changes++;
-
-                        continue;
-                    }
-
-                    if (CommandName != NormalizedCommandName)
-                    {
-                        Main.Instance.ManualLogSource.LogInfo($"Command {CommandType.FullName} name normalized: {CommandName} -> {NormalizedCommandName}.");
-
-                        CommandConfiguration.Names[CommandNameIndex] = NormalizedCommandName;
-
-                        Changes++;
-                    }
-
-                    if (_CommandNames.TryGetValue(CommandName, out Type ConflictType))
-                    {
-                        Main.Instance.ManualLogSource.LogWarning($"Command name \"{CommandName}\" of {CommandType.FullName} is already used by {ConflictType.FullName}.");
-                        continue;
-                    }
-
-                    _CommandNames.Add(CommandName, CommandType);
-                }
-
-                UpdateCommandEntryConfiguration(CommandType, CommandConfiguration);
-            }
-
-            OnCommandEntryCreated?.Invoke(CommandType);
-        }
-
-        foreach (KeyValuePair<string, Type> NewPluginCommandType in PluginCommandTypes)
-        {
-            Main.Instance.ManualLogSource.LogInfo($"Command entry for {NewPluginCommandType.Key} has been created.");
-
-            CommandConfigurationItem CommandConfiguration = CreateCommandConfiguration(NewPluginCommandType.Value);
-            CommandConfigurations.Add(NewPluginCommandType.Key, CommandConfiguration);
-
-            UpdateCommandEntryConfiguration(NewPluginCommandType.Value, CommandConfiguration);
-
-            Changes++;
-        }
-
-        return Changes;
-    }
-
-    private void UpdateCommandEntryConfiguration(Type CommandType, CommandConfigurationItem CommandConfiguration)
-    {
-        if (!_CommandEntries.TryGetValue(CommandType, out CommandEntry CommandEntry))
+        if (!command.CallerPolicy.IsAllowed(caller))
             return;
 
-        CommandEntry.Configuration = CommandConfiguration;
-    }
+        if (!command.ExecutionPolicy.CanExecute(executionSide))
+            return;
 
-    public void RegisterAssembly(Assembly Assembly, string ConfigurationFile)
-    {
-        Dictionary<string, Type> PluginCommandTypes = [];
-
-        Type[] AssemblyTypes;
         try
         {
-            AssemblyTypes = Assembly.GetTypes();
-        }
-        catch (Exception Exception)
-        {
-            Main.Instance.ManualLogSource.LogError($"Failed to retrieve types from assembly {Assembly.GetName().Name}\nException message:\n{Exception.Message}\nStack trace:\n{Exception.StackTrace}");
-            return;
-        }
-
-        Type InterfaceType = typeof(ICommand);
-
-        foreach (Type AssemblyType in AssemblyTypes)
-        {
-            if (AssemblyType.IsAbstract || AssemblyType.IsInterface)
-                continue;
-
-            if (!InterfaceType.IsAssignableFrom(AssemblyType))
-                continue;
-
-            if (_CommandEntries.ContainsKey(AssemblyType))
-                continue;
-
-            ICommand Command;
-
-            try
-            {
-                Command = CommandFactory(AssemblyType);
-            }
-            catch (Exception Exception)
-            {
-                Main.Instance.ManualLogSource.LogError($"Failed to obtain the interface for the command {AssemblyType.FullName}.\nException message:\n{Exception.Message}\nStack trace:\n{Exception.StackTrace}");
-                continue;
-            }
-
-            if (!_AssemblyCommands.TryGetValue(Assembly, out HashSet<Type> AssemblyCommands))
-            {
-                AssemblyCommands = [];
-                _AssemblyCommands[Assembly] = AssemblyCommands;
-            }
-
-            AssemblyCommands.Add(AssemblyType);
-
-            PluginCommandTypes.Add(AssemblyType.FullName, AssemblyType);
-
-            // TODO: ADD HASH CODE FOR NETWORKING
-
-            CommandEntry CommandEntry = new(Command);
-
-            _CommandEntries.Add(
-                AssemblyType,
-                CommandEntry
+            command.Execute(
+                new Context()
+                {
+                    Caller = caller,
+                    Arguments = arguments
+                }
             );
-
-            OnCommandInstanceCreated?.Invoke(AssemblyType);
+        }
+        catch (Exception exception)
+        {
+            // log
         }
 
-        if (PluginCommandTypes.Count == 0)
-            return;
-
-        Dictionary<string, CommandConfigurationItem>? CommandConfiguration = TryReadConfiguration(ConfigurationFile);
-
-        if (CommandConfiguration is null)
-            return;
-
-        uint Changes = UpdateCommand(PluginCommandTypes, CommandConfiguration);
-
-        if (Changes == 0)
-            return;
-
-        TrySaveConfiguration(CommandConfiguration, ConfigurationFile);
+        if (command is IDisposable disposable)
+        {
+            try
+            {
+                disposable.Dispose();
+            }
+            catch (Exception Exception)
+            {
+                // log
+            }
+        }
     }
 
-    public void DeregisterCommand(Type CommandType)
+    public bool ProcessCommand(ICaller caller, string input)
     {
-        if (!_CommandEntries.TryGetValue(CommandType, out CommandEntry CommandEntry))
-            return;
+        Main.Instance.ManualLogSource.LogInfo($"Message: {input}");
+        bool result = parser.TryParse(settings.ClientPrefix, input, register.CommandNameMap, out string commandName, out IReadOnlyList<string> commandArguments);
 
-        if (CommandEntry.Configuration is not null)
-            foreach (string Name in CommandEntry.Configuration.Names)
-                _CommandNames.Remove(Name);
+        Console.WriteLine($"Arguments: [{string.Join(", ", commandArguments ?? [])}]");
 
-        try
+        Main.Instance.ManualLogSource.LogInfo($"Command? {result}");
+
+        if (result)
         {
-            CommandEntry.Dispose();
-        }
-        catch (Exception Exception)
-        {
-            Main.Instance.ManualLogSource.LogError($"Failed to dispose the command {CommandType.FullName}.\nException message:\n{Exception.Message}\nStack trace:\n{Exception.StackTrace}");
+            Type command = register.CommandNameMap[commandName];
+
+
+
+            ProcessCommand(command, caller, EExecutionSide.MainPlayer, commandArguments);
         }
 
-        _CommandEntries.Remove(CommandType);
-
-        OnCommandEntryRemoved?.Invoke(CommandType);
-    }
-
-    public void DeregisterAssembly(Assembly Assembly)
-    {
-        if (!_AssemblyCommands.TryGetValue(Assembly, out HashSet<Type> AssemblyCommands))
-            return;
-
-        foreach (Type AssemblyCommand in AssemblyCommands)
-            DeregisterCommand(AssemblyCommand);
-
-        _AssemblyCommands.Remove(Assembly);
-    }
-
-    private CommandConfigurationItem CreateCommandConfiguration(Type CommandType)
-    {
-        CommandConfigurationItem CommandConfiguration = new()
-        {
-            Names = [NormalizeCommandName(CommandType.FullName)]
-        };
-
-        return CommandConfiguration;
-    }
-
-    public static string NormalizeCommandName(string? CommandName)
-    {
-        if (string.IsNullOrEmpty(CommandName))
-            return string.Empty;
-
-        int CommandNameLength = CommandName.Length;
-        char[] Characters = new char[CommandNameLength];
-        int CharacterPosition = 0;
-
-        for (int Index = 0; Index < CommandNameLength; Index++)
-        {
-            char Character = CommandName[Index];
-
-            if (Character == ' ')
-                continue;
-
-            Character = char.ToLowerInvariant(Character);
-            Characters[CharacterPosition++] = Character;
-        }
-
-        return new string(Characters, 0, CharacterPosition);
+        return result;
     }
 }

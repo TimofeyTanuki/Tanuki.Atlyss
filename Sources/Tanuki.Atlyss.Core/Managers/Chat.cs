@@ -1,23 +1,29 @@
-﻿using Mirror;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Tanuki.Atlyss.API.Commands.Callers;
-
-namespace Tanuki.Atlyss.Core.Managers;
+﻿namespace Tanuki.Atlyss.Core.Managers;
 
 public sealed class Chat
 {
-    internal Chat() { }
+    private readonly Commands Commands;
+    private readonly Data.Commands.Callers.Player CommandCaller = new();
 
-    public void OnPlayerChatted(string Message, ref bool ShouldAllow)
+    internal Chat(Commands Commands) => this.Commands = Commands;
+
+    public void OnPlayerChatted(string message, ref bool runOriginal)
     {
+        if (CommandCaller.player != Player._mainPlayer)
+            CommandCaller.player = Player._mainPlayer;
 
+        if (Commands.ProcessCommand(CommandCaller, message))
+        {
+            ChatBehaviour._current._chatAssets._chatInput.text = string.Empty;
+            ChatBehaviour._current._chatAssets._chatInput.DeactivateInputField();
+
+            runOriginal = false;
+        }
     }
 
-    public void SendClientMessage(string Message) =>
-        Player._mainPlayer._chatBehaviour.New_ChatMessage(Message);
+    public void SendClientMessage(string message) =>
+        Player._mainPlayer._chatBehaviour.New_ChatMessage(message);
 
-    public void SendServerMessage(Player Player, string Message) =>
-        Player._chatBehaviour.Target_RecieveMessage(Message);
+    public void SendServerMessage(Player player, string message) =>
+        player._chatBehaviour.Target_RecieveMessage(message);
 }

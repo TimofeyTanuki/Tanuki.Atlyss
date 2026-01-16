@@ -1,25 +1,29 @@
 ﻿using HarmonyLib;
+using System;
 
 namespace Tanuki.Atlyss.Game.Patches.Player;
 
 [HarmonyPatch(typeof(global::Player), nameof(global::Player.OnStartAuthority), MethodType.Normal)]
-public class OnStartAuthority
+public sealed class OnStartAuthority
 {
-    public delegate void Postfix(global::Player Player);
-    private static Postfix? _OnPostfix;
+    private static Action<global::Player>? onPostfix;
 
-    public static event Postfix OnPostfix
+    public static event Action<global::Player> OnPostfix
     {
-        add => Managers.Patches.Subscribe<OnStartAuthority, Postfix>(ref _OnPostfix, value);
-        remove => Managers.Patches.Unsubscribe(ref _OnPostfix, value);
+        add
+        {
+            if (Managers.Patches.EnsurePatched<OnStartAuthority>())
+                onPostfix += value;
+        }
+        remove => onPostfix -= value;
     }
 
     [HarmonyPostfix]
-    private static void PostfixMethod(global::Player __instance)
+    private static void Postfix(global::Player __instance)
     {
-        if (_OnPostfix is null)
+        if (onPostfix is null)
             return;
 
-        _OnPostfix.Invoke(__instance);
+        onPostfix.Invoke(__instance);
     }
 }

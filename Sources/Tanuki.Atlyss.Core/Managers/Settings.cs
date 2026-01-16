@@ -7,62 +7,84 @@ namespace Tanuki.Atlyss.Core.Managers;
 
 public sealed class Settings
 {
-    public string[] PreferredLanguages { get; internal set; } = null!;
-    internal readonly Dictionary<string, byte> _PreferredLanguageOrder = new(StringComparer.OrdinalIgnoreCase);
-    public IReadOnlyDictionary<string, byte> PreferredLanguageOrder => _PreferredLanguageOrder;
+    private readonly Data.Tanuki.Settings settings;
 
-    internal Settings() { }
+    internal Settings(Data.Tanuki.Settings settings) => this.settings = settings;
 
-    private void RefreshPreferredLanguages()
+    private void RefreshLanguageSection()
     {
-        _PreferredLanguageOrder.Clear();
+        Data.Settings.Translations section = settings.Translations;
 
-        HashSet<char> InvalidCharacters = [.. Path.GetInvalidFileNameChars()];
-        List<string> Languages = [];
+        HashSet<char> invalidCharacters = [.. Path.GetInvalidFileNameChars()];
+        List<string> languages = [];
 
-        byte Priority = 0;
-        foreach (string RawString in Configuration.Instance.General.PreferredLanguages.Value.Split(',', StringSplitOptions.RemoveEmptyEntries))
+        byte priority = 0;
+        foreach (string rawString in Configuration.Instance.Language.PreferredLanguages.Value.Split(',', StringSplitOptions.RemoveEmptyEntries))
         {
-            Span<char> Span = RawString
+            Span<char> span = rawString
                 .ToCharArray()
                 .AsSpan();
 
-            for (int Position = 0; Position < Span.Length; Position++)
-                Span[Position] = char.ToLowerInvariant(Span[Position]);
+            for (int position = 0; position < span.Length; position++)
+                span[position] = char.ToLower(span[position]);
 
-            Span = Span.RemoveCharacters(InvalidCharacters);
+            span = span.RemoveCharacters(invalidCharacters);
 
-            int Start = 0;
-            while (Start < Span.Length && Span[Start] == ' ')
-                Start++;
+            int start = 0;
+            while (start < span.Length && span[start] == ' ')
+                start++;
 
-            int End = Span.Length;
-            while (End > Start && (Span[End - 1] == ' ' || Span[End - 1] == '.'))
-                End--;
+            int end = span.Length;
+            while (end > start && (span[end - 1] == ' ' || span[end - 1] == '.'))
+                end--;
 
-            Span = Span[Start..End];
+            span = span[start..end];
 
-            if (Span.Length == 0 || (Span.Length == 1 && Span[0] == '.'))
+            if (span.Length == 0 || (span.Length == 1 && span[0] == '.'))
                 continue;
 
-            string Language = Span.ToString();
+            string language = span.ToString();
 
-            if (!_PreferredLanguageOrder.TryAdd(Language, Priority))
+            if (!section.preferredLanguageOrder.TryAdd(language, priority))
                 continue;
 
-            Languages.Add(Language);
+            languages.Add(language);
 
-            if (Priority == byte.MaxValue)
+            if (priority == byte.MaxValue)
                 break;
 
-            Priority++;
+            priority++;
         }
 
-        PreferredLanguages = [.. Languages];
+        section.PreferredLanguages = [.. languages];
     }
 
-    public void Refresh()
+    private void RefreshCommandsSection()
     {
-        RefreshPreferredLanguages();
+        Data.Settings.Commands section = settings.Commands;
+        section.ClientPrefix = Configuration.Instance.Commands.ClientPrefix.Value;
+        section.ServerPrefix = Configuration.Instance.Commands.ServerPrefix.Value;
+
+        if (section.ClientPrefix.Length == 0 ||
+            section.ClientPrefix.Length > Data.Settings.Commands.CLIENTPREFIX_MAXLENGTH)
+        {
+            section.ClientPrefix = Data.Settings.Commands.CLIENTPREFIX_DEFAULT;
+            Configuration.Instance.Commands.ClientPrefix.Value = section.ClientPrefix;
+        }
+
+        if (section.ServerPrefix.Length == 0 ||
+            section.ServerPrefix.Length > Data.Settings.Commands.SERVERPREFIX_MAXLENGTH)
+        {
+            section.ServerPrefix = Data.Settings.Commands.SERVERPREFIX_DEFAULT;
+            Configuration.Instance.Commands.ServerPrefix.Value = section.ServerPrefix;
+        }
+
+        settings.Commands.Prefixes = [Configuration.Instance.Commands.ClientPrefix.Value, Configuration.Instance.Commands.ServerPrefix.Value];
+    }
+
+    internal void Refresh()
+    {
+        RefreshCommandsSection();
+        RefreshLanguageSection();
     }
 }

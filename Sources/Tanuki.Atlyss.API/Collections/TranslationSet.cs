@@ -7,92 +7,83 @@ namespace Tanuki.Atlyss.API.Collections;
 
 public class TranslationSet : IDictionary<string, string>
 {
-    protected Dictionary<string, string> Translations;
+    protected Dictionary<string, string> translations;
 
     protected TranslationSet() : this(EqualityComparer<string>.Default) { }
 
-    protected TranslationSet(IEqualityComparer<string> EqualityComparer) =>
-        Translations = new(EqualityComparer);
+    protected TranslationSet(IEqualityComparer<string> equalityComparer) =>
+        translations = new(equalityComparer);
 
-    protected TranslationSet(IDictionary<string, string> Translations) :
-        this(Translations, Translations is Dictionary<string, string> Dictionary ? Dictionary.Comparer : EqualityComparer<string>.Default)
+    protected TranslationSet(IDictionary<string, string> translations) :
+        this(translations, translations is Dictionary<string, string> dictionary ? dictionary.Comparer : EqualityComparer<string>.Default)
     { }
 
-    protected TranslationSet(IDictionary<string, string> Translations, IEqualityComparer<string> EqualityComparer) =>
-        this.Translations = new(Translations, EqualityComparer);
+    protected TranslationSet(IDictionary<string, string> translations, IEqualityComparer<string> equalityComparer) =>
+        this.translations = new(translations, equalityComparer);
 
-    public virtual ICollection<string> Keys => Translations.Keys;
-    public virtual ICollection<string> Values => Translations.Values;
-    public virtual int Count => Translations.Count;
+    public virtual ICollection<string> Keys => translations.Keys;
+    public virtual ICollection<string> Values => translations.Values;
+    public virtual int Count => translations.Count;
     public virtual bool IsReadOnly => false;
 
-    public virtual void Add(string Key, string Value) => Translations.Add(Key, Value);
+    public virtual void Add(string key, string value) => translations.Add(key, value);
 
-    public virtual void Add(KeyValuePair<string, string> Item) => Translations.Add(Item.Key, Item.Value);
+    public virtual void Add(KeyValuePair<string, string> item) => translations.Add(item.Key, item.Value);
 
-    public virtual void Clear() => Translations.Clear();
+    public virtual void Clear() => translations.Clear();
 
-    public virtual bool Contains(KeyValuePair<string, string> Item) =>
-        Translations.TryGetValue(Item.Key, out string Value) && Value == Item.Value;
+    public virtual bool Contains(KeyValuePair<string, string> item) =>
+        translations.TryGetValue(item.Key, out string value) && value == item.Value;
 
-    public virtual bool ContainsKey(string Key) => Translations.ContainsKey(Key);
+    public virtual bool ContainsKey(string key) => translations.ContainsKey(key);
 
-    public virtual void CopyTo(KeyValuePair<string, string>[] Array, int ArrayIndex)
+    public virtual void CopyTo(KeyValuePair<string, string>[] array, int arrayIndex)
     {
-        if (Array is null)
+        if (array is null)
             throw new ArgumentNullException(nameof(Array));
 
-        if (ArrayIndex < 0 || ArrayIndex >= Array.Length)
-            throw new ArgumentOutOfRangeException(nameof(ArrayIndex));
+        if (arrayIndex < 0 || arrayIndex >= array.Length)
+            throw new ArgumentOutOfRangeException(nameof(arrayIndex));
 
-        if (Array.Length - ArrayIndex < Translations.Count)
+        if (array.Length - arrayIndex < translations.Count)
             throw new ArgumentException("The destination array is too small.");
 
-        foreach (KeyValuePair<string, string> Item in Translations)
-            Array[ArrayIndex++] = Item;
+        foreach (KeyValuePair<string, string> Item in translations)
+            array[arrayIndex++] = Item;
     }
 
-    public virtual IEnumerator<KeyValuePair<string, string>> GetEnumerator() => Translations.GetEnumerator();
+    public virtual IEnumerator<KeyValuePair<string, string>> GetEnumerator() => translations.GetEnumerator();
 
-    public virtual bool Remove(string Key) => Translations.Remove(Key);
+    public virtual bool Remove(string key) => translations.Remove(key);
 
-    public virtual bool Remove(KeyValuePair<string, string> Item)
+    public virtual bool Remove(KeyValuePair<string, string> item)
     {
-        if (Translations.TryGetValue(Item.Key, out string Value) && Value == Item.Value)
-            return Translations.Remove(Item.Key);
+        if (translations.TryGetValue(item.Key, out string value) && value == item.Value)
+            return translations.Remove(item.Key);
 
         return false;
     }
 
-    public virtual bool TryGetValue(string Key, out string Value) => Translations.TryGetValue(Key, out Value);
+    public virtual bool TryGetValue(string key, out string value) => translations.TryGetValue(key, out value);
 
-    IEnumerator IEnumerable.GetEnumerator() => Translations.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => translations.GetEnumerator();
 
-    public virtual string this[string Key]
+    public virtual string this[string key]
     {
-        get => Translations[Key];
-        set => Translations[Key] = value;
+        get => translations[key];
+        set => translations[key] = value;
     }
 
-    public virtual string Translate(string Key, params object[] Placeholder) => Translate(CultureInfo.InvariantCulture, Key, Placeholder);
+    public virtual string Translate(string key, params object[] placeholder) => Translate(CultureInfo.InvariantCulture, key, placeholder);
 
-    public virtual string Translate(IFormatProvider FormatProvider, string Key, params object[] Placeholder)
+    public virtual string Translate(IFormatProvider formatProvider, string key, params object[] placeholder)
     {
-        if (!Translations.TryGetValue(Key, out string Value))
-            return $"{{{Key}}}";
+        if (!translations.TryGetValue(key, out string value))
+            return $"{{{key}}}";
 
-        if (Placeholder.Length > 0)
-        {
-            try
-            {
-                Value = string.Format(FormatProvider, Value, Placeholder);
-            }
-            catch (Exception Exception)
-            {
-                Value = $"{{{Key}:{Exception.GetType().Name}}}";
-            }
-        }
+        if (placeholder.Length > 0)
+            value = string.Format(formatProvider, value, placeholder);
 
-        return Value;
+        return value;
     }
 }

@@ -1,26 +1,30 @@
 ﻿using HarmonyLib;
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Tanuki.Atlyss.Game.Patches.LoadSceneManager;
 
 [HarmonyPatch(typeof(global::LoadSceneManager), "Init_LoadScreenDisable", MethodType.Normal)]
-public class Init_LoadScreenDisable
+public sealed class Init_LoadScreenDisable
 {
-    public delegate void Postfix();
-    private static Postfix? _OnPostfix;
+    private static Action? onPostfix;
 
-    public static event Postfix OnPostfix
+    public static event Action OnPostfix
     {
-        add => Managers.Patches.Subscribe<Init_LoadScreenDisable, Postfix>(ref _OnPostfix, value);
-        remove => Managers.Patches.Unsubscribe(ref _OnPostfix, value);
+        add
+        {
+            if (Managers.Patches.EnsurePatched<Init_LoadScreenDisable>())
+                onPostfix += value;
+        }
+        remove => onPostfix -= value;
     }
 
     [HarmonyPostfix, SuppressMessage("CodeQuality", "IDE0051")]
-    private static void PostfixMethod()
+    private static void Postfix()
     {
-        if (_OnPostfix is null)
+        if (onPostfix is null)
             return;
 
-        _OnPostfix.Invoke();
+        onPostfix.Invoke();
     }
 }

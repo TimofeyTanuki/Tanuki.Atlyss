@@ -5,21 +5,21 @@ namespace Tanuki.Atlyss.Core.Extensions;
 
 public static class Span
 {
-    extension(Span<char> Span)
+    extension(Span<char> span)
     {
-        public Span<char> RemoveCharacters(ISet<char> Set)
+        public Span<char> RemoveCharacters(ISet<char> set)
         {
-            int Length = 0;
+            int length = 0;
 
-            for (int Index = 0; Index < Span.Length; Index++)
+            for (int index = 0; index < span.Length; index++)
             {
-                char Character = Span[Index];
+                char character = span[index];
 
-                if (!Set.Contains(Character))
-                    Span[Length++] = Character;
+                if (!set.Contains(character))
+                    span[length++] = character;
             }
 
-            return Span[..Length];
+            return span[..length];
         }
     }
 }

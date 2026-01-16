@@ -2,16 +2,20 @@
 
 namespace Tanuki.Atlyss.Core;
 
-internal class Configuration
+internal sealed class Configuration
 {
     public static Configuration Instance = null!;
-    public Models.Configuration.Settings General = null!;
+
+    public Data.Configuration.Language Language = null!;
+    public Data.Configuration.Commands Commands = null!;
 
     private Configuration() { }
 
-    public static void Initialize() =>
-        Instance ??= new();
+    public static void Initialize() => Instance ??= new();
 
-    public void Load(ConfigFile ConfigFile) =>
-        General = new Models.Configuration.Settings(ref ConfigFile);
+    public void Load(ConfigFile ConfigFile)
+    {
+        Language = new Data.Configuration.Language(ConfigFile);
+        Commands = new Data.Configuration.Commands(ConfigFile);
+    }
 }

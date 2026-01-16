@@ -1,50 +1,56 @@
 ﻿using HarmonyLib;
 using Mirror;
+using System;
 
 namespace Tanuki.Atlyss.Game.Patches.MapInstance;
 
 [HarmonyPatch(typeof(global::MapInstance), nameof(global::MapInstance.DeserializeSyncVars), MethodType.Normal)]
-public class DeserializeSyncVars
+public sealed class DeserializeSyncVars
 {
-    public delegate void Prefix(global::MapInstance MapInstance, NetworkReader NetworkReader, bool InitialState, int InitialPosition);
-    private static Prefix? _OnPrefix;
+    private static Action<global::MapInstance, NetworkReader, bool, int>? onPrefix;
+    private static Action<global::MapInstance, NetworkReader, bool, int>? onPostfix;
 
-    public static event Prefix OnPrefix
+    public static event Action<global::MapInstance, NetworkReader, bool, int> OnPrefix
     {
-        add => Managers.Patches.Subscribe<DeserializeSyncVars, Prefix>(ref _OnPrefix, value);
-        remove => Managers.Patches.Unsubscribe(ref _OnPrefix, value);
+        add
+        {
+            if (Managers.Patches.EnsurePatched<DeserializeSyncVars>())
+                onPrefix += value;
+        }
+        remove => onPrefix -= value;
     }
 
-    public delegate void Postfix(global::MapInstance MapInstance, NetworkReader NetworkReader, bool InitialState, int InitialPosition);
-    private static Postfix? _OnPostfix;
-
-    public static event Postfix OnPostfix
+    public static event Action<global::MapInstance, NetworkReader, bool, int> OnPostfix
     {
-        add => Managers.Patches.Subscribe<DeserializeSyncVars, Postfix>(ref _OnPostfix, value);
-        remove => Managers.Patches.Unsubscribe(ref _OnPostfix, value);
+        add
+        {
+            if (Managers.Patches.EnsurePatched<DeserializeSyncVars>())
+                onPostfix += value;
+        }
+        remove => onPostfix -= value;
     }
 
     [HarmonyPrefix]
-    private static void PrefixMethod(global::MapInstance __instance, NetworkReader reader, bool initialState, out int __state)
+    private static void Prefix(global::MapInstance __instance, NetworkReader reader, bool initialState, out int __state)
     {
         __state = reader.Position;
 
-        if (_OnPrefix is null)
+        if (onPrefix is null)
             return;
 
-        _OnPrefix.Invoke(__instance, reader, initialState, __state);
+        onPrefix.Invoke(__instance, reader, initialState, __state);
 
         reader.Position = __state;
     }
 
     [HarmonyPostfix]
-    private static void PostfixMethod(global::MapInstance __instance, NetworkReader reader, bool initialState, int __state)
+    private static void Postfix(global::MapInstance __instance, NetworkReader reader, bool initialState, int __state)
     {
-        if (_OnPostfix is null)
+        if (onPostfix is null)
             return;
 
-        int Position = reader.Position;
-        _OnPostfix.Invoke(__instance, reader, initialState, __state);
-        reader.Position = Position;
+        int originalPosition = reader.Position;
+        onPostfix.Invoke(__instance, reader, initialState, __state);
+        reader.Position = originalPosition;
     }
 }
