@@ -2,20 +2,19 @@
 
 public sealed class Chat
 {
-    private readonly Commands Commands;
-    private readonly Data.Commands.Callers.Player CommandCaller = new();
+    private readonly Routers.Commands commandRouter;
 
-    internal Chat(Commands Commands) => this.Commands = Commands;
+    internal Chat(Routers.Commands commandRouter) => this.commandRouter = commandRouter;
 
     public void OnPlayerChatted(string message, ref bool runOriginal)
     {
-        if (CommandCaller.player != Player._mainPlayer)
-            CommandCaller.player = Player._mainPlayer;
+        if (runOriginal == false)
+            return;
 
-        if (Commands.ProcessCommand(CommandCaller, message))
+        if (commandRouter.RouteCommand(message))
         {
-            ChatBehaviour._current._chatAssets._chatInput.text = string.Empty;
-            ChatBehaviour._current._chatAssets._chatInput.DeactivateInputField();
+            Player._mainPlayer._chatBehaviour._chatAssets._chatInput.text = string.Empty;
+            Player._mainPlayer._chatBehaviour._chatAssets._chatInput.DeactivateInputField();
 
             runOriginal = false;
         }

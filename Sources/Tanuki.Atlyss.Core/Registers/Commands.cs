@@ -10,9 +10,9 @@ namespace Tanuki.Atlyss.Core.Registers;
 
 public sealed class Commands
 {
-    private readonly Dictionary<string, Type> commandNameMap = new(StringComparer.OrdinalIgnoreCase);
-    private readonly Dictionary<ulong, Type> commandHashMap = [];
-    private readonly Dictionary<Type, Serialization.Commands.Configuration> commandConfigurations = [];
+    private readonly Dictionary<string, Type> nameMap = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<ulong, Type> hashMap = [];
+    private readonly Dictionary<Type, Data.Commands.RegistryEntry> entries = [];
     private readonly Dictionary<Assembly, HashSet<Type>> assemblyCommands = [];
     private readonly Data.Settings.Commands settings;
 
@@ -22,15 +22,12 @@ public sealed class Commands
     /// <summary>
     /// Provides a lookup of a command <see cref="Type"/> by its active names.
     /// </summary>
-    public IReadOnlyDictionary<string, Type> CommandNameMap => commandNameMap;
+    public IReadOnlyDictionary<string, Type> NameMap => nameMap;
 
     /// <summary>
     /// Provides a lookup of <see cref="Serialization.Commands.Configuration"/> objects by their corresponding command <see cref="Type"/>.
     /// </summary>
-    /// <remarks>
-    /// Modifying these configurations isn't recommended, as they're managed by the registry.
-    /// </remarks>
-    public IReadOnlyDictionary<Type, Serialization.Commands.Configuration> CommandConfigurations => commandConfigurations;
+    public IReadOnlyDictionary<Type, Data.Commands.RegistryEntry> Entries => entries;
 
     /// <summary>
     /// Provides a lookup of commands grouped by their <see cref="Assembly"/>.
@@ -39,6 +36,7 @@ public sealed class Commands
     /// Modifying the <see cref="HashSet{T}"/> values isn't recommended, as they're managed by the registry.
     /// </remarks>
     public IReadOnlyDictionary<Assembly, HashSet<Type>> AssemblyCommands => assemblyCommands;
+    public IReadOnlyDictionary<ulong, Type> HashMap => hashMap;
 
     internal Commands(Data.Settings.Commands settings) => this.settings = settings;
 
@@ -133,16 +131,16 @@ public sealed class Commands
                         changes++;
                     }
 
-                    if (commandNameMap.TryGetValue(name, out Type existingCommand))
+                    if (nameMap.TryGetValue(name, out Type existingCommand))
                     {
                         Main.Instance.ManualLogSource.LogWarning($"Command name \"{name}\" of {command.FullName} is already used by {existingCommand.FullName}.");
                         continue;
                     }
 
-                    commandNameMap.Add(name, command);
+                    nameMap.Add(name, command);
                 }
 
-                this.commandConfigurations[command] = configuration;
+                entries[command].configuration = configuration;
             }
 
             OnCommandRegistered?.Invoke(command);
@@ -152,10 +150,10 @@ public sealed class Commands
         {
             Main.Instance.ManualLogSource.LogInfo($"Command configuration entry for {pluginCommand.Key} has been created.");
 
-            Serialization.Commands.Configuration commandConfiguration = Serialization.Commands.Configuration.CreateFromType(pluginCommand.Value, settings.Prefixes);
-            commandConfigurations.Add(pluginCommand.Key, commandConfiguration);
+            Serialization.Commands.Configuration newCommandConfiguration = Serialization.Commands.Configuration.CreateFromType(pluginCommand.Value, settings.Prefixes);
+            commandConfigurations.Add(pluginCommand.Key, newCommandConfiguration);
 
-            this.commandConfigurations[pluginCommand.Value] = commandConfiguration;
+            entries[pluginCommand.Value].configuration = newCommandConfiguration;
 
             changes++;
         }
@@ -182,7 +180,7 @@ public sealed class Commands
     {
         Assembly assembly = command.Assembly;
 
-        if (commandHashMap.ContainsKey(hash))
+        if (hashMap.ContainsKey(hash))
         {
             Main.Instance.ManualLogSource.LogWarning($"Failed to register command {command.FullName} because its hash {hash} is already in use.");
             return false;
@@ -199,8 +197,8 @@ public sealed class Commands
 
         assemblyCommands.Add(command);
 
-        commandHashMap[hash] = command;
-        commandConfigurations[command] = default!;
+        hashMap[hash] = command;
+        entries[command] = new(hash, null);
 
         OnCommandRegistered?.Invoke(command);
 
@@ -211,14 +209,17 @@ public sealed class Commands
 
     public void DeregisterCommand(Type сommandType)
     {
-        if (!commandConfigurations.TryGetValue(сommandType, out Serialization.Commands.Configuration configuration))
+        if (!entries.TryGetValue(сommandType, out Data.Commands.RegistryEntry entry))
             return;
+
+        Serialization.Commands.Configuration? configuration = entry.configuration;
 
         if (configuration is not null)
             foreach (string Name in configuration.names)
-                commandNameMap.Remove(Name);
+                nameMap.Remove(Name);
 
-        commandConfigurations.Remove(сommandType);
+        entries.Remove(сommandType);
+        hashMap.Remove(entry.hash);
 
         OnCommandDeregistered?.Invoke(сommandType);
     }
@@ -250,7 +251,7 @@ public sealed class Commands
             if (!commandInterfaceType.IsAssignableFrom(type))
                 continue;
 
-            if (commandConfigurations.ContainsKey(type))
+            if (entries.ContainsKey(type))
                 continue;
 
             if (!RegisterCommand(type, Utilities.Commands.Hash.Generate(type)))

@@ -5,12 +5,12 @@ namespace Tanuki.Atlyss.Core.Managers;
 
 public sealed class Plugins
 {
-    private readonly Registers.Plugins registry;
+    private readonly Registers.Plugins pluginRegistry;
 
     public event Action? OnBeforePluginsLoad;
 
-    internal Plugins(Registers.Plugins registry) =>
-        this.registry = registry;
+    internal Plugins(Registers.Plugins pluginRegistry) =>
+        this.pluginRegistry = pluginRegistry;
 
     internal void Refresh()
     {
@@ -24,13 +24,13 @@ public sealed class Plugins
             if (pluginInfo.Instance is not IPlugin plugin)
                 continue;
 
-            registry.RegisterPlugin(pluginType, plugin);
+            pluginRegistry.RegisterPlugin(pluginType, plugin);
         }
     }
 
     public void UnloadPlugins()
     {
-        foreach (IPlugin plugin in registry.PluginInterfaces.Values)
+        foreach (IPlugin plugin in pluginRegistry.PluginInterfaces.Values)
             UnloadPlugin(plugin);
     }
 
@@ -38,7 +38,7 @@ public sealed class Plugins
     {
         OnBeforePluginsLoad?.Invoke();
 
-        foreach (IPlugin plugin in registry.PluginInterfaces.Values)
+        foreach (IPlugin plugin in pluginRegistry.PluginInterfaces.Values)
             LoadPlugin(plugin);
     }
 

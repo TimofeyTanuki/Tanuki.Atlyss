@@ -1,36 +1,19 @@
-﻿using Tanuki.Atlyss.Core.Managers;
-
-namespace Tanuki.Atlyss.Core;
+﻿namespace Tanuki.Atlyss.Core;
 
 public sealed class Tanuki
 {
-    public static Tanuki Instance { get; internal set; } = null!;
+    internal static Tanuki instance = null!;
 
-    public readonly Data.Tanuki.Settings Settings;
-    public readonly Data.Tanuki.Registers Registers;
-    public readonly Data.Tanuki.Managers Managers;
+    internal Data.Tanuki.Settings settings = null!;
+    internal Data.Tanuki.Registers registers = null!;
+    internal Data.Tanuki.Managers managers = null!;
+    internal Data.Tanuki.Providers providers = null!;
 
-    internal Tanuki()
-    {
-        Settings = new()
-        {
-            Translations = new(),
-            Commands = new()
-        };
+    public static Tanuki Instance => instance;
+    internal Data.Tanuki.Settings Settings => settings;
+    internal Data.Tanuki.Registers Registers => registers;
+    internal Data.Tanuki.Managers Managers => managers;
+    internal Data.Tanuki.Providers Providers => providers;
 
-        Registers = new()
-        {
-            Plugins = new(),
-            Commands = new(Settings.Commands)
-        };
-
-        Managers = new()
-        {
-            Settings = new(Settings),
-            Plugins = new(Registers.Plugins),
-            Commands = new(Registers.Commands, Settings.Commands)
-        };
-
-        Managers.Chat = new(Managers.Commands);
-    }
+    internal Tanuki() { }
 }

@@ -2,8 +2,10 @@
 
 public interface ICommand
 {
+    public EExecutionType ExecutionType { get; }
     public ICallerPolicy CallerPolicy { get; }
-    public IExecutionPolicy ExecutionPolicy { get; }
 
-    public bool Execute(IContext context);
+    public void ClientCallback(IContext context) { }
+
+    public void ServerCallback(IContext context) { }
 }

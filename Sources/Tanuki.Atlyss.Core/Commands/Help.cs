@@ -9,13 +9,16 @@ namespace Tanuki.Atlyss.Core.Commands;
 
 public sealed class Help : ICommand
 {
-    private readonly Registers.Plugins pluginRegistry = Tanuki.Instance.Registers.Plugins;
-    private readonly Registers.Commands commandRegistry = Tanuki.Instance.Registers.Commands;
+    private static readonly ICallerPolicy callerPolicy = new Policies.Commands.Caller.Player();
+    private static readonly EExecutionType executionType = EExecutionType.Local;
 
-    public ICallerPolicy CallerPolicy => new Policies.Commands.Caller.MainPlayer();
-    public IExecutionPolicy ExecutionPolicy => new Policies.Commands.Execution.Player();
+    private readonly Registers.Plugins pluginRegistry = Tanuki.Instance.registers.plugins;
+    private readonly Registers.Commands commandRegistry = Tanuki.Instance.registers.commands;
 
-    public bool Execute(IContext context)
+    public ICallerPolicy CallerPolicy => callerPolicy;
+    public EExecutionType ExecutionType => executionType;
+
+    public void ClientCallback(IContext context)
     {
         IReadOnlyList<string> arguments = context.Arguments;
 
@@ -68,12 +71,10 @@ public sealed class Help : ICommand
         if (message.Length == 0)
         {
             ChatBehaviour._current.New_ChatMessage(Main.Instance.Translate("Commands.Help.PluginsNotFound"));
-            return false;
+            return;
         }
 
         ChatBehaviour._current.New_ChatMessage(message.ToString());
-
-        return false;
     }
 
     private ushort BuildMessageSection(StringBuilder stringBuilder, IEnumerable<Type> commands, List<string> additionalNames, string additionalNamesSeparator)
@@ -82,7 +83,13 @@ public sealed class Help : ICommand
 
         foreach (Type command in commands)
         {
-            Serialization.Commands.Configuration configuration = commandRegistry.CommandConfigurations[command];
+            if (!commandRegistry.Entries.TryGetValue(command, out Data.Commands.RegistryEntry registryEntry))
+                continue;
+
+            Serialization.Commands.Configuration? configuration = registryEntry.Configuration;
+
+            if (configuration is null)
+                continue;
 
             if (configuration.names.Count == 0)
             {

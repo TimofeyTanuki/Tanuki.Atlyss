@@ -9,36 +9,30 @@ public class Commands(IReadOnlyList<char> quoteCharacters)
 {
     private readonly IReadOnlyList<char> quoteCharacters = quoteCharacters ?? throw new ArgumentNullException(nameof(quoteCharacters));
 
-
-    public bool TryParse<T>(
+    public bool TryParse(
         string prefix,
         string input,
-        IReadOnlyDictionary<string, T>? commandNameMap,
         out string commandName,
-        out IReadOnlyList<string> commandArguments)
+        out IReadOnlyList<string> commandArguments,
+        IReadOnlyDictionary<string, Type>? commandNameMap = null)
     {
         commandName = null!;
         commandArguments = null!;
-        Console.WriteLine("ST1");
+
         if (string.IsNullOrEmpty(input))
             return false;
 
-        Console.WriteLine("ST2");
         if (!input.StartsWith(prefix))
             return false;
 
-        Console.WriteLine("ST3");
         int length = input.Length;
         int index = 0;
-        Console.WriteLine("ST34");
 
         while (index < length && !char.IsWhiteSpace(input[index])) index++;
         commandName = input[prefix.Length..index];
 
-        Console.WriteLine($"ST6 {commandName}");
         if (commandNameMap is not null && !commandNameMap.ContainsKey(commandName))
             return false;
-        Console.WriteLine("ST");
 
         var parsedArguments = new List<string>();
 

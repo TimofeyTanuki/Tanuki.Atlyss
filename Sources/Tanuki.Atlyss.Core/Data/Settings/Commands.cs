@@ -10,5 +10,5 @@ public sealed class Commands
     public string ClientPrefix { get; internal set; } = null!;
     public string ServerPrefix { get; internal set; } = null!;
 
-    public string[] Prefixes { get; internal set; } = default!;
+    public string[] Prefixes { get; internal set; } = null!;
 }

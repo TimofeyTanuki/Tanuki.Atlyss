@@ -6,13 +6,16 @@ namespace Tanuki.Atlyss.Core.Commands;
 
 public sealed class Reload : ICommand
 {
-    private readonly Registers.Plugins pluginRegistry = Tanuki.Instance.Registers.Plugins;
-    private readonly Managers.Plugins pluginManager = Tanuki.Instance.Managers.Plugins;
+    private static readonly ICallerPolicy callerPolicy = new Policies.Commands.Caller.Player();
+    private static readonly EExecutionType executionType = EExecutionType.Local;
 
-    public ICallerPolicy CallerPolicy => new Policies.Commands.Caller.MainPlayer();
-    public IExecutionPolicy ExecutionPolicy => new Policies.Commands.Execution.Player();
+    private readonly Registers.Plugins pluginRegistry = Tanuki.Instance.registers.Plugins;
+    private readonly Managers.Plugins pluginManager = Tanuki.Instance.managers.Plugins;
 
-    public bool Execute(IContext context)
+    public ICallerPolicy CallerPolicy => callerPolicy;
+    public EExecutionType ExecutionType => executionType;
+
+    public void ClientCallback(IContext context)
     {
         IReadOnlyList<string> arguments = context.Arguments;
 
@@ -20,7 +23,7 @@ public sealed class Reload : ICommand
         {
             ChatBehaviour._current.New_ChatMessage(Main.Instance.Translate("Commands.Reload.Full"));
             pluginManager.ReloadPlugins();
-            return false;
+            return;
         }
 
         List<IPlugin> plugins = [];
@@ -50,7 +53,7 @@ public sealed class Reload : ICommand
         if (plugins.Count == 0)
         {
             ChatBehaviour._current.New_ChatMessage(Main.Instance.Translate("Commands.Reload.PluginsNotFound"));
-            return false;
+            return;
         }
 
         ChatBehaviour._current.New_ChatMessage(
@@ -66,6 +69,6 @@ public sealed class Reload : ICommand
         foreach (IPlugin plugin in plugins)
             pluginManager.ReloadPlugin(plugin);
 
-        return false;
+        return;
     }
 }

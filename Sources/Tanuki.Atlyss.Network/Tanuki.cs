@@ -2,7 +2,9 @@
 
 public sealed class Tanuki
 {
-    public static Tanuki Instance = null!;
+    private static Tanuki instance = null!;
+
+    public static Tanuki Instance => instance;
 
     public readonly Managers.Steam Steam;
     public readonly Managers.Lobby Lobby;
@@ -15,5 +17,5 @@ public sealed class Tanuki
         Network = new();
     }
 
-    public static void Initialize() => Instance ??= new();
+    public static void Initialize() => instance ??= new();
 }

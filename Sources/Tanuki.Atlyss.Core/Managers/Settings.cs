@@ -13,7 +13,7 @@ public sealed class Settings
 
     private void RefreshLanguageSection()
     {
-        Data.Settings.Translations section = settings.Translations;
+        Data.Settings.Translations section = settings.translations;
 
         HashSet<char> invalidCharacters = [.. Path.GetInvalidFileNameChars()];
         List<string> languages = [];
@@ -61,7 +61,7 @@ public sealed class Settings
 
     private void RefreshCommandsSection()
     {
-        Data.Settings.Commands section = settings.Commands;
+        Data.Settings.Commands section = settings.commands;
         section.ClientPrefix = Configuration.Instance.Commands.ClientPrefix.Value;
         section.ServerPrefix = Configuration.Instance.Commands.ServerPrefix.Value;
 
@@ -79,7 +79,7 @@ public sealed class Settings
             Configuration.Instance.Commands.ServerPrefix.Value = section.ServerPrefix;
         }
 
-        settings.Commands.Prefixes = [Configuration.Instance.Commands.ClientPrefix.Value, Configuration.Instance.Commands.ServerPrefix.Value];
+        settings.commands.Prefixes = [Configuration.Instance.Commands.ClientPrefix.Value, Configuration.Instance.Commands.ServerPrefix.Value];
     }
 
     internal void Refresh()

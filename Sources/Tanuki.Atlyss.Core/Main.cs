@@ -1,14 +1,16 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
+using Tanuki.Atlyss.Core.Data.Tanuki;
 
 namespace Tanuki.Atlyss.Core;
 
 /*
  * GLOBAL TODO
  *
- * KILL CommandsLegacy.cs
- *
- *
+ * CLIENTS MUSTN'T KNOW ABOUT SERVER COMMANDS
+ * SERVER MUSTN'T KNOW ABOUT CLIENT' COMMANDS
+ * ^^^ safety policy
+ * 
  * NETWORKING MODULE
  *
  *
@@ -72,16 +74,55 @@ internal sealed class Main : Bases.Plugin
 
     internal void Start()
     {
-        Tanuki.Instance = new();
-        Tanuki.Instance.Managers.Plugins.OnBeforePluginsLoad += HandleSettingsRefresh;
+        Settings settings = new()
+        {
+            commands = new(),
+            translations = new(),
+        };
+
+        Data.Tanuki.Registers registers = new()
+        {
+            commands = new(settings.commands),
+            plugins = new()
+        };
+
+        Data.Tanuki.Providers providers = new()
+        {
+            commands = new(registers.commands)
+        };
+
+        Data.Tanuki.Routers routers = new()
+        {
+            commands = new(new(['"', '\"', '`']), settings.commands, registers.commands, providers.commands)
+        };
+
+        Data.Tanuki.Managers managers = new()
+        {
+            settings = new(settings),
+            plugins = new(registers.plugins),
+            chat = new(routers.commands)
+        };
+
+        Tanuki.instance = new()
+        {
+            managers = managers,
+            providers = providers,
+            registers = registers,
+            settings = settings
+        };
+
+        managers.plugins.OnBeforePluginsLoad += HandleSettingsRefresh;
 
         Game.Providers.Player.Initialize();
+
+
+        Network.
 
         //Network.Tanuki.Initialize();
         //Network.Tanuki.Instance.Steam.CreateCallbacks();
 
-        Tanuki.Instance.Registers.Plugins.Refresh();
-        Tanuki.Instance.Managers.Plugins.LoadPlugins();
+        registers.plugins.Refresh();
+        managers.plugins.LoadPlugins();
     }
 
     private void HandleSettingsRefresh()
@@ -94,15 +135,15 @@ internal sealed class Main : Bases.Plugin
             reloadConfiguration = false;
         }
 
-        Tanuki.Instance.Managers.Settings.Refresh();
+        Tanuki.Instance.managers.settings.Refresh();
     }
 
     protected override void Load() =>
-        Game.Patches.ChatBehaviour.Send_ChatMessage.OnPrefix += Tanuki.Instance.Managers.Chat.OnPlayerChatted;
+        Game.Patches.ChatBehaviour.Send_ChatMessage.OnPrefix += Tanuki.Instance.managers.chat.OnPlayerChatted;
 
     protected override void Unload()
     {
         reloadConfiguration = true;
-        Game.Patches.ChatBehaviour.Send_ChatMessage.OnPrefix -= Tanuki.Instance.Managers.Chat.OnPlayerChatted;
+        Game.Patches.ChatBehaviour.Send_ChatMessage.OnPrefix -= Tanuki.Instance.managers.chat.OnPlayerChatted;
     }
 }
