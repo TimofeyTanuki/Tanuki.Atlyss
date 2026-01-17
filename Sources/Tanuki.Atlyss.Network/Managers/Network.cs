@@ -2,6 +2,7 @@
 using System;
 using System.Text;
 using Tanuki.Atlyss.Network.Components;
+using UnityEngine;
 
 namespace Tanuki.Atlyss.Network.Managers;
 
@@ -17,7 +18,15 @@ public sealed class Network
     {
         Steam Steam = Tanuki.Instance.Steam;
 
+        SteamNetworkMessagesPoller = GameObject.Instantiate(new SteamNetworkMessagesPoller());
+        GameObject.DontDestroyOnLoad(SteamNetworkMessagesPoller);
 
+        SteamNetworkMessagesPoller.Handler = s;
+    }
+
+    private void s(ReadOnlyMemory<byte> memory, int arg2, SteamNetworkingMessage_t t)
+    {
+        //Console.WriteLine(string.Join("", memory.Span.ToArray()))
     }
 
     private void OnSteamRelayNetworkStatus(SteamRelayNetworkStatus_t SteamRelayNetworkStatus)
