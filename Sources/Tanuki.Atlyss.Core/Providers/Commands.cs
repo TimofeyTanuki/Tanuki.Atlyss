@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
-using Tanuki.Atlyss.API.Tanuki.Commands;
+using Tanuki.Atlyss.API.Core.Commands;
 
 namespace Tanuki.Atlyss.Core.Providers;
 

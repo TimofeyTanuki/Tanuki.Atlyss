@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Tanuki.Atlyss.API.Tanuki.Commands;
+using Tanuki.Atlyss.API.Core.Commands;
 
 namespace Tanuki.Atlyss.Core.Commands;
 
@@ -14,6 +14,7 @@ public sealed class Help : ICommand
 
     private readonly Registers.Plugins pluginRegistry = Tanuki.Instance.registers.plugins;
     private readonly Registers.Commands commandRegistry = Tanuki.Instance.registers.commands;
+    private readonly Main main = Main.Instance;
 
     public ICallerPolicy CallerPolicy => callerPolicy;
     public EExecutionType ExecutionType => executionType;
@@ -26,7 +27,7 @@ public sealed class Help : ICommand
             message = new(),
             messageSection = new();
 
-        string additionalNamesSeparator = Main.Instance.Translate("Commands.Help.Active.Entry.AdditionalNames.Separator");
+        string additionalNamesSeparator = main.Translate("Commands.Help.Active.Entry.AdditionalNames.Separator");
 
         List<string> additionalNames = [];
 
@@ -60,17 +61,17 @@ public sealed class Help : ICommand
                 inactiveCommands == 0)
                 continue;
 
-            message.Append(Main.Instance.Translate("Commands.Help.Header", sectionName));
+            message.Append(main.Translate("Commands.Help.Header", sectionName));
 
             message.Append(messageSection);
 
             if (inactiveCommands > 0)
-                message.Append(Main.Instance.Translate("Commands.Help.Inactive", inactiveCommands));
+                message.Append(main.Translate("Commands.Help.Inactive", inactiveCommands));
         }
 
         if (message.Length == 0)
         {
-            ChatBehaviour._current.New_ChatMessage(Main.Instance.Translate("Commands.Help.PluginsNotFound"));
+            ChatBehaviour._current.New_ChatMessage(main.Translate("Commands.Help.PluginsNotFound"));
             return;
         }
 
@@ -101,22 +102,22 @@ public sealed class Help : ICommand
 
             int commandNamesCount = configuration.names.Count;
             for (int index = 1; index < commandNamesCount; index++)
-                additionalNames.Add(Main.Instance.Translate("Commands.Help.Active.Entry.AdditionalNames.Item", configuration.names[index]));
+                additionalNames.Add(main.Translate("Commands.Help.Active.Entry.AdditionalNames.Item", configuration.names[index]));
 
             string commandSyntax =
                 string.IsNullOrEmpty(configuration.syntax) ?
-                string.Empty : Main.Instance.Translate("Commands.Help.Active.Entry.Syntax", configuration.syntax);
+                string.Empty : main.Translate("Commands.Help.Active.Entry.Syntax", configuration.syntax);
 
             string commandHelp =
                 string.IsNullOrEmpty(configuration.help) ?
-                string.Empty : Main.Instance.Translate("Commands.Help.Active.Entry.Help", configuration.help);
+                string.Empty : main.Translate("Commands.Help.Active.Entry.Help", configuration.help);
 
             string commandAdditionalNames =
                 commandNamesCount > 1 ?
-                Main.Instance.Translate("Commands.Help.Active.Entry.AdditionalNames", string.Join(additionalNamesSeparator, additionalNames)) : string.Empty;
+                main.Translate("Commands.Help.Active.Entry.AdditionalNames", string.Join(additionalNamesSeparator, additionalNames)) : string.Empty;
 
             stringBuilder.Append(
-                Main.Instance.Translate(
+                main.Translate(
                     "Commands.Help.Active.Entry",
                     configuration.names[0],
                     commandSyntax,

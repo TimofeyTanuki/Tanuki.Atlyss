@@ -13,10 +13,10 @@ public class Lobby
 
     internal Lobby()
     {
-        Steam Steam = Tanuki.Instance.Steam;
+        //Steam Steam = Tanuki.Instance.Steam;
 
-        Steam.OnLobbyEntered += OnLobbyEntered;
-        Steam.OnLobbyDataUpdate += OnLobbyDataUpdate;
+        //Steam.OnLobbyEntered += OnLobbyEntered;
+        //Steam.OnLobbyDataUpdate += OnLobbyDataUpdate;
     }
 
     private void RefreshLobbyOwner() =>

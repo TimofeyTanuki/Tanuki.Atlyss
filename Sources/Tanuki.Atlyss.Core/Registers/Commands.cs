@@ -1,15 +1,17 @@
-﻿using Newtonsoft.Json;
+﻿using BepInEx.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Tanuki.Atlyss.API.Tanuki.Commands;
+using Tanuki.Atlyss.API.Core.Commands;
 
 namespace Tanuki.Atlyss.Core.Registers;
 
 public sealed class Commands
 {
+    private readonly ManualLogSource manualLogSource;
     private readonly Dictionary<string, Type> nameMap = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<ulong, Type> hashMap = [];
     private readonly Dictionary<Type, Data.Commands.RegistryEntry> entries = [];
@@ -38,7 +40,11 @@ public sealed class Commands
     public IReadOnlyDictionary<Assembly, HashSet<Type>> AssemblyCommands => assemblyCommands;
     public IReadOnlyDictionary<ulong, Type> HashMap => hashMap;
 
-    internal Commands(Data.Settings.Commands settings) => this.settings = settings;
+    internal Commands(ManualLogSource manualLogSource, Data.Settings.Commands settings)
+    {
+        this.manualLogSource = manualLogSource;
+        this.settings = settings;
+    }
 
     public Dictionary<string, Serialization.Commands.Configuration>? TryReadConfiguration(string path)
     {
@@ -50,7 +56,7 @@ public sealed class Commands
             }
             catch (Exception exception)
             {
-                Main.Instance.ManualLogSource.LogError($"Unable to read the configuration file \"{path}\".\nException message:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
+                manualLogSource.LogError($"Unable to read the configuration file \"{path}\".\nException message:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
                 return null;
             }
         }
@@ -66,7 +72,7 @@ public sealed class Commands
         }
         catch (Exception exception)
         {
-            Main.Instance.ManualLogSource.LogError($"Failed to save the updated configuration file \"{file}\".\nException message:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
+            manualLogSource.LogError($"Failed to save the updated configuration file \"{file}\".\nException message:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
             return;
         }
     }
@@ -88,7 +94,7 @@ public sealed class Commands
 
             if (configuration is null)
             {
-                Main.Instance.ManualLogSource.LogInfo($"Command configuration entry for {command.FullName} has been restored.");
+                manualLogSource.LogInfo($"Command configuration entry for {command.FullName} has been restored.");
 
                 configuration = Serialization.Commands.Configuration.CreateFromType(command, settings.Prefixes);
                 commandConfigurations[commandConfigurationKey] = configuration;
@@ -113,7 +119,7 @@ public sealed class Commands
 
                     if (string.IsNullOrEmpty(normalizedName))
                     {
-                        Main.Instance.ManualLogSource.LogInfo($"Removed empty command name from {command.FullName}.");
+                        manualLogSource.LogInfo($"Removed empty command Name from {command.FullName}.");
 
                         configuration.names.RemoveAt(nameIndex);
 
@@ -124,7 +130,7 @@ public sealed class Commands
 
                     if (name != normalizedName)
                     {
-                        Main.Instance.ManualLogSource.LogInfo($"Command {command.FullName} name normalized: {name} -> {normalizedName}.");
+                        manualLogSource.LogInfo($"Command {command.FullName} Name normalized: {name} -> {normalizedName}.");
 
                         configuration.names[nameIndex] = normalizedName;
 
@@ -133,7 +139,7 @@ public sealed class Commands
 
                     if (nameMap.TryGetValue(name, out Type existingCommand))
                     {
-                        Main.Instance.ManualLogSource.LogWarning($"Command name \"{name}\" of {command.FullName} is already used by {existingCommand.FullName}.");
+                        manualLogSource.LogWarning($"Command Name \"{name}\" of {command.FullName} is already used by {existingCommand.FullName}.");
                         continue;
                     }
 
@@ -148,7 +154,7 @@ public sealed class Commands
 
         foreach (KeyValuePair<string, Type> pluginCommand in pluginCommands)
         {
-            Main.Instance.ManualLogSource.LogInfo($"Command configuration entry for {pluginCommand.Key} has been created.");
+            manualLogSource.LogInfo($"Command configuration entry for {pluginCommand.Key} has been created.");
 
             Serialization.Commands.Configuration newCommandConfiguration = Serialization.Commands.Configuration.CreateFromType(pluginCommand.Value, settings.Prefixes);
             commandConfigurations.Add(pluginCommand.Key, newCommandConfiguration);
@@ -182,7 +188,7 @@ public sealed class Commands
 
         if (hashMap.ContainsKey(hash))
         {
-            Main.Instance.ManualLogSource.LogWarning($"Failed to register command {command.FullName} because its hash {hash} is already in use.");
+            manualLogSource.LogWarning($"Failed to register command {command.FullName} because its Hash {hash} is already in use.");
             return false;
         }
 
@@ -237,7 +243,7 @@ public sealed class Commands
         }
         catch (Exception exception)
         {
-            Main.Instance.ManualLogSource.LogError($"Failed to retrieve types from assembly {assembly.GetName().Name}\nException message:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
+            manualLogSource.LogError($"Failed to retrieve types from assembly {assembly.GetName().Name}\nException message:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
             return;
         }
 

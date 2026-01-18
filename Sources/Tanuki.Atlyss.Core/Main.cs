@@ -54,7 +54,7 @@ internal sealed class Main : Bases.Plugin
     internal static Main Instance = null!;
     private bool reloadConfiguration = false;
 
-    public ManualLogSource ManualLogSource { get; internal set; } = null!;
+    private ManualLogSource manualLogSource = null!;
 
     public Main()
     {
@@ -65,11 +65,11 @@ internal sealed class Main : Bases.Plugin
     public void Awake()
     {
         Instance = this;
-        ManualLogSource = Logger;
+        manualLogSource = Logger;
 
         Configuration.Instance.Load(Config);
 
-        Logger.LogInfo("Tanuki.Atlyss by Timofey Tanuki / tanu.su");
+        Logger.LogMessage("Tanuki.Atlyss by Timofey Tanuki / tanu.su");
     }
 
     internal void Start()
@@ -82,7 +82,7 @@ internal sealed class Main : Bases.Plugin
 
         Data.Tanuki.Registers registers = new()
         {
-            commands = new(settings.commands),
+            commands = new(manualLogSource, settings.commands),
             plugins = new()
         };
 
@@ -93,13 +93,13 @@ internal sealed class Main : Bases.Plugin
 
         Data.Tanuki.Routers routers = new()
         {
-            commands = new(new(['"', '\"', '`']), settings.commands, registers.commands, providers.commands)
+            commands = new(manualLogSource, new(['"', '\"', '`']), settings.commands, registers.commands, providers.commands)
         };
 
         Data.Tanuki.Managers managers = new()
         {
             settings = new(settings),
-            plugins = new(registers.plugins),
+            plugins = new(manualLogSource, registers.plugins),
             chat = new(routers.commands)
         };
 
@@ -113,10 +113,14 @@ internal sealed class Main : Bases.Plugin
 
         managers.plugins.OnBeforePluginsLoad += HandleSettingsRefresh;
 
+        Atlyss.Network.Tanuki.Initialize();
+
+        Network.Tanuki Network = Atlyss.Network.Tanuki.Instance;
+        Network.Providers.Steam.Initialize();
+
         Game.Providers.Player.Initialize();
 
-
-        Network.
+        //Network.
 
         //Network.Tanuki.Initialize();
         //Network.Tanuki.Instance.Steam.CreateCallbacks();

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Tanuki.Atlyss.API.Tanuki.Plugins;
+using Tanuki.Atlyss.API.Core.Plugins;
 
 namespace Tanuki.Atlyss.Core.Registers;
 

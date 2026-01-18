@@ -1,4 +1,4 @@
-﻿namespace Tanuki.Atlyss.API.Tanuki.Commands;
+﻿namespace Tanuki.Atlyss.API.Core.Commands;
 
 public enum EExecutionType
 {

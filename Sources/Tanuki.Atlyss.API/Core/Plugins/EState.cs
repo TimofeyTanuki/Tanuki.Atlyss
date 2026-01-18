@@ -1,4 +1,4 @@
-﻿namespace Tanuki.Atlyss.API.Tanuki.Plugins;
+﻿namespace Tanuki.Atlyss.API.Core.Plugins;
 
 public enum EState
 {

@@ -15,4 +15,5 @@
   <Project Path="Tanuki.Atlyss.Core/Tanuki.Atlyss.Core.csproj" />
   <Project Path="Tanuki.Atlyss.Game/Tanuki.Atlyss.Game.csproj" Id="fa20b2f6-b65b-4c0d-ad41-a0f78e8d0f57" />
   <Project Path="Tanuki.Atlyss.Network/Tanuki.Atlyss.Network.csproj" Id="6076b054-73f2-4dfe-9c3d-3238ccb0aa1b" />
+  <Project Path="Tanuki.Atlyss.Shared/Tanuki.Atlyss.Shared.csproj" Id="5e7e1331-4bae-4edf-a580-740c31b46e58" />
 </Solution>

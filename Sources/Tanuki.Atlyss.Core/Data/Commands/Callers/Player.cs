@@ -1,4 +1,4 @@
-﻿using Tanuki.Atlyss.API.Tanuki.Commands;
+﻿using Tanuki.Atlyss.API.Core.Commands;
 
 namespace Tanuki.Atlyss.Core.Data.Commands.Callers;
 

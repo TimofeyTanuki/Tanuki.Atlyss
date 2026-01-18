@@ -1,16 +1,21 @@
-﻿using System;
-using Tanuki.Atlyss.API.Tanuki.Plugins;
+﻿using BepInEx.Logging;
+using System;
+using Tanuki.Atlyss.API.Core.Plugins;
 
 namespace Tanuki.Atlyss.Core.Managers;
 
 public sealed class Plugins
 {
+    private readonly ManualLogSource manualLogSource;
     private readonly Registers.Plugins pluginRegistry;
 
     public event Action? OnBeforePluginsLoad;
 
-    internal Plugins(Registers.Plugins pluginRegistry) =>
+    internal Plugins(ManualLogSource manualLogSource, Registers.Plugins pluginRegistry)
+    {
+        this.manualLogSource = manualLogSource;
         this.pluginRegistry = pluginRegistry;
+    }
 
     internal void Refresh()
     {
@@ -60,7 +65,7 @@ public sealed class Plugins
         catch (Exception exception)
         {
 
-            Main.Instance.ManualLogSource.LogError($"Failed to unload plugin {plugin.Name} ({plugin.GetType().Assembly.GetName().Name}).\nException message:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
+            manualLogSource.LogError($"Failed to unload plugin {plugin.Name} ({plugin.GetType().Assembly.GetName().Name}).\nException message:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
         }
     }
 
@@ -75,7 +80,7 @@ public sealed class Plugins
         }
         catch (Exception exception)
         {
-            Main.Instance.ManualLogSource.LogError($"Failed to load plugin {plugin.Name} ({plugin.GetType().Assembly.GetName().Name}).\nException message:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
+            manualLogSource.LogError($"Failed to load plugin {plugin.Name} ({plugin.GetType().Assembly.GetName().Name}).\nException message:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
         }
     }
 

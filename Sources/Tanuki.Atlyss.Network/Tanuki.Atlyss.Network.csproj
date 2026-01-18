@@ -7,9 +7,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Tanuki.Atlyss.API\Tanuki.Atlyss.API.csproj">
+      <CopyLocalSatelliteAssemblies>False</CopyLocalSatelliteAssemblies>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Tanuki.Atlyss.Shared\Tanuki.Atlyss.Shared.csproj">
+      <Private>False</Private>
+      <CopyLocalSatelliteAssemblies>False</CopyLocalSatelliteAssemblies>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="$(BepInExCoreDir)BepInEx.dll" Private="False" />
     <Reference Include="$(GameDataManagedDir)Assembly-CSharp.dll" Private="False" />
     <Reference Include="$(GameDataManagedDir)com.rlabrecque.steamworks.net.dll" Private="False" />
     <Reference Include="$(GameDataManagedDir)UnityEngine.CoreModule.dll" Private="False" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Bases\" />
   </ItemGroup>
 
 </Project>

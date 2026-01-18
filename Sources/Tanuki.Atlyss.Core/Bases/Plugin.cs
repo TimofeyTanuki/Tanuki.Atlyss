@@ -1,7 +1,7 @@
 ﻿using BepInEx;
 using System;
 using System.IO;
-using Tanuki.Atlyss.API.Tanuki.Plugins;
+using Tanuki.Atlyss.API.Core.Plugins;
 using Tanuki.Atlyss.Core.Serialization.Translation;
 
 namespace Tanuki.Atlyss.Core.Bases;
@@ -31,7 +31,7 @@ public abstract class Plugin : BaseUnityPlugin, IPlugin
         translationSet.Clear();
 
         string path = Utilities.Translations.LanguageFileSelector.GetPreferredFile(
-            Tanuki.Instance.settings.translations.PreferredLanguageOrder,
+            Tanuki.Instance.Settings.Translations.PreferredLanguageOrder,
             configurationDirectory,
             ".translations.json"
         );
@@ -67,9 +67,9 @@ public abstract class Plugin : BaseUnityPlugin, IPlugin
 
         ProcessTranslationSet();
 
-        Tanuki.Instance.registers.commands.DeregisterAssembly(GetType().Assembly);
+        Tanuki.Instance.Registers.Commands.DeregisterAssembly(GetType().Assembly);
 
-        Tanuki.Instance.registers.commands.RegisterAssembly(
+        Tanuki.Instance.Registers.Commands.RegisterAssembly(
             GetType().Assembly,
             Utilities.Translations.LanguageFileSelector.GetPreferredFile(
                 Tanuki.Instance.settings.translations.PreferredLanguageOrder,
@@ -98,7 +98,7 @@ public abstract class Plugin : BaseUnityPlugin, IPlugin
     {
         OnUnload?.Invoke();
 
-        Tanuki.Instance.registers.commands.DeregisterAssembly(GetType().Assembly);
+        Tanuki.Instance.Registers.Commands.DeregisterAssembly(GetType().Assembly);
 
         try
         {

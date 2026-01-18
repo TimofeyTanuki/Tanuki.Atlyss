@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Tanuki.Atlyss.API.Tanuki.Plugins;
+namespace Tanuki.Atlyss.API.Core.Plugins;
 
 public interface IPlugin
 {

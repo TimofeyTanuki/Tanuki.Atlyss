@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using Tanuki.Atlyss.API.Tanuki.Commands;
-using Tanuki.Atlyss.API.Tanuki.Plugins;
+using Tanuki.Atlyss.API.Core.Commands;
+using Tanuki.Atlyss.API.Core.Plugins;
 
 namespace Tanuki.Atlyss.Core.Commands;
 
@@ -11,6 +11,7 @@ public sealed class Reload : ICommand
 
     private readonly Registers.Plugins pluginRegistry = Tanuki.Instance.registers.Plugins;
     private readonly Managers.Plugins pluginManager = Tanuki.Instance.managers.Plugins;
+    private readonly Main main = Main.Instance;
 
     public ICallerPolicy CallerPolicy => callerPolicy;
     public EExecutionType ExecutionType => executionType;
@@ -21,7 +22,7 @@ public sealed class Reload : ICommand
 
         if (arguments.Count == 0)
         {
-            ChatBehaviour._current.New_ChatMessage(Main.Instance.Translate("Commands.Reload.Full"));
+            ChatBehaviour._current.New_ChatMessage(main.Translate("Commands.Reload.Full"));
             pluginManager.ReloadPlugins();
             return;
         }
@@ -52,15 +53,15 @@ public sealed class Reload : ICommand
 
         if (plugins.Count == 0)
         {
-            ChatBehaviour._current.New_ChatMessage(Main.Instance.Translate("Commands.Reload.PluginsNotFound"));
+            ChatBehaviour._current.New_ChatMessage(main.Translate("Commands.Reload.PluginsNotFound"));
             return;
         }
 
         ChatBehaviour._current.New_ChatMessage(
-            Main.Instance.Translate(
+            main.Translate(
                 "Commands.Reload.Plugins",
                 string.Join(
-                    Main.Instance.Translate("Commands.Reload.Plugins.Separator"),
+                    main.Translate("Commands.Reload.Plugins.Separator"),
                     pluginNames
                 )
             )

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Tanuki.Atlyss.API.Tanuki.Commands;
+using Tanuki.Atlyss.API.Core.Commands;
 
 namespace Tanuki.Atlyss.Core.Contexts.Commands;
 
