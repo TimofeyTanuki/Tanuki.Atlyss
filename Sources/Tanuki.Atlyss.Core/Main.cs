@@ -1,8 +1,11 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
+using Steamworks;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using Tanuki.Atlyss.Core.Packets.Commands;
 
 namespace Tanuki.Atlyss.Core;
 
@@ -47,9 +50,14 @@ namespace Tanuki.Atlyss.Core;
 internal sealed class Main : Bases.Plugin
 {
     public static Main Instance = null!;
-    private bool reloadConfiguration = false;
 
+
+    private bool reloadConfiguration = false;
     private ManualLogSource manualLogSource = null!;
+    private TanukiServerHello tanukiServerHelloPacket = new()
+    {
+        Version = PluginInfo.VERSION
+    };
 
     public Main()
     {
@@ -96,46 +104,85 @@ internal sealed class Main : Bases.Plugin
         {
             managers = managers,
             providers = providers,
-            registers = registers
+            registers = registers,
+            routers = routers
         };
 
         managers.plugins.OnBeforePluginsLoad += HandleSettingsRefresh;
 
-        Atlyss.Network.Tanuki.Initialize();
+        Network.Tanuki.Initialize();
 
-        Network.Tanuki Network = Atlyss.Network.Tanuki.Instance;
-        Network.Providers.Steam.CreateCallbacks();
+        Network.Tanuki network = Network.Tanuki.Instance;
+        network.Providers.Steam.CreateCallbacks();
+
+        network.Providers.SteamLobby.OnLobbyChanged += OnNetworkProviderSteamLobbyLobbyChanged;
+        Game.Providers.Player.OnPlayerInitialized += Player_OnPlayerInitialized;
+
+        network.Registers.Packets.Register<TanukiServerHello>(null);
+        network.Managers.Packets.AddHandler<TanukiServerHello>(TanukiServerHelloPacketHandler);
 
         registers.plugins.Refresh();
         managers.plugins.LoadPlugins();
     }
 
+    private void Player_OnPlayerInitialized(Player player)
+    {
+        manualLogSource.LogInfo("Player_OnPlayerInitialized D0");
+        if (AtlyssNetworkManager._current.isNetworkActive)
+            return;
 
-    private readonly FieldInfo entriesField = typeof(Network.Services.RateLimiter).GetField("entries", BindingFlags.Instance | BindingFlags.NonPublic);
-    Dictionary<ulong, Network.Data.Packets.RateLimitEntry> entries = [];
+        manualLogSource.LogInfo("Player_OnPlayerInitialized D1");
+
+        if (player == Player._mainPlayer)
+            return;
+
+        manualLogSource.LogInfo("Player_OnPlayerInitialized D3");
+
+        Network.Routers.Packets packetRouter = Network.Tanuki.Instance.Routers.Packet;
+
+        if (!ulong.TryParse(player._steamID, out ulong steamId))
+            return;
+
+        bool success = packetRouter.SendPacketToUser(new(steamId), tanukiServerHelloPacket, out EResult result);
+
+        manualLogSource.LogInfo($"Player_OnPlayerInitialized D4 {steamId} {success} {result}");
+    }
+
     float sec = 0;
+    long lastGc = 0;
     private void FixedUpdate()
     {
+        //if (!Player._mainPlayer)
+        //    return;
+
         Network.Tanuki Network = Atlyss.Network.Tanuki.Instance;
 
         if (UnityEngine.Time.unscaledTime < sec)
             return;
 
-        sec = UnityEngine.Time.unscaledTime + 1;
+        sec = UnityEngine.Time.unscaledTime + 3;
 
         StringBuilder sb = new();
 
-        entries ??= (Dictionary<ulong, Network.Data.Packets.RateLimitEntry>)entriesField.GetValue(Network.Managers.Network.RateLimiter);
+        //Dictionary<ulong, Network.Data.Packets.RateLimitEntry> entries = (Dictionary<ulong, Network.Data.Packets.RateLimitEntry>)typeof(Network.Services.RateLimiter).GetField("entries", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(Network.Managers.Network.RateLimiter);
 
-        foreach (var x in entries)
-        {
-            sb.AppendLine($"{x.Key} {x.Value.Usage} {x.Value.NextRefresh}");
-        }
+        //GC.Collect();
+        GC.GetTotalMemory(false);
+        GC.WaitForPendingFinalizers();
+        long gc = GC.GetTotalMemory(false);
+        
+        sb.AppendLine($"{Math.Round(sec, 0)} > {gc} {(lastGc <= gc ? '+' : string.Empty)}{gc - lastGc}");
+        lastGc = gc;
+
+        //foreach (var x in entries)
+        //{
+        //    sb.AppendLine($"{x.Key} {x.Value.Usage}");
+        //}
 
         if (sb.Length == 0)
             return;
 
-        manualLogSource.LogInfo(sb.ToString());
+        manualLogSource.LogDebug(sb.ToString());
     }
 
     private void HandleSettingsRefresh()
@@ -153,7 +200,6 @@ internal sealed class Main : Bases.Plugin
 
     protected override void Load()
     {
-        /*
         Network.Tanuki network = Network.Tanuki.Instance;
         Providers.Settings settingsProvider = Tanuki.instance.providers.settings;
 
@@ -170,11 +216,40 @@ internal sealed class Main : Bases.Plugin
         Network.Components.SteamNetworkMessagePoller steamNetworkMessagePoller = networkNetworkManager.SteamNetworkMessagesPoller;
         steamNetworkMessagePoller.MessageBufferSize = settingsProviderNetworkSection.steamNetworkMessagePollerBuffer;
 
-        steamNetworkMessagePoller.enabled = true;
-        */
+        tanukiServerHelloPacket.ServerCommandPrefix = settingsProvider.CommandSection.serverPrefix;
 
         Game.Patches.ChatBehaviour.Send_ChatMessage.OnPrefix += Tanuki.Instance.managers.chat.OnPlayerChatted;
+
+        if (!Network.Tanuki.Instance.Providers.SteamLobby.SteamId.Equals(CSteamID.Nil))
+        {
+            if (AtlyssNetworkManager._current.isNetworkActive)
+                network.Routers.Packet.SendPacketToLobbyChat(tanukiServerHelloPacket);
+
+            network.Managers.Network.SteamNetworkMessagesPoller.enabled = true;
+        }
     }
+
+    private void TanukiServerHelloPacketHandler(CSteamID sender, Packets.Commands.TanukiServerHello packet)
+    {
+        manualLogSource.LogInfo($"TanukiServerHelloPacketHandler received");
+        if (!sender.IsLobby() || !Network.Tanuki.Instance.Providers.SteamLobby.OwnerSteamId.Equals(sender))
+            return;
+
+        Routers.Commands commandRouter = Tanuki.instance.routers.commands;
+        manualLogSource.LogInfo($"ver {packet.Version}");
+
+        if (packet.Version != PluginInfo.VERSION)
+        {
+            commandRouter.ServerPrefix = Data.Settings.Commands.SERVER_PREFIX_DEFAULT;
+            return;
+        }
+
+        commandRouter.ServerPrefix = packet.ServerCommandPrefix;
+        manualLogSource.LogInfo($"pref {packet.ServerCommandPrefix}");
+    }
+
+    private void OnNetworkProviderSteamLobbyLobbyChanged(CSteamID lobby) =>
+        Network.Tanuki.Instance.Managers.Network.SteamNetworkMessagesPoller.enabled = !lobby.Equals(CSteamID.Nil);
 
     protected override void Unload()
     {

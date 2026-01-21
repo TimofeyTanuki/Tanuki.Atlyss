@@ -110,6 +110,4 @@ public sealed class PacketProcessor
                 arrayPool.Return(decompressedBuffer);
         }
     }
-
-    public void ReturnBuffer(byte[] buffer) => arrayPool.Return(buffer);
 }

@@ -2,10 +2,10 @@
 
 public sealed class Commands
 {
-    public const string CLIENTPREFIX_DEFAULT = "/";
-    public const byte CLIENTPREFIX_MAXLENGTH = 16;
-    public const string SERVERPREFIX_DEFAULT = "/";
-    public const byte SERVERPREFIX_MAXLENGTH = 16;
+    public const string CLIENT_PREFIX_DEFAULT = "/";
+    public const byte CLIENT_PREFIX_MAX_LENGTH = 4;
+    public const string SERVER_PREFIX_DEFAULT = "/";
+    public const byte SERVER_PREFIX_MAX_LENGTH = 4;
 
     internal string clientPrefix = null!;
     internal string serverPrefix = null!;

@@ -3,7 +3,9 @@ using Steamworks;
 using System;
 using System.Buffers;
 using System.Runtime.InteropServices;
+using Tanuki.Atlyss.API.Network.Packets;
 using Tanuki.Atlyss.Network.Components;
+using Tanuki.Atlyss.Network.Data.Packets;
 using Tanuki.Atlyss.Network.Providers;
 
 namespace Tanuki.Atlyss.Network.Managers;
@@ -31,7 +33,7 @@ public sealed class Network
         set
         {
             steamLocalChannel = value;
-            SteamNetworkMessagesPoller.LocalChannel = value;
+            packetRouter.steamLocalChannel = SteamNetworkMessagesPoller.LocalChannel = value;
         }
     }
 
@@ -54,41 +56,50 @@ public sealed class Network
         steamNetworkMessagePoller.onSteamNetworkingMessages = OnSteamNetworkingMessages;
         steamNetworkMessagePoller.steamNetworkingMessageHandler = SteamNetworkMessageHandler;
 
-        steamProvider.OnLobbyChatUpdate += SteamProvider_OnLobbyChatUpdate;
-        steamProvider.OnSteamRelayNetworkStatus += SteamProvider_OnSteamRelayNetworkStatus;
-        steamProvider.OnSteamNetworkingMessagesSessionRequest += SteamProvider_OnSteamNetworkingMessagesSessionRequest;
-        steamProvider.OnLobbyChatMsg += SteamProvider_OnLobbyChatMsg;
+        steamProvider.OnLobbyChatUpdate += OnLobbyChatUpdate;
+        steamProvider.OnSteamRelayNetworkStatus += OnSteamRelayNetworkStatus;
+        steamProvider.OnSteamNetworkingMessagesSessionRequest += OnSteamNetworkingMessagesSessionRequest;
+        steamProvider.OnLobbyChatMsg += OnLobbyChatMsg;
 
-        Game.Patches.SteamLobby.Reset_LobbyQueueParams.OnPostfix += OnSteamLobbyResetLobbyQueueParamsPostfix;
+        steamLobbyProvider.OnLobbyChanged += OnLobbyChanged;
+    }
 
-        SteamLocalChannel = 0;
+    private void OnLobbyChanged(CSteamID lobbyId)
+    {
+        if (lobbyId.Equals(CSteamID.Nil))
+             rateLimiter.Reset();
     }
 
     private bool CheckBandwidthOverflow(CSteamID sender, uint usage)
     {
         if (sender.IsLobby() ||
-            PreventLobbyOwnerRateLimiting && sender.Equals(steamLobbyProvider.LobbyOwner))
+            PreventLobbyOwnerRateLimiting && sender.Equals(steamLobbyProvider.OwnerSteamId))
+        {
+            Console.WriteLine($"PREVENTED FOR {sender.m_SteamID}");
             return false;
+        }
 
         return rateLimiter.CheckBandwidthOverflow(sender, usage);
     }
 
-    private void SteamProvider_OnLobbyChatMsg(LobbyChatMsg_t lobbyChatMsg)
+    private void OnLobbyChatMsg(LobbyChatMsg_t lobbyChatMsg)
     {
+        rateLimiter.Tick();
         byte[] buffer = arrayPool.Rent(Tanuki.PACKET_MAX_SIZE);
 
-        int size = SteamMatchmaking.GetLobbyChatEntry(steamLobbyProvider.Lobby, (int)lobbyChatMsg.m_iChatID, out CSteamID sender, buffer, Tanuki.PACKET_MAX_SIZE, out EChatEntryType _);
+        int size = SteamMatchmaking.GetLobbyChatEntry(steamLobbyProvider.OwnerSteamId, (int)lobbyChatMsg.m_iChatID, out CSteamID sender, buffer, Tanuki.PACKET_MAX_SIZE, out EChatEntryType _);
 
         if (CheckBandwidthOverflow(sender, (uint)size))
             return;
 
+        packetRouter.ReceivePacket(sender, buffer);
+        arrayPool.Return(buffer);
     }
 
-
-    private void SteamProvider_OnSteamNetworkingMessagesSessionRequest(SteamNetworkingMessagesSessionRequest_t steamNetworkingMessagesSessionRequest)
+    private void OnSteamNetworkingMessagesSessionRequest(SteamNetworkingMessagesSessionRequest_t steamNetworkingMessagesSessionRequest)
     {
         rateLimiter.Tick();
-        manualLogSource.LogInfo($"SteamProvider_OnSteamNetworkingMessagesSessionRequest {steamNetworkingMessagesSessionRequest.m_identityRemote.GetSteamID64()}");
+        manualLogSource.LogInfo($"OnSteamNetworkingMessagesSessionRequest {steamNetworkingMessagesSessionRequest.m_identityRemote.GetSteamID64()}");
 
         if (CheckBandwidthOverflow(steamNetworkingMessagesSessionRequest.m_identityRemote.GetSteamID(), 0))
             return;
@@ -96,20 +107,17 @@ public sealed class Network
         SteamNetworkingMessages.AcceptSessionWithUser(ref steamNetworkingMessagesSessionRequest.m_identityRemote);
     }
 
-    private void OnSteamLobbyResetLobbyQueueParamsPostfix() =>
-        rateLimiter.Reset();
-
-    private void SteamProvider_OnSteamRelayNetworkStatus(SteamRelayNetworkStatus_t steamRelayNetworkStatus)
+    private void OnSteamRelayNetworkStatus(SteamRelayNetworkStatus_t steamRelayNetworkStatus)
     {
         if (steamRelayNetworkStatus.m_eAvail != ESteamNetworkingAvailability.k_ESteamNetworkingAvailability_Current)
             return;
 
-        steamProvider.OnSteamRelayNetworkStatus -= SteamProvider_OnSteamRelayNetworkStatus;
+        steamProvider.OnSteamRelayNetworkStatus -= OnSteamRelayNetworkStatus;
         SteamNetworkingUtils.InitRelayNetworkAccess();
         steamNetworkMessagePoller.enabled = true;
     }
 
-    private void SteamProvider_OnLobbyChatUpdate(LobbyChatUpdate_t lobbyChatUpdate)
+    private void OnLobbyChatUpdate(LobbyChatUpdate_t lobbyChatUpdate)
     {
         EChatMemberStateChange state = (EChatMemberStateChange)lobbyChatUpdate.m_rgfChatMemberStateChange;
 
@@ -146,7 +154,11 @@ public sealed class Network
                 }
             }
         }
-        catch { }
+        catch
+        {
+            arrayPool.Return(buffer);
+            return;
+        }
 
         packetRouter.ReceivePacket(sender, buffer);
         arrayPool.Return(buffer);

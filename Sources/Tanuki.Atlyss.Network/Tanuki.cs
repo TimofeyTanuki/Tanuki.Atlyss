@@ -1,4 +1,7 @@
 ﻿using BepInEx.Logging;
+using System.Text;
+using Tanuki.Atlyss.API.Network.Packets;
+using Tanuki.Atlyss.Network.Data.Packets;
 using UnityEngine;
 
 namespace Tanuki.Atlyss.Network;
@@ -64,8 +67,7 @@ public sealed class Tanuki
 
         GameObject gameObject = new();
         Components.SteamNetworkMessagePoller steamNetworkMessagePoller = gameObject.AddComponent<Components.SteamNetworkMessagePoller>();
-        steamNetworkMessagePoller.enabled = false;
-        UnityEngine.Object.DontDestroyOnLoad(gameObject);
+        Object.DontDestroyOnLoad(gameObject);
 
         Data.Tanuki.Managers managers = new()
         {

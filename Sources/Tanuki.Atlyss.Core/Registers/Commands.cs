@@ -112,7 +112,6 @@ public sealed class Commands
 
                 for (int nameIndex = configuration.names.Count - 1; nameIndex >= 0; nameIndex--)
                 {
-                    manualLogSource.LogInfo(string.Join(", ", nameMap.Keys));
                     string? name = configuration.names[nameIndex];
                     string normalizedName = Utilities.Commands.Name.Normalize(name, commandSettings.Prefixes);
 

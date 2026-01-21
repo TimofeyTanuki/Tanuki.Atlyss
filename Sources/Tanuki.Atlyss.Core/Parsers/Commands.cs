@@ -22,14 +22,22 @@ public class Commands(IReadOnlyList<char> quoteCharacters)
         if (string.IsNullOrEmpty(input))
             return false;
 
-        if (!input.StartsWith(prefix))
+        if (!input.StartsWith(prefix, StringComparison.Ordinal))
             return false;
 
         int length = input.Length;
+
+        if (length > prefix.Length &&
+            input.AsSpan(prefix.Length).StartsWith(prefix, StringComparison.Ordinal))
+            return false;
+
         int index = 0;
 
         while (index < length && !char.IsWhiteSpace(input[index])) index++;
         commandName = input[prefix.Length..index];
+
+        if (commandName.Length == 0)
+            return false;
 
         if (commandNameMap is not null && !commandNameMap.ContainsKey(commandName))
             return false;

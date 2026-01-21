@@ -72,6 +72,8 @@ public sealed class SteamNetworkMessagePoller() : MonoBehaviour
         if (count == 0)
             return;
 
+        Console.WriteLine($"Count: {count}");
+
         onSteamNetworkingMessages!();
 
         for (int index = 0; index < count; index++)

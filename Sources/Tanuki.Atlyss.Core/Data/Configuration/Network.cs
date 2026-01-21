@@ -4,7 +4,7 @@ namespace Tanuki.Atlyss.Core.Data.Configuration;
 
 internal sealed class Network(ConfigFile configFile)
 {
-    private const string SECTION_NAME = "NetworkSection";
+    private const string SECTION_NAME = "Network";
 
     public ConfigEntry<int> MainSteamMessageChannel =
         configFile.Bind(

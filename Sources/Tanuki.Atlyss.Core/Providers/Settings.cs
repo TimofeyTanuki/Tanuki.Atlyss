@@ -69,16 +69,16 @@ public sealed class Settings
         commandSection.serverPrefix = Configuration.Instance.Commands.ServerPrefix.Value;
 
         if (commandSection.ClientPrefix.Length == 0 ||
-            commandSection.ClientPrefix.Length > Data.Settings.Commands.CLIENTPREFIX_MAXLENGTH)
+            commandSection.ClientPrefix.Length > Data.Settings.Commands.CLIENT_PREFIX_MAX_LENGTH)
         {
-            commandSection.clientPrefix = Data.Settings.Commands.CLIENTPREFIX_DEFAULT;
+            commandSection.clientPrefix = Data.Settings.Commands.CLIENT_PREFIX_DEFAULT;
             Configuration.Instance.Commands.ClientPrefix.Value = commandSection.ClientPrefix;
         }
 
         if (commandSection.ServerPrefix.Length == 0 ||
-            commandSection.ServerPrefix.Length > Data.Settings.Commands.SERVERPREFIX_MAXLENGTH)
+            commandSection.ServerPrefix.Length > Data.Settings.Commands.SERVER_PREFIX_MAX_LENGTH)
         {
-            commandSection.serverPrefix = Data.Settings.Commands.SERVERPREFIX_DEFAULT;
+            commandSection.serverPrefix = Data.Settings.Commands.SERVER_PREFIX_DEFAULT;
             Configuration.Instance.Commands.ServerPrefix.Value = commandSection.ServerPrefix;
         }
 

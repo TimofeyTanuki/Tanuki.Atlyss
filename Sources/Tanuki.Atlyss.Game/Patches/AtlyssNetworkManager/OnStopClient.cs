@@ -7,6 +7,7 @@ namespace Tanuki.Atlyss.Game.Patches.AtlyssNetworkManager;
 public sealed class OnStopClient
 {
     private static Action? onPrefix;
+    private static Action? onPostfix;
 
     public static event Action OnPrefix
     {
@@ -18,6 +19,16 @@ public sealed class OnStopClient
         remove => onPrefix -= value;
     }
 
+    public static event Action OnPostfix
+    {
+        add
+        {
+            if (Managers.Patches.EnsurePatched<OnStopClient>())
+                onPostfix += value;
+        }
+        remove => onPostfix -= value;
+    }
+
     [HarmonyPrefix]
     private static void Prefix()
     {
@@ -25,5 +36,14 @@ public sealed class OnStopClient
             return;
 
         onPrefix.Invoke();
+    }
+
+    [HarmonyPostfix]
+    private static void Postfix()
+    {
+        if (onPostfix is null)
+            return;
+
+        onPostfix.Invoke();
     }
 }

@@ -13,6 +13,8 @@ public sealed class Commands
     private readonly Registers.Commands commandRegistry;
     private readonly Providers.Commands commandProvider;
 
+    public string? ServerPrefix;
+
     internal Commands(
         ManualLogSource manualLogSource,
         Parsers.Commands commandParser,
@@ -31,13 +33,10 @@ public sealed class Commands
     {
         IReadOnlyDictionary<string, Type> nameMap = commandRegistry.NameMap;
 
-        ICommand? command;
-        manualLogSource.LogInfo($"Name map size: {nameMap.Count}");
-
         if (commandParser.TryParse(commandSettings.ClientPrefix, input, out string? commandName, out IReadOnlyList<string>? commandArguments, nameMap))
         {
             manualLogSource.LogInfo($"Executing: {commandName} [{string.Join(",", commandArguments)}]");
-            command = commandProvider.Create(nameMap[commandName]);
+            ICommand command = commandProvider.Create(nameMap[commandName]);
 
 
             //test only
@@ -59,10 +58,14 @@ public sealed class Commands
             return true;
         }
         // commandSettings.ServerPrefix must be replaced with synced string (main tanuki atlyss packet to identify friendly servers)
-        if (commandParser.TryParse(commandSettings.ServerPrefix, input, out commandName, out commandArguments))
+
+        if (!string.IsNullOrEmpty(ServerPrefix))
         {
-            // send to server
-            manualLogSource.LogInfo($"Send to server: {commandName} [{string.Join(",", commandArguments)}]");
+            if (commandParser.TryParse(ServerPrefix, input, out commandName, out commandArguments))
+            {
+                // send to server
+                manualLogSource.LogInfo($"Send to server: {commandName} [{string.Join(",", commandArguments)}]");
+            }
         }
 
         return false;

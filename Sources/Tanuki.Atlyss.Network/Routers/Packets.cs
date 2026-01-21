@@ -15,6 +15,8 @@ public sealed class Packets
     private readonly Registers.Packets packetRegistry;
     private readonly PacketProcessor packetProcessor;
 
+    internal int steamLocalChannel;
+
     internal Packets(ManualLogSource manualLogSource, Registers.Packets packetRegistry, PacketProcessor packetProcessor)
     {
         this.manualLogSource = manualLogSource;
@@ -99,6 +101,9 @@ public sealed class Packets
 
         return true;
     }
+
+    public bool SendPacketToUser<TPacket>(CSteamID target, TPacket packet, out EResult steamResult)
+        where TPacket : Packet, new() => SendPacketToUser(target, packet, steamLocalChannel, out steamResult);
 
     public void ReceivePacket(CSteamID sender, ReadOnlySpan<byte> data)
     {
