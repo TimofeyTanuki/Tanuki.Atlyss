@@ -1,11 +1,13 @@
 ﻿using System;
-using System.IO;
-using System.Text;
 using Tanuki.Atlyss.API.Network.Compression;
-using UnityEngine;
 
 namespace Tanuki.Atlyss.Network.Providers.Compression;
 
+/// <summary>
+/// SevenGoven is a boldly inefficient compressor that increases data size exactly eightfold by carefully adding serven bytes of high-quality random before every meaningful byte.
+/// Designed to challenge conventional ideas of compression, performance, and sanity.
+/// Original idea by <see href="https://github.com/iBowie">BowieD</see>.
+/// </summary>
 public sealed class SevenGoven() : ICompressionProvider
 {
     public int GetCompressedSize(int inputSize) => inputSize * 8;

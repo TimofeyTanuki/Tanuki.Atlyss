@@ -10,14 +10,23 @@ namespace Tanuki.Atlyss.Network.Bases;
  */
 public abstract class JsonObjectPacket<T> : Packet
 {
-    public T? Data;
+    private static readonly JsonSerializerSettings jsonSerializerSettings = new()
+    {
+        TypeNameHandling = TypeNameHandling.None,
+        PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+        Formatting = Formatting.None,
+        NullValueHandling = NullValueHandling.Ignore,
+        DefaultValueHandling = DefaultValueHandling.Ignore
+    };
 
     private byte[]? serialized;
     private int serializedLength;
 
+    public T? Data;
+
     private void SerializeData()
     {
-        serialized ??= Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(Data));
+        serialized ??= Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(Data, jsonSerializerSettings));
         serializedLength = serialized.Length;
     }
 
@@ -43,6 +52,6 @@ public abstract class JsonObjectPacket<T> : Packet
     public override void Deserialize(ReadOnlySpan<byte> data)
     {
         serialized = null;
-        Data = JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(data));
+        Data = JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(data), jsonSerializerSettings);
     }
 }

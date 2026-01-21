@@ -7,6 +7,16 @@ using Tanuki.Atlyss.API.Network.Compression;
 
 namespace Tanuki.Atlyss.Network.Providers.Compression;
 
+/// <summary>
+/// Provides data compression using the Brotli algorithm.
+/// </summary>
+/// <param name="compressionLevel">
+/// Specifies the compression level used by the encoder.
+/// </param>
+/// <param name="maxCompressedDataSize">
+/// Defines the maximum expected size of compressed data.
+/// This value shouldn't be set too high, as reserving a large memory buffer can degrade performance and may be abused in malicious scenarios.
+/// </param>
 public sealed class Brotli(CompressionLevel compressionLevel = CompressionLevel.Fastest, int maxCompressedDataSize = 16384) : ICompressionProvider
 {
     private const int HEADER_SIZE = sizeof(int);
@@ -38,7 +48,12 @@ public sealed class Brotli(CompressionLevel compressionLevel = CompressionLevel.
         memoryStream.Position = 0;
         memoryStream.Read(output.Slice(HEADER_SIZE, compressedLength));
 
-        return HEADER_SIZE + compressedLength;
+        int length = HEADER_SIZE + compressedLength;
+
+        if (length > maxCompressedDataSize)
+            throw new InvalidOperationException("Compressed data exceeds the compressor's maximum allowed size.");
+
+        return length;
     }
 
     public int Decompress(ReadOnlySpan<byte> input, Span<byte> output)
