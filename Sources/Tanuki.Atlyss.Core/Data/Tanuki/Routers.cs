@@ -2,7 +2,7 @@
 
 public sealed class Routers
 {
-    public Core.Routers.Commands commands = null!;
+    internal Core.Routers.Commands commands = null!;
 
     public Core.Routers.Commands Commands => commands;
 

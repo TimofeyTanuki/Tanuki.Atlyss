@@ -14,9 +14,9 @@ public sealed class Commands
     private readonly ManualLogSource manualLogSource;
     private readonly Dictionary<string, Type> nameMap = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<ulong, Type> hashMap = [];
-    private readonly Dictionary<Type, Data.Commands.RegistryEntry> entries = [];
+    private readonly Dictionary<Type, Data.Commands.Descriptor> descriptors = [];
     private readonly Dictionary<Assembly, HashSet<Type>> assemblyCommands = [];
-    private readonly Data.Settings.Commands settings;
+    private readonly Data.Settings.Commands commandSettings;
 
     public Action<Type>? OnCommandRegistered;
     public Action<Type>? OnCommandDeregistered;
@@ -29,7 +29,7 @@ public sealed class Commands
     /// <summary>
     /// Provides a lookup of <see cref="Serialization.Commands.Configuration"/> objects by their corresponding command <see cref="Type"/>.
     /// </summary>
-    public IReadOnlyDictionary<Type, Data.Commands.RegistryEntry> Entries => entries;
+    public IReadOnlyDictionary<Type, Data.Commands.Descriptor> Descriptors => descriptors;
 
     /// <summary>
     /// Provides a lookup of commands grouped by their <see cref="Assembly"/>.
@@ -43,7 +43,7 @@ public sealed class Commands
     internal Commands(ManualLogSource manualLogSource, Data.Settings.Commands settings)
     {
         this.manualLogSource = manualLogSource;
-        this.settings = settings;
+        this.commandSettings = settings;
     }
 
     public Dictionary<string, Serialization.Commands.Configuration>? TryReadConfiguration(string path)
@@ -56,7 +56,7 @@ public sealed class Commands
             }
             catch (Exception exception)
             {
-                manualLogSource.LogError($"Unable to read the configuration file \"{path}\".\nException message:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
+                manualLogSource.LogError($"Unable to read the configuration file \"{path}\".\nException:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
                 return null;
             }
         }
@@ -72,14 +72,14 @@ public sealed class Commands
         }
         catch (Exception exception)
         {
-            manualLogSource.LogError($"Failed to save the updated configuration file \"{file}\".\nException message:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
+            manualLogSource.LogError($"Failed to save the updated configuration file \"{file}\".\nException:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
             return;
         }
     }
 
     private uint ProcessExistingConfiguration(Dictionary<string, Type> pluginCommands, Dictionary<string, Serialization.Commands.Configuration> commandConfigurations)
     {
-        string[] prefixes = [settings.ClientPrefix, settings.ServerPrefix];
+        string[] prefixes = [commandSettings.ClientPrefix, commandSettings.ServerPrefix];
 
         uint changes = 0;
 
@@ -96,9 +96,8 @@ public sealed class Commands
             {
                 manualLogSource.LogInfo($"Command configuration entry for {command.FullName} has been restored.");
 
-                configuration = Serialization.Commands.Configuration.CreateFromType(command, settings.Prefixes);
+                configuration = Serialization.Commands.Configuration.CreateFromType(command, commandSettings.Prefixes);
                 commandConfigurations[commandConfigurationKey] = configuration;
-
                 changes++;
             }
             else
@@ -106,7 +105,6 @@ public sealed class Commands
                 if (configuration.names is null)
                 {
                     configuration.names = [];
-
                     changes++;
 
                     continue;
@@ -114,39 +112,45 @@ public sealed class Commands
 
                 for (int nameIndex = configuration.names.Count - 1; nameIndex >= 0; nameIndex--)
                 {
+                    manualLogSource.LogInfo(string.Join(", ", nameMap.Keys));
                     string? name = configuration.names[nameIndex];
-                    string normalizedName = Utilities.Commands.Name.Normalize(name, settings.Prefixes);
+                    string normalizedName = Utilities.Commands.Name.Normalize(name, commandSettings.Prefixes);
 
                     if (string.IsNullOrEmpty(normalizedName))
                     {
-                        manualLogSource.LogInfo($"Removed empty command Name from {command.FullName}.");
+                        manualLogSource.LogInfo($"Removed empty command name from {command.FullName}.");
 
                         configuration.names.RemoveAt(nameIndex);
-
                         changes++;
+
+                        continue;
+                    }
+
+                    if (nameMap.TryGetValue(normalizedName, out Type existingCommand))
+                    {
+                        if (command == existingCommand)
+                        {
+                            configuration.names.RemoveAt(nameIndex);
+                            changes++;
+                        }
+                        else
+                            manualLogSource.LogWarning($"Command name \"{name}\" of {command.FullName} is already used by {existingCommand.FullName}.");
 
                         continue;
                     }
 
                     if (name != normalizedName)
                     {
-                        manualLogSource.LogInfo($"Command {command.FullName} Name normalized: {name} -> {normalizedName}.");
+                        manualLogSource.LogInfo($"Command {command.FullName} name normalized: {name} -> {normalizedName}.");
 
                         configuration.names[nameIndex] = normalizedName;
-
                         changes++;
                     }
 
-                    if (nameMap.TryGetValue(name, out Type existingCommand))
-                    {
-                        manualLogSource.LogWarning($"Command Name \"{name}\" of {command.FullName} is already used by {existingCommand.FullName}.");
-                        continue;
-                    }
-
-                    nameMap.Add(name, command);
+                    nameMap.Add(normalizedName, command);
                 }
 
-                entries[command].configuration = configuration;
+                descriptors[command].configuration = configuration;
             }
 
             OnCommandRegistered?.Invoke(command);
@@ -156,10 +160,10 @@ public sealed class Commands
         {
             manualLogSource.LogInfo($"Command configuration entry for {pluginCommand.Key} has been created.");
 
-            Serialization.Commands.Configuration newCommandConfiguration = Serialization.Commands.Configuration.CreateFromType(pluginCommand.Value, settings.Prefixes);
+            Serialization.Commands.Configuration newCommandConfiguration = Serialization.Commands.Configuration.CreateFromType(pluginCommand.Value, commandSettings.Prefixes);
             commandConfigurations.Add(pluginCommand.Key, newCommandConfiguration);
 
-            entries[pluginCommand.Value].configuration = newCommandConfiguration;
+            descriptors[pluginCommand.Value].configuration = newCommandConfiguration;
 
             changes++;
         }
@@ -204,7 +208,7 @@ public sealed class Commands
         assemblyCommands.Add(command);
 
         hashMap[hash] = command;
-        entries[command] = new(hash, null);
+        descriptors[command] = new(hash, null);
 
         OnCommandRegistered?.Invoke(command);
 
@@ -215,7 +219,7 @@ public sealed class Commands
 
     public void DeregisterCommand(Type сommandType)
     {
-        if (!entries.TryGetValue(сommandType, out Data.Commands.RegistryEntry entry))
+        if (!descriptors.TryGetValue(сommandType, out Data.Commands.Descriptor entry))
             return;
 
         Serialization.Commands.Configuration? configuration = entry.configuration;
@@ -224,8 +228,8 @@ public sealed class Commands
             foreach (string Name in configuration.names)
                 nameMap.Remove(Name);
 
-        entries.Remove(сommandType);
-        hashMap.Remove(entry.hash);
+        descriptors.Remove(сommandType);
+        hashMap.Remove(entry.Hash);
 
         OnCommandDeregistered?.Invoke(сommandType);
     }
@@ -243,7 +247,7 @@ public sealed class Commands
         }
         catch (Exception exception)
         {
-            manualLogSource.LogError($"Failed to retrieve types from assembly {assembly.GetName().Name}\nException message:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
+            manualLogSource.LogError($"Failed to retrieve types from assembly {assembly.GetName().Name}\nException:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
             return;
         }
 
@@ -257,7 +261,7 @@ public sealed class Commands
             if (!commandInterfaceType.IsAssignableFrom(type))
                 continue;
 
-            if (entries.ContainsKey(type))
+            if (descriptors.ContainsKey(type))
                 continue;
 
             if (!RegisterCommand(type, Utilities.Commands.Hash.Generate(type)))

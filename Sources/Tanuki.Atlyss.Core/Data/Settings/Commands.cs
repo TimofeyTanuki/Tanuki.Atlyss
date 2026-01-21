@@ -7,8 +7,11 @@ public sealed class Commands
     public const string SERVERPREFIX_DEFAULT = "/";
     public const byte SERVERPREFIX_MAXLENGTH = 16;
 
-    public string ClientPrefix { get; internal set; } = null!;
-    public string ServerPrefix { get; internal set; } = null!;
+    internal string clientPrefix = null!;
+    internal string serverPrefix = null!;
+    internal string[] prefixes = null!;
 
-    public string[] Prefixes { get; internal set; } = null!;
+    public string ClientPrefix => clientPrefix;
+    public string ServerPrefix => serverPrefix;
+    public string[] Prefixes => prefixes;
 }

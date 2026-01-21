@@ -11,21 +11,23 @@ public sealed class Packets
 {
     private readonly ManualLogSource manualLogSource;
     private readonly Dictionary<ulong, Type> hashMap = [];
-    private readonly Dictionary<Type, RegistryEntry> packetEntries = [];
+    private readonly Dictionary<Type, Descriptor> packetDescriptors = [];
 
     public IReadOnlyDictionary<ulong, Type> HashMap => hashMap;
-    public IReadOnlyDictionary<Type, RegistryEntry> PacketEntries => packetEntries;
+    public IReadOnlyDictionary<Type, Descriptor> PacketDescriptors => packetDescriptors;
 
     internal Packets(ManualLogSource manualLogSource) => this.manualLogSource = manualLogSource;
 
-    public void Register<T>(ICompressionProvider? compressionProvider)
-        where T : Packet
+    public void Register<TPacket>(ICompressionProvider? compressionProvider)
+        where TPacket : Packet, new()
     {
-        Type type = typeof(T);
+        Type type = typeof(TPacket);
 
-        if (packetEntries.ContainsKey(type))
+        if (packetDescriptors.TryGetValue(type, out Descriptor descriptor))
         {
-            manualLogSource.LogWarning($"Packet {type.FullName} is already registered.");
+            if (compressionProvider != descriptor.CompressionProvider)
+                manualLogSource.LogWarning($"Packets {type.FullName} is already registered with another compression provider.");
+
             return;
         }
 
@@ -33,17 +35,14 @@ public sealed class Packets
 
         if (hashMap.ContainsKey(signature))
         {
-            manualLogSource.LogWarning($"Packet with Signature {signature} is alredy registered.");
+            manualLogSource.LogWarning($"Packets with Signature {signature} is alredy registered.");
             return;
         }
 
         hashMap.Add(signature, type);
-        packetEntries.Add(
+        packetDescriptors.Add(
             type,
-            new(signature)
-            {
-                CompressionProvider = compressionProvider
-            }
+            new Descriptor<TPacket>(signature, compressionProvider)
         );
     }
 
@@ -52,10 +51,10 @@ public sealed class Packets
     {
         Type type = typeof(T);
 
-        if (!packetEntries.TryGetValue(type, out RegistryEntry registryEntry))
+        if (!packetDescriptors.TryGetValue(type, out Descriptor registryEntry))
             return;
 
         hashMap.Remove(registryEntry.Signature);
-        packetEntries.Remove(type);
+        packetDescriptors.Remove(type);
     }
 }

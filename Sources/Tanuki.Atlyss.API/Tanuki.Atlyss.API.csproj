@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <Reference Include="$(GameDataManagedDir)Assembly-CSharp.dll" Private="False" />
+    <Reference Include="$(GameDataManagedDir)com.rlabrecque.steamworks.net.dll" Private="False" />
   </ItemGroup>
   
 </Project>

@@ -1,4 +1,5 @@
 ﻿using BepInEx.Logging;
+using Steamworks;
 using System;
 using Tanuki.Atlyss.API.Network.Packets;
 using Tanuki.Atlyss.Network.Data.Packets;
@@ -16,28 +17,43 @@ public sealed class Packets
         this.packetRegistry = packetRegistry;
     }
 
-    public void AddHandler<T>(API.Network.Packets.Handler handler)
-        where T : Packet
+    public void AddHandler<TPacket>(Action<CSteamID, TPacket> handler)
+        where TPacket : Packet, new()
     {
-        Type type = typeof(T);
+        Type type = typeof(TPacket);
 
-        if (!packetRegistry.PacketEntries.TryGetValue(type, out RegistryEntry registryEntry))
+        if (!packetRegistry.PacketDescriptors.TryGetValue(type, out Descriptor descriptor))
         {
-            manualLogSource.LogWarning($"Cannot add handler for packet {type.FullName} because it isn't registered.");
+            manualLogSource.LogError($"Failed to add handler for packet {type.FullName} because it isn't registered.");
             return;
         }
 
-        registryEntry.PacketHandlers.Add(handler);
+        if (descriptor is not Descriptor<TPacket> typedDescriptor)
+        {
+            manualLogSource.LogError($"Failed to add handler for packet {type.FullName} because packet descriptor type doesn't match the expected handler type.");
+            return;
+        }
+
+        typedDescriptor.PacketHandlers.Add(handler);
     }
 
-    public void RemoveHandler<T>(API.Network.Packets.Handler handler)
-        where T : Packet
+    public void RemoveHandler<TPacket>(Action<CSteamID, TPacket> handler)
+        where TPacket : Packet, new()
     {
-        Type type = typeof(T);
+        Type type = typeof(TPacket);
 
-        if (!packetRegistry.PacketEntries.TryGetValue(type, out RegistryEntry registryEntry))
+        if (!packetRegistry.PacketDescriptors.TryGetValue(type, out Descriptor descriptor))
+        {
+            manualLogSource.LogError($"Failed to add handler for packet {type.FullName} because it isn't registered.");
             return;
+        }
 
-        registryEntry.PacketHandlers.Remove(handler);
+        if (descriptor is not Descriptor<TPacket> typedDescriptor)
+        {
+            manualLogSource.LogError($"Failed to add handler for packet {type.FullName} because packet descriptor type doesn't match the expected handler type.");
+            return;
+        }
+
+        typedDescriptor.PacketHandlers.Remove(handler);
     }
 }

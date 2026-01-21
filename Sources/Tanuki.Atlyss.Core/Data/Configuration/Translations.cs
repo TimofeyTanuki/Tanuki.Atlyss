@@ -2,9 +2,9 @@
 
 namespace Tanuki.Atlyss.Core.Data.Configuration;
 
-internal sealed class Language(ConfigFile configFile)
+internal sealed class Translations(ConfigFile configFile)
 {
-    private const string SECTION_NAME = "translations";
+    private const string SECTION_NAME = "TranslationSection";
 
     public ConfigEntry<string> PreferredLanguages = configFile.Bind(SECTION_NAME, "PreferredLanguages", "neutral, english, russian", "List of preferred languages in order of priority.");
 }

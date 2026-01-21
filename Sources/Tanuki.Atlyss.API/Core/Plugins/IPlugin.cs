@@ -12,7 +12,7 @@ public interface IPlugin
     string Name { get; }
     EState State { get; }
 
-    void LoadPlugin();
+    public void LoadPlugin();
 
-    void UnloadPlugin(EState state);
+    public void UnloadPlugin(EState state);
 }

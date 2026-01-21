@@ -84,7 +84,7 @@ public sealed class Help : ICommand
 
         foreach (Type command in commands)
         {
-            if (!commandRegistry.Entries.TryGetValue(command, out Data.Commands.RegistryEntry registryEntry))
+            if (!commandRegistry.Descriptors.TryGetValue(command, out Data.Commands.Descriptor registryEntry))
                 continue;
 
             Serialization.Commands.Configuration? configuration = registryEntry.Configuration;

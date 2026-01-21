@@ -1,13 +1,7 @@
-﻿using System;
-using System.Buffers.Binary;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using Tanuki.Atlyss.API.Network.Packets;
+﻿namespace Tanuki.Atlyss.Core.Packets.Commands;
 
-namespace Tanuki.Atlyss.Core.Packets.Commands;
-
-internal class CommandRequest : Packet
+/*
+internal class CommandRequest : IPacket
 {
     public string? Name;
     public ulong? Hash;
@@ -22,7 +16,7 @@ internal class CommandRequest : Packet
         else if (Hash is not null)
             size += sizeof(ulong);
         else
-            throw new InvalidOperationException("Name or hash must be set.");
+            throw new InvalidOperationException("Name or Hash must be set.");
 
         size += 2;
 
@@ -119,3 +113,4 @@ internal class CommandRequest : Packet
         Arguments = arguments;
     }
 }
+*/

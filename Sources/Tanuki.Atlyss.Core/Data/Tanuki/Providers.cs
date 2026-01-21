@@ -2,9 +2,11 @@
 
 public sealed class Providers
 {
-    public Core.Providers.Commands commands = null!;
+    internal Core.Providers.Commands commands = null!;
+    internal Core.Providers.Settings settings = null!;
 
     public Core.Providers.Commands Commands => commands;
+    public Core.Providers.Settings Settings => settings;
 
     internal Providers() { }
 }

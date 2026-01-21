@@ -25,7 +25,7 @@ internal class Patches
         }
         catch (Exception Exception)
         {
-            manualLogSource.LogError($"Failed to apply patch {patchType.FullName}.\nException message:\n{Exception.Message}\nStack trace:\n{Exception.StackTrace}");
+            manualLogSource.LogError($"Failed to apply patch {patchType.FullName}.\nException:\n{Exception.Message}\nStack trace:\n{Exception.StackTrace}");
             return false;
         }
 

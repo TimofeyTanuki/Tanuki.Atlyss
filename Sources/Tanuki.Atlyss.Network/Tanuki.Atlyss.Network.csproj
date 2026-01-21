@@ -11,6 +11,7 @@
       <CopyLocalSatelliteAssemblies>False</CopyLocalSatelliteAssemblies>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\Tanuki.Atlyss.Game\Tanuki.Atlyss.Game.csproj" />
     <ProjectReference Include="..\Tanuki.Atlyss.Shared\Tanuki.Atlyss.Shared.csproj">
       <Private>False</Private>
       <CopyLocalSatelliteAssemblies>False</CopyLocalSatelliteAssemblies>
@@ -22,10 +23,7 @@
     <Reference Include="$(GameDataManagedDir)Assembly-CSharp.dll" Private="False" />
     <Reference Include="$(GameDataManagedDir)com.rlabrecque.steamworks.net.dll" Private="False" />
     <Reference Include="$(GameDataManagedDir)UnityEngine.CoreModule.dll" Private="False" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Bases\" />
+    <Reference Include="$(GameDataManagedDir)Newtonsoft.Json.dll" Private="False" />
   </ItemGroup>
 
 </Project>

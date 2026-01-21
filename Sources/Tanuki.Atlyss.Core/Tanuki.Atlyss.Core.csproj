@@ -32,6 +32,7 @@
     <Reference Include="$(GameDataManagedDir)Newtonsoft.Json.dll" Private="False" />
     <Reference Include="$(GameDataManagedDir)UnityEngine.dll" Private="False" />
     <Reference Include="$(GameDataManagedDir)UnityEngine.CoreModule.dll" Private="False" />
+    <Reference Include="$(GameDataManagedDir)com.rlabrecque.steamworks.net.dll" Private="False" />
   </ItemGroup>
   
 </Project>

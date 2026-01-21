@@ -1,6 +1,8 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
-using Tanuki.Atlyss.Core.Data.Tanuki;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Text;
 
 namespace Tanuki.Atlyss.Core;
 
@@ -10,9 +12,6 @@ namespace Tanuki.Atlyss.Core;
  * CLIENTS MUSTN'T KNOW ABOUT SERVER COMMANDS
  * SERVER MUSTN'T KNOW ABOUT CLIENT' COMMANDS
  * ^^^ safety policy
- * 
- * NETWORKING MODULE
- *
  *
  * HASH CODES FOR NETWORKING
  *   Command Execution
@@ -33,10 +32,6 @@ namespace Tanuki.Atlyss.Core;
  *
  * LISTEN CHAT ON HOST FOR NON TANUKI USERS
  *
- *
- * explore e621
- *
- *
  * PERMISSION GROUPS
  *   sth like this:
  *     default:
@@ -51,7 +46,7 @@ namespace Tanuki.Atlyss.Core;
 [BepInPlugin(PluginInfo.GUID, PluginInfo.NAME, PluginInfo.VERSION)]
 internal sealed class Main : Bases.Plugin
 {
-    internal static Main Instance = null!;
+    public static Main Instance = null!;
     private bool reloadConfiguration = false;
 
     private ManualLogSource manualLogSource = null!;
@@ -74,31 +69,25 @@ internal sealed class Main : Bases.Plugin
 
     internal void Start()
     {
-        Settings settings = new()
+        Data.Tanuki.Providers providers = new()
         {
             commands = new(),
-            translations = new(),
+            settings = new()
         };
 
         Data.Tanuki.Registers registers = new()
         {
-            commands = new(manualLogSource, settings.commands),
+            commands = new(manualLogSource, providers.settings.CommandSection),
             plugins = new()
-        };
-
-        Data.Tanuki.Providers providers = new()
-        {
-            commands = new(registers.commands)
         };
 
         Data.Tanuki.Routers routers = new()
         {
-            commands = new(manualLogSource, new(['"', '\"', '`']), settings.commands, registers.commands, providers.commands)
+            commands = new(manualLogSource, new(['"', '\"', '`']), providers.settings.CommandSection, registers.commands, providers.commands)
         };
 
         Data.Tanuki.Managers managers = new()
         {
-            settings = new(settings),
             plugins = new(manualLogSource, registers.plugins),
             chat = new(routers.commands)
         };
@@ -107,8 +96,7 @@ internal sealed class Main : Bases.Plugin
         {
             managers = managers,
             providers = providers,
-            registers = registers,
-            settings = settings
+            registers = registers
         };
 
         managers.plugins.OnBeforePluginsLoad += HandleSettingsRefresh;
@@ -116,17 +104,38 @@ internal sealed class Main : Bases.Plugin
         Atlyss.Network.Tanuki.Initialize();
 
         Network.Tanuki Network = Atlyss.Network.Tanuki.Instance;
-        Network.Providers.Steam.Initialize();
-
-        Game.Providers.Player.Initialize();
-
-        //Network.
-
-        //Network.Tanuki.Initialize();
-        //Network.Tanuki.Instance.Steam.CreateCallbacks();
+        Network.Providers.Steam.CreateCallbacks();
 
         registers.plugins.Refresh();
         managers.plugins.LoadPlugins();
+    }
+
+
+    private readonly FieldInfo entriesField = typeof(Network.Services.RateLimiter).GetField("entries", BindingFlags.Instance | BindingFlags.NonPublic);
+    Dictionary<ulong, Network.Data.Packets.RateLimitEntry> entries = [];
+    float sec = 0;
+    private void FixedUpdate()
+    {
+        Network.Tanuki Network = Atlyss.Network.Tanuki.Instance;
+
+        if (UnityEngine.Time.unscaledTime < sec)
+            return;
+
+        sec = UnityEngine.Time.unscaledTime + 1;
+
+        StringBuilder sb = new();
+
+        entries ??= (Dictionary<ulong, Network.Data.Packets.RateLimitEntry>)entriesField.GetValue(Network.Managers.Network.RateLimiter);
+
+        foreach (var x in entries)
+        {
+            sb.AppendLine($"{x.Key} {x.Value.Usage} {x.Value.NextRefresh}");
+        }
+
+        if (sb.Length == 0)
+            return;
+
+        manualLogSource.LogInfo(sb.ToString());
     }
 
     private void HandleSettingsRefresh()
@@ -139,14 +148,39 @@ internal sealed class Main : Bases.Plugin
             reloadConfiguration = false;
         }
 
-        Tanuki.Instance.managers.settings.Refresh();
+        Tanuki.Instance.providers.settings.Refresh();
     }
 
-    protected override void Load() =>
+    protected override void Load()
+    {
+        /*
+        Network.Tanuki network = Network.Tanuki.Instance;
+        Providers.Settings settingsProvider = Tanuki.instance.providers.settings;
+
+        Data.Settings.Network settingsProviderNetworkSection = settingsProvider.NetworkSection;
+
+        Network.Managers.Network networkNetworkManager = network.Managers.Network;
+        networkNetworkManager.SteamLocalChannel = settingsProviderNetworkSection.mainSteamMessageChannel;
+        networkNetworkManager.PreventLobbyOwnerRateLimiting = settingsProviderNetworkSection.preventLobbyOwnerRateLimiting;
+
+        Network.Services.RateLimiter networkNetworkManagerRateLimiter = networkNetworkManager.RateLimiter;
+        networkNetworkManagerRateLimiter.Bandwidth = settingsProviderNetworkSection.rateLimiterBandwidth;
+        networkNetworkManagerRateLimiter.Window = settingsProviderNetworkSection.rateLimiterWindow;
+
+        Network.Components.SteamNetworkMessagePoller steamNetworkMessagePoller = networkNetworkManager.SteamNetworkMessagesPoller;
+        steamNetworkMessagePoller.MessageBufferSize = settingsProviderNetworkSection.steamNetworkMessagePollerBuffer;
+
+        steamNetworkMessagePoller.enabled = true;
+        */
+
         Game.Patches.ChatBehaviour.Send_ChatMessage.OnPrefix += Tanuki.Instance.managers.chat.OnPlayerChatted;
+    }
 
     protected override void Unload()
     {
+        Network.Tanuki network = Network.Tanuki.Instance;
+        network.Managers.Network.SteamNetworkMessagesPoller.enabled = false;
+
         reloadConfiguration = true;
         Game.Patches.ChatBehaviour.Send_ChatMessage.OnPrefix -= Tanuki.Instance.managers.chat.OnPlayerChatted;
     }

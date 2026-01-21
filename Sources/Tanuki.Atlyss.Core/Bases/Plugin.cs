@@ -31,7 +31,7 @@ public abstract class Plugin : BaseUnityPlugin, IPlugin
         translationSet.Clear();
 
         string path = Utilities.Translations.LanguageFileSelector.GetPreferredFile(
-            Tanuki.Instance.Settings.Translations.PreferredLanguageOrder,
+            Tanuki.Instance.Providers.Settings.TranslationSection.PreferredLanguageOrder,
             configurationDirectory,
             ".translations.json"
         );
@@ -45,7 +45,7 @@ public abstract class Plugin : BaseUnityPlugin, IPlugin
         }
         catch (Exception exception)
         {
-            Logger.LogError($"Failed to load translation set from file \"{path}\".\nException message:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
+            Logger.LogError($"Failed to load translation set from file \"{path}\".\nException:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
         }
     }
 
@@ -72,7 +72,7 @@ public abstract class Plugin : BaseUnityPlugin, IPlugin
         Tanuki.Instance.Registers.Commands.RegisterAssembly(
             GetType().Assembly,
             Utilities.Translations.LanguageFileSelector.GetPreferredFile(
-                Tanuki.Instance.settings.translations.PreferredLanguageOrder,
+                Tanuki.Instance.Providers.Settings.TranslationSection.PreferredLanguageOrder,
                 configurationDirectory,
                 ".commands.json"
             )
@@ -84,7 +84,7 @@ public abstract class Plugin : BaseUnityPlugin, IPlugin
         }
         catch (Exception exception)
         {
-            Logger.LogError($"An exception occurred while loading the plugin.\nException message:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
+            Logger.LogError($"An exception occurred while loading the plugin.\nException:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
             UnloadPlugin(EState.Failure);
             return;
         }
@@ -106,7 +106,7 @@ public abstract class Plugin : BaseUnityPlugin, IPlugin
         }
         catch (Exception exception)
         {
-            Logger.LogError($"An exception occurred while unloading the plugin.\nException message:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
+            Logger.LogError($"An exception occurred while unloading the plugin.\nException:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
             _State = EState.Failure;
             return;
         }

@@ -19,7 +19,6 @@ public sealed class DeserializeSyncVars
         }
         remove => onPrefix -= value;
     }
-
     public static event Action<global::Player, NetworkReader, bool, int> OnPostfix
     {
         add

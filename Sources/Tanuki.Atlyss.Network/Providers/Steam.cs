@@ -5,69 +5,76 @@ namespace Tanuki.Atlyss.Network.Providers;
 
 public sealed class Steam
 {
+    private bool callbackCreated = false;
+
     public event Action<SteamRelayNetworkStatus_t>? OnSteamRelayNetworkStatus;
     public event Action<SteamNetworkingMessagesSessionRequest_t>? OnSteamNetworkingMessagesSessionRequest;
     public event Action<GameLobbyJoinRequested_t>? OnGameLobbyJoinRequested;
-    public event Action<LobbyEnter_t>? OnLobbyEntered;
+    public event Action<LobbyEnter_t>? OnLobbyEnter;
     public event Action<LobbyChatMsg_t>? OnLobbyChatMsg;
     public event Action<LobbyDataUpdate_t>? OnLobbyDataUpdate;
+    public event Action<LobbyChatUpdate_t>? OnLobbyChatUpdate;
 
-    private Callback<SteamRelayNetworkStatus_t> steamRelayNetworkStatusCallback = null!;
-    private Callback<SteamNetworkingMessagesSessionRequest_t> steamNetworkingMessagesSessionRequest = null!;
-    private Callback<GameLobbyJoinRequested_t> gameLobbyJoinRequested = null!;
-    private Callback<LobbyEnter_t> lobbyEnter = null!;
-    private Callback<LobbyChatMsg_t> lobbyChatMsg = null!;
-    private Callback<LobbyDataUpdate_t> lobbyDataUpdate = null!;
-
-    private bool initialized = false;
+    private static Callback<SteamRelayNetworkStatus_t> steamRelayNetworkStatus = null!;
+    private static Callback<SteamNetworkingMessagesSessionRequest_t> steamNetworkingMessagesSessionRequest = null!;
+    private static Callback<GameLobbyJoinRequested_t> gameLobbyJoinRequested = null!;
+    private static Callback<LobbyEnter_t> lobbyEnter = null!;
+    private static Callback<LobbyChatMsg_t> lobbyChatMsg = null!;
+    private static Callback<LobbyDataUpdate_t> lobbyDataUpdate = null!;
+    private static Callback<LobbyChatUpdate_t> lobbyChatUpdate = null!;
 
     internal Steam() { }
 
-    public void Initialize()
+    private void SteamRelayNetworkStatus(SteamRelayNetworkStatus_t steamRelayNetworkStatus) =>
+        OnSteamRelayNetworkStatus?.Invoke(steamRelayNetworkStatus);
+
+    private void SteamNetworkingMessagesSessionRequest(SteamNetworkingMessagesSessionRequest_t steamNetworkingMessagesSessionRequest) =>
+        OnSteamNetworkingMessagesSessionRequest?.Invoke(steamNetworkingMessagesSessionRequest);
+
+    private void GameLobbyJoinRequested(GameLobbyJoinRequested_t gameLobbyJoinRequested) =>
+        OnGameLobbyJoinRequested?.Invoke(gameLobbyJoinRequested);
+
+    private void LobbyEntered(LobbyEnter_t lobbyEnter) =>
+        OnLobbyEnter?.Invoke(lobbyEnter);
+
+    private void LobbyChatMessage(LobbyChatMsg_t lobbyChatMsg) =>
+        OnLobbyChatMsg?.Invoke(lobbyChatMsg);
+
+    private void LobbyDataUpdate(LobbyDataUpdate_t LobbyDataUpdate) =>
+        OnLobbyDataUpdate?.Invoke(LobbyDataUpdate);
+
+    private void LobbyChatUpdate(LobbyChatUpdate_t LobbyChatUpdate) =>
+        OnLobbyChatUpdate?.Invoke(LobbyChatUpdate);
+
+    public void CreateCallbacks()
     {
-        if (!SteamManager.Initialized && !initialized)
+        if (callbackCreated)
             return;
 
-        steamRelayNetworkStatusCallback = Callback<SteamRelayNetworkStatus_t>.Create(SteamRelayNetworkStatus);
+        steamRelayNetworkStatus = Callback<SteamRelayNetworkStatus_t>.Create(SteamRelayNetworkStatus);
         steamNetworkingMessagesSessionRequest = Callback<SteamNetworkingMessagesSessionRequest_t>.Create(SteamNetworkingMessagesSessionRequest);
-        gameLobbyJoinRequested = Callback<GameLobbyJoinRequested_t>.Create(new Callback<GameLobbyJoinRequested_t>.DispatchDelegate(JoinRequest));
-        lobbyEnter = Callback<LobbyEnter_t>.Create(new Callback<LobbyEnter_t>.DispatchDelegate(LobbyEntered));
+        gameLobbyJoinRequested = Callback<GameLobbyJoinRequested_t>.Create(GameLobbyJoinRequested);
+        lobbyEnter = Callback<LobbyEnter_t>.Create(LobbyEntered);
         lobbyChatMsg = Callback<LobbyChatMsg_t>.Create(LobbyChatMessage);
-        lobbyDataUpdate = Callback<LobbyDataUpdate_t>.Create(LobbyDataUpdateCallback);
+        lobbyDataUpdate = Callback<LobbyDataUpdate_t>.Create(LobbyDataUpdate);
+        lobbyChatUpdate = Callback<LobbyChatUpdate_t>.Create(LobbyChatUpdate);
 
-        initialized = true;
+        callbackCreated = true;
     }
-
-    private void LobbyDataUpdateCallback(LobbyDataUpdate_t LobbyDataUpdate) =>
-        OnLobbyDataUpdate?.Invoke(LobbyDataUpdate);
 
     public void DisposeCallbacks()
     {
-        if (!initialized)
+        if (!callbackCreated)
             return;
 
-        steamRelayNetworkStatusCallback.Dispose();
+        steamRelayNetworkStatus.Dispose();
         steamNetworkingMessagesSessionRequest.Dispose();
         gameLobbyJoinRequested.Dispose();
         lobbyEnter.Dispose();
         lobbyChatMsg.Dispose();
         lobbyDataUpdate.Dispose();
+        lobbyChatUpdate.Dispose();
 
-        initialized = false;
+        callbackCreated = false;
     }
-
-    private void SteamRelayNetworkStatus(SteamRelayNetworkStatus_t steamRelayNetworkStatus) =>
-        OnSteamRelayNetworkStatus?.Invoke(steamRelayNetworkStatus);
-
-    private void LobbyEntered(LobbyEnter_t lobbyEnter) =>
-        OnLobbyEntered?.Invoke(lobbyEnter);
-
-    private void JoinRequest(GameLobbyJoinRequested_t gameLobbyJoinRequested) =>
-        OnGameLobbyJoinRequested?.Invoke(gameLobbyJoinRequested);
-
-    private void LobbyChatMessage(LobbyChatMsg_t lobbyChatMsg) =>
-        OnLobbyChatMsg?.Invoke(lobbyChatMsg);
-
-    private void SteamNetworkingMessagesSessionRequest(SteamNetworkingMessagesSessionRequest_t steamNetworkingMessagesSessionRequest) =>
-        OnSteamNetworkingMessagesSessionRequest?.Invoke(steamNetworkingMessagesSessionRequest);
 }

@@ -65,7 +65,7 @@ public sealed class Plugins
         catch (Exception exception)
         {
 
-            manualLogSource.LogError($"Failed to unload plugin {plugin.Name} ({plugin.GetType().Assembly.GetName().Name}).\nException message:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
+            manualLogSource.LogError($"Failed to unload plugin {plugin.Name} ({plugin.GetType().Assembly.GetName().Name}).\nException:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
         }
     }
 
@@ -80,7 +80,7 @@ public sealed class Plugins
         }
         catch (Exception exception)
         {
-            manualLogSource.LogError($"Failed to load plugin {plugin.Name} ({plugin.GetType().Assembly.GetName().Name}).\nException message:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
+            manualLogSource.LogError($"Failed to load plugin {plugin.Name} ({plugin.GetType().Assembly.GetName().Name}).\nException:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
         }
     }
 

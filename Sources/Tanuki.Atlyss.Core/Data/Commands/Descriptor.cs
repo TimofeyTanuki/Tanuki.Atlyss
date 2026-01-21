@@ -1,16 +1,15 @@
 ﻿namespace Tanuki.Atlyss.Core.Data.Commands;
 
-public sealed class RegistryEntry
+public sealed class Descriptor
 {
-    internal ulong hash;
+    public readonly ulong Hash;
     internal Serialization.Commands.Configuration? configuration;
 
-    public ulong Hash => hash;
     public Serialization.Commands.Configuration? Configuration => configuration;
 
-    internal RegistryEntry(ulong hash, Serialization.Commands.Configuration? configuration)
+    internal Descriptor(ulong hash, Serialization.Commands.Configuration? configuration)
     {
-        this.hash = hash;
+        Hash = hash;
         this.configuration = configuration;
     }
 }
