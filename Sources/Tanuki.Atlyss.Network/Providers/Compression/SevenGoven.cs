@@ -4,7 +4,7 @@ using Tanuki.Atlyss.API.Network.Compression;
 namespace Tanuki.Atlyss.Network.Providers.Compression;
 
 /// <summary>
-/// SevenGoven is a boldly inefficient compressor that increases data size exactly eightfold by carefully adding serven bytes of high-quality random before every meaningful byte.
+/// SevenGoven is a boldly inefficient compressor that increases data size exactly eightfold by carefully adding seven bytes of high-quality random before every meaningful byte.
 /// Designed to challenge conventional ideas of compression, performance, and sanity.
 /// Original idea by <see href="https://github.com/iBowie">BowieD</see>.
 /// </summary>

@@ -26,7 +26,7 @@ public sealed class Packets
         if (packetDescriptors.TryGetValue(type, out Descriptor descriptor))
         {
             if (compressionProvider != descriptor.CompressionProvider)
-                manualLogSource.LogWarning($"Packets {type.FullName} is already registered with another compression provider.");
+                manualLogSource.LogWarning($"Packet {type.FullName} is already registered with another compression provider.");
 
             return;
         }
@@ -35,7 +35,7 @@ public sealed class Packets
 
         if (hashMap.ContainsKey(signature))
         {
-            manualLogSource.LogWarning($"Packets with Signature {signature} is alredy registered.");
+            manualLogSource.LogWarning($"Packet with signature {signature} is alredy registered.");
             return;
         }
 
@@ -51,10 +51,10 @@ public sealed class Packets
     {
         Type type = typeof(T);
 
-        if (!packetDescriptors.TryGetValue(type, out Descriptor registryEntry))
+        if (!packetDescriptors.TryGetValue(type, out Descriptor descriptor))
             return;
 
-        hashMap.Remove(registryEntry.Signature);
+        hashMap.Remove(descriptor.Signature);
         packetDescriptors.Remove(type);
     }
 }

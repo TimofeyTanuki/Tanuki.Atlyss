@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Buffers.Binary;
-using System.Collections.Generic;
 using System.Text;
 using Tanuki.Atlyss.API.Network.Packets;
 using Tanuki.Atlyss.Shared.Serialization;

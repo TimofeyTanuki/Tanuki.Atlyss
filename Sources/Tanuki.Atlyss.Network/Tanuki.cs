@@ -1,7 +1,4 @@
 ﻿using BepInEx.Logging;
-using System.Text;
-using Tanuki.Atlyss.API.Network.Packets;
-using Tanuki.Atlyss.Network.Data.Packets;
 using UnityEngine;
 
 namespace Tanuki.Atlyss.Network;

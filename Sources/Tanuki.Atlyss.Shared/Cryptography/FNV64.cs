@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 
 namespace Tanuki.Atlyss.Shared.Cryptography;
 

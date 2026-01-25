@@ -2,8 +2,6 @@
 using BepInEx.Logging;
 using Steamworks;
 using System;
-using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
 using Tanuki.Atlyss.Core.Packets.Commands;
 
@@ -127,16 +125,12 @@ internal sealed class Main : Bases.Plugin
 
     private void Player_OnPlayerInitialized(Player player)
     {
-        manualLogSource.LogInfo("Player_OnPlayerInitialized D0");
+        manualLogSource.LogInfo($"Player_OnPlayerInitialized\nisNetworkActive: {AtlyssNetworkManager._current.isNetworkActive}\nplayer == Player._mainPlayer: {player == Player._mainPlayer}");
         if (AtlyssNetworkManager._current.isNetworkActive)
             return;
 
-        manualLogSource.LogInfo("Player_OnPlayerInitialized D1");
-
         if (player == Player._mainPlayer)
             return;
-
-        manualLogSource.LogInfo("Player_OnPlayerInitialized D3");
 
         Network.Routers.Packets packetRouter = Network.Tanuki.Instance.Routers.Packet;
 
@@ -145,44 +139,7 @@ internal sealed class Main : Bases.Plugin
 
         bool success = packetRouter.SendPacketToUser(new(steamId), tanukiServerHelloPacket, out EResult result);
 
-        manualLogSource.LogInfo($"Player_OnPlayerInitialized D4 {steamId} {success} {result}");
-    }
-
-    float sec = 0;
-    long lastGc = 0;
-    private void FixedUpdate()
-    {
-        //if (!Player._mainPlayer)
-        //    return;
-
-        Network.Tanuki Network = Atlyss.Network.Tanuki.Instance;
-
-        if (UnityEngine.Time.unscaledTime < sec)
-            return;
-
-        sec = UnityEngine.Time.unscaledTime + 3;
-
-        StringBuilder sb = new();
-
-        //Dictionary<ulong, Network.Data.Packets.RateLimitEntry> entries = (Dictionary<ulong, Network.Data.Packets.RateLimitEntry>)typeof(Network.Services.RateLimiter).GetField("entries", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(Network.Managers.Network.RateLimiter);
-
-        //GC.Collect();
-        GC.GetTotalMemory(false);
-        GC.WaitForPendingFinalizers();
-        long gc = GC.GetTotalMemory(false);
-        
-        sb.AppendLine($"{Math.Round(sec, 0)} > {gc} {(lastGc <= gc ? '+' : string.Empty)}{gc - lastGc}");
-        lastGc = gc;
-
-        //foreach (var x in entries)
-        //{
-        //    sb.AppendLine($"{x.Key} {x.Value.Usage}");
-        //}
-
-        if (sb.Length == 0)
-            return;
-
-        manualLogSource.LogDebug(sb.ToString());
+        manualLogSource.LogInfo($"Hello packet sent to {steamId}, success: {success}, result: {result}");
     }
 
     private void HandleSettingsRefresh()

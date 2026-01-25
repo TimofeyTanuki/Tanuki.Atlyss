@@ -3,9 +3,7 @@ using Steamworks;
 using System;
 using System.Buffers;
 using System.Runtime.InteropServices;
-using Tanuki.Atlyss.API.Network.Packets;
 using Tanuki.Atlyss.Network.Components;
-using Tanuki.Atlyss.Network.Data.Packets;
 using Tanuki.Atlyss.Network.Providers;
 
 namespace Tanuki.Atlyss.Network.Managers;
@@ -67,7 +65,7 @@ public sealed class Network
     private void OnLobbyChanged(CSteamID lobbyId)
     {
         if (lobbyId.Equals(CSteamID.Nil))
-             rateLimiter.Reset();
+            rateLimiter.Reset();
     }
 
     private bool CheckBandwidthOverflow(CSteamID sender, uint usage)
