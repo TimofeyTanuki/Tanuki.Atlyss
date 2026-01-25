@@ -3,7 +3,7 @@ using BepInEx.Logging;
 using Steamworks;
 using System;
 using System.Text;
-using Tanuki.Atlyss.Core.Packets.Commands;
+using Tanuki.Atlyss.Core.Packets;
 
 namespace Tanuki.Atlyss.Core;
 
@@ -52,7 +52,7 @@ internal sealed class Main : Bases.Plugin
 
     private bool reloadConfiguration = false;
     private ManualLogSource manualLogSource = null!;
-    private TanukiServerHello tanukiServerHelloPacket = new()
+    private readonly TanukiServerHello tanukiServerHelloPacket = new()
     {
         Version = PluginInfo.VERSION
     };
@@ -186,14 +186,14 @@ internal sealed class Main : Bases.Plugin
         }
     }
 
-    private void TanukiServerHelloPacketHandler(CSteamID sender, Packets.Commands.TanukiServerHello packet)
+    private void TanukiServerHelloPacketHandler(CSteamID sender, TanukiServerHello packet)
     {
-        manualLogSource.LogInfo($"TanukiServerHelloPacketHandler received");
+        manualLogSource.LogInfo($"Hello packet received\nsender.IsLobby():{sender.IsLobby()}\nOwnerSteamId.Equals(sender): {Network.Tanuki.Instance.Providers.SteamLobby.OwnerSteamId.Equals(sender)}");
         if (!sender.IsLobby() || !Network.Tanuki.Instance.Providers.SteamLobby.OwnerSteamId.Equals(sender))
             return;
 
         Routers.Commands commandRouter = Tanuki.instance.routers.commands;
-        manualLogSource.LogInfo($"ver {packet.Version}");
+        manualLogSource.LogInfo($"version: {packet.Version}");
 
         if (packet.Version != PluginInfo.VERSION)
         {
@@ -202,7 +202,7 @@ internal sealed class Main : Bases.Plugin
         }
 
         commandRouter.ServerPrefix = packet.ServerCommandPrefix;
-        manualLogSource.LogInfo($"pref {packet.ServerCommandPrefix}");
+        manualLogSource.LogInfo($"server prefix: {packet.ServerCommandPrefix}");
     }
 
     private void OnNetworkProviderSteamLobbyLobbyChanged(CSteamID lobby) =>

@@ -3,7 +3,7 @@ using System.Text;
 using Tanuki.Atlyss.API.Network.Packets;
 using Tanuki.Atlyss.Shared.Serialization;
 
-namespace Tanuki.Atlyss.Core.Packets.Commands;
+namespace Tanuki.Atlyss.Core.Packets;
 
 public sealed class TanukiServerHello : Packet
 {
@@ -38,5 +38,7 @@ public sealed class TanukiServerHello : Packet
 
         if (Version != PluginInfo.VERSION)
             return;
+
+        ServerCommandPrefix = BinaryString.ReadNullTerminated(buffer[Version.Length..], encoding);
     }
 }
