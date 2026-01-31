@@ -5,15 +5,15 @@ namespace Tanuki.Atlyss.API.Core.Commands;
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
 public sealed class CommandMetadataAttribute : Attribute
 {
-    private readonly EExecutionType executionType;
-    public EExecutionType ExecutionType => executionType;
+    private readonly EExecutionSide executionSide;
+    public EExecutionSide ExecutionSide => executionSide;
 
     private readonly Type? callerPolicyType;
     public Type? CallerPolicy => callerPolicyType;
 
-    public CommandMetadataAttribute(EExecutionType executionType, Type? callerPolicyType = null)
+    public CommandMetadataAttribute(EExecutionSide executionSide, Type? callerPolicyType = null)
     {
-        this.executionType = executionType;
+        this.executionSide = executionSide;
 
         if (callerPolicyType is not null)
         {

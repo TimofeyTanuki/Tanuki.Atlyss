@@ -40,7 +40,7 @@ public sealed class Commands
             Type commandType = nameMap[commandName];
             Data.Commands.Descriptor commandDescriptor = commandRegistry.Descriptors[commandType];
 
-            if (commandDescriptor.executionType == EExecutionType.Remote)
+            if (commandDescriptor.executionSide == EExecutionSide.Server && !AtlyssNetworkManager._current.isNetworkActive)
             {
                 manualLogSource.LogInfo($"(Remote command) Send to server: {commandName} [{string.Join(",", commandArguments)}]");
 
@@ -65,7 +65,7 @@ public sealed class Commands
                     command.Execute(
                         new Contexts.Commands.Context()
                         {
-                            Caller = new Data.Commands.Callers.Player(Player._mainPlayer),
+                            Caller = caller,
                             Arguments = commandArguments
                         }
                     );
@@ -137,7 +137,7 @@ public sealed class Commands
         ICaller caller = new Data.Commands.Callers.Player(player);
         Data.Commands.Descriptor commandDescriptor = commandRegistry.Descriptors[commandType];
 
-        if (commandDescriptor.executionType != EExecutionType.Remote)
+        if (commandDescriptor.executionSide != EExecutionSide.Server)
             return false;
 
         if (commandDescriptor.callerPolicy.IsAllowed(caller))

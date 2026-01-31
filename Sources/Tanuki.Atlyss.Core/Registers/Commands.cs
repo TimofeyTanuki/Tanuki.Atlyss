@@ -214,17 +214,17 @@ public sealed class Commands
 
         CommandMetadataAttribute? commandMetadata = command.GetCustomAttribute<CommandMetadataAttribute>();
 
-        EExecutionType executionType;
+        EExecutionSide executionSide;
         ICallerPolicy callerPolicy;
 
         if (commandMetadata is null)
         {
-            executionType = EExecutionType.Local;
+            executionSide = EExecutionSide.Client;
             callerPolicy = commandCallerPolicyProvider.GetOrCreate<Policies.Commands.Caller.Free>();
         }
         else
         {
-            executionType = commandMetadata.ExecutionType;
+            executionSide = commandMetadata.ExecutionSide;
             Type? callerPolicyType = commandMetadata.CallerPolicy;
             callerPolicy =
                 callerPolicyType is null ?
@@ -233,7 +233,7 @@ public sealed class Commands
         }
 
         hashMap[hash] = command;
-        descriptors[command] = new(hash, executionType, callerPolicy, null);
+        descriptors[command] = new(hash, executionSide, callerPolicy, null);
 
         OnCommandRegistered?.Invoke(command);
 

@@ -4,18 +4,12 @@ using Tanuki.Atlyss.API.Core.Plugins;
 
 namespace Tanuki.Atlyss.Core.Commands;
 
-[CommandMetadata(EExecutionType.Local, typeof(Policies.Commands.Caller.Player))]
+[CommandMetadata(EExecutionSide.Client, typeof(Policies.Commands.Caller.Player))]
 public sealed class Reload : ICommand
 {
-    private static readonly ICallerPolicy callerPolicy = new Policies.Commands.Caller.Player();
-    private static readonly EExecutionType executionType = EExecutionType.Local;
-
     private readonly Registers.Plugins pluginRegistry = Tanuki.Instance.registers.Plugins;
     private readonly Managers.Plugins pluginManager = Tanuki.Instance.managers.Plugins;
     private readonly Main main = Main.Instance;
-
-    public ICallerPolicy CallerPolicy => callerPolicy;
-    public EExecutionType ExecutionType => executionType;
 
     public void Execute(IContext context)
     {

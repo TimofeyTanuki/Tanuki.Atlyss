@@ -1,7 +1,7 @@
 ﻿namespace Tanuki.Atlyss.API.Core.Commands;
 
-public enum EExecutionType
+public enum EExecutionSide
 {
-    Local,
-    Remote
+    Client,
+    Server
 }
