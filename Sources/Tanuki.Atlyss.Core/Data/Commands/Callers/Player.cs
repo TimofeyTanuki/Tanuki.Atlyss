@@ -2,7 +2,7 @@
 
 namespace Tanuki.Atlyss.Core.Data.Commands.Callers;
 
-public class Player() : ICaller
+public class Player(global::Player player) : ICaller
 {
-    public global::Player player = null!;
+    public global::Player player = player;
 }

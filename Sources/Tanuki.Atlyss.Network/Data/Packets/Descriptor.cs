@@ -12,8 +12,9 @@ public abstract class Descriptor(ulong signature, ICompressionProvider? compress
     public readonly ulong Signature = signature;
     public readonly ICompressionProvider? CompressionProvider = compressionProvider;
 
+    internal bool isMuted = false;
+
     public abstract void ProcessPacket(PacketProcessor packetProcessor, CSteamID sender, ReadOnlySpan<byte> packetData);
-    //public abstract void PackPacket()
 }
 
 public sealed class Descriptor<TPacket>(ulong signature, ICompressionProvider? compressionProvider) : Descriptor(signature, compressionProvider)

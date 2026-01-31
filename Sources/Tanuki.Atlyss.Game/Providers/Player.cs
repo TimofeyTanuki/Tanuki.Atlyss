@@ -1,6 +1,8 @@
 ﻿using Mirror;
+using Steamworks;
 using System;
 using System.Collections.Generic;
+using Tanuki.Atlyss.Game.Data;
 using Tanuki.Atlyss.Game.Utilities.Player;
 
 namespace Tanuki.Atlyss.Game.Providers;
@@ -9,14 +11,14 @@ public sealed class Player
 {
     public static Player Instance { get; internal set; } = null!;
 
-    public readonly Dictionary<uint, global::Player> players = [];
+    public readonly Dictionary<uint, PlayerEntry> playerEntries = [];
     private readonly SortedSet<uint> initializingPlayers = [];
 
     public static event Action<global::Player>? OnPlayerAdded;
     public static event Action<global::Player>? OnPlayerRemoved;
     public static event Action<global::Player>? OnPlayerInitialized;
 
-    public IReadOnlyDictionary<uint, global::Player> Players => players;
+    public IReadOnlyDictionary<uint, PlayerEntry> PlayerEntries => playerEntries;
 
     private Player()
     {
@@ -61,7 +63,7 @@ public sealed class Player
     private void OnAtlyssNetworkManagerStopClientPrefix()
     {
         initializingPlayers.Clear();
-        players.Clear();
+        playerEntries.Clear();
     }
 
     private void OnNetworkBehaviourStartClientPostfix(NetworkBehaviour instance)
@@ -75,13 +77,13 @@ public sealed class Player
         if (string.IsNullOrEmpty(player._steamID))
             return;
 
-        if (players.ContainsKey(player.netId))
+        if (playerEntries.ContainsKey(player.netId))
         {
-            players[player.netId] = player;
+            playerEntries[player.netId].player = player;
             return;
         }
 
-        players.Add(player.netId, player);
+        playerEntries.Add(player.netId, new(player));
         AddInitializingPlayer(player);
 
         OnPlayerAdded?.Invoke(player);
@@ -92,10 +94,10 @@ public sealed class Player
         if (instance is not global::Player player)
             return;
 
-        if (!players.ContainsKey(instance.netId))
+        if (!playerEntries.ContainsKey(instance.netId))
             return;
 
-        players.Remove(instance.netId);
+        playerEntries.Remove(instance.netId);
         initializingPlayers.Remove(instance.netId);
 
         OnPlayerRemoved?.Invoke(player);
@@ -103,48 +105,59 @@ public sealed class Player
 
     public global::Player? GetByNetID(uint netId)
     {
-        foreach (global::Player Player in players.Values)
-            if (Player.netId == netId)
-                return Player;
+        if (playerEntries.TryGetValue(netId, out PlayerEntry playerEntry))
+            return playerEntry.player;
 
         return null;
     }
 
     public global::Player? GetBySteamId(ulong steamId)
     {
-        string match = steamId.ToString();
-
-        foreach (global::Player player in players.Values)
-            if (player._steamID == match)
-                return player;
+        foreach (PlayerEntry playerEntry in playerEntries.Values)
+            if (playerEntry.steamId.m_SteamID == steamId)
+                return playerEntry.player;
 
         return null;
     }
 
+    public global::Player? GetBySteamId(CSteamID steamId) => GetBySteamId(steamId.m_SteamID);
+
     public global::Player? GetByDefaultNickname(string nickname, bool strictLength, StringComparison stringComparsion)
     {
-        foreach (global::Player Player in players.Values)
-            if (Nickname.Match(Player._nickname, nickname, strictLength, stringComparsion))
-                return Player;
+        foreach (PlayerEntry playerEntry in playerEntries.Values)
+        {
+            global::Player player = playerEntry.player;
+
+            if (Nickname.Match(player._nickname, nickname, strictLength, stringComparsion))
+                return player;
+        }    
 
         return null;
     }
 
     public global::Player? GetByGlobalNickname(string nickname, bool strictLength, StringComparison stringComparsion)
     {
-        foreach (global::Player Player in players.Values)
-            if (Nickname.Match(Player._globalNickname, nickname, strictLength, stringComparsion))
-                return Player;
+        foreach (PlayerEntry playerEntry in playerEntries.Values)
+        {
+            global::Player player = playerEntry.player;
+
+            if (Nickname.Match(player._globalNickname, nickname, strictLength, stringComparsion))
+                return player;
+        }
 
         return null;
     }
 
     public global::Player? GetByAnyNickname(string nickname, bool strictLength, StringComparison stringComparsion)
     {
-        foreach (global::Player Player in players.Values)
-            if (Nickname.Match(Player._nickname, nickname, strictLength, stringComparsion) ||
-                Nickname.Match(Player._globalNickname, nickname, strictLength, stringComparsion))
-                return Player;
+        foreach (PlayerEntry playerEntry in playerEntries.Values)
+        {
+            global::Player player = playerEntry.player;
+
+            if (Nickname.Match(player._nickname, nickname, strictLength, stringComparsion) ||
+                Nickname.Match(player._globalNickname, nickname, strictLength, stringComparsion))
+                return player;
+        }
 
         return null;
     }

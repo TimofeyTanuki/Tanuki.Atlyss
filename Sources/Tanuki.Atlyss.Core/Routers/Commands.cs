@@ -1,4 +1,5 @@
 ﻿using BepInEx.Logging;
+using Steamworks;
 using System;
 using System.Collections.Generic;
 using Tanuki.Atlyss.API.Core.Commands;
@@ -29,50 +30,129 @@ public sealed class Commands
         this.commandProvider = commandProvider;
     }
 
-    public bool RouteCommand(string input)
+    public bool HandleCommandClient(string input)
     {
         IReadOnlyDictionary<string, Type> nameMap = commandRegistry.NameMap;
 
         if (commandParser.TryParse(commandSettings.ClientPrefix, input, out string? commandName, out IReadOnlyList<string>? commandArguments, nameMap))
         {
             manualLogSource.LogInfo($"Executing: {commandName} [{string.Join(",", commandArguments)}]");
-            ICommand command = commandProvider.Create(nameMap[commandName]);
+            Type commandType = nameMap[commandName];
+            Data.Commands.Descriptor commandDescriptor = commandRegistry.Descriptors[commandType];
 
+            if (commandDescriptor.executionType == EExecutionType.Remote)
+            {
+                manualLogSource.LogInfo($"(Remote command) Send to server: {commandName} [{string.Join(",", commandArguments)}]");
 
-            //test only
-            command.ClientCallback(
-                new Contexts.Commands.Context()
-                {
-                    Caller = new Data.Commands.Callers.Player()
+                Main.Instance.Network.Routers.Packet.SendPacketToUser(
+                    Main.Instance.Network.Providers.SteamLobby.OwnerSteamId,
+                    new Packets.Commands.Request()
                     {
-                        player = Player._mainPlayer
+                        Hash = commandDescriptor.Hash,
+                        Arguments = commandArguments
                     },
-                    Arguments = commandArguments
+                    out EResult _
+                );
+            }
+            else
+            {
+                ICaller caller = new Data.Commands.Callers.Player(Player._mainPlayer);
+
+                if (commandDescriptor.callerPolicy.IsAllowed(caller))
+                {
+                    ICommand command = commandProvider.Create(commandType);
+
+                    command.Execute(
+                        new Contexts.Commands.Context()
+                        {
+                            Caller = new Data.Commands.Callers.Player(Player._mainPlayer),
+                            Arguments = commandArguments
+                        }
+                    );
                 }
-            );
-
-
-            //if (command.ExecutionType == EExecutionType.Local)
-            //commands.NameMap[commandName]
+            }
 
             return true;
         }
-        // commandSettings.ServerPrefix must be replaced with synced string (main tanuki atlyss packet to identify friendly servers)
 
-        if (!string.IsNullOrEmpty(ServerPrefix))
+        if (Player._mainPlayer._isHostPlayer || string.IsNullOrEmpty(ServerPrefix))
+            return false;
+
+        if (commandParser.TryParse(ServerPrefix, input, out commandName, out commandArguments))
         {
-            if (commandParser.TryParse(ServerPrefix, input, out commandName, out commandArguments))
-            {
-                // send to server
-                manualLogSource.LogInfo($"Send to server: {commandName} [{string.Join(",", commandArguments)}]");
-            }
+            manualLogSource.LogInfo($"(Unknown command) Send to server: {commandName} [{string.Join(",", commandArguments)}]");
+
+            Main.Instance.Network.Routers.Packet.SendPacketToUser(
+                Main.Instance.Network.Providers.SteamLobby.OwnerSteamId,
+                new Packets.Commands.Request()
+                {
+                    Name = commandName,
+                    Arguments = commandArguments
+                },
+                out EResult _
+            );
+
+            return true;
         }
 
         return false;
     }
 
-    public void HandleIncomingPacket()
+    public bool HandleCommandServer(Player player, string input)
     {
+        IReadOnlyDictionary<string, Type> nameMap = commandRegistry.NameMap;
 
+        if (commandParser.TryParse(commandSettings.serverPrefix, input, out string? commandName, out IReadOnlyList<string>? commandArguments, nameMap))
+        {
+            Type commandType = nameMap[commandName];
+
+            return HandleCommandServer(player, commandType, commandArguments);
+        }
+
+        return false;
+    }
+
+    public void HandleIncomingPacket(CSteamID sender, Packets.Commands.Request packet)
+    {
+        Player? player = Game.Providers.Player.Instance.GetBySteamId(sender);
+
+        if (!player)
+            return;
+
+        Type? commandType = null;
+
+        if (packet.Hash.HasValue)
+            commandRegistry.HashMap.TryGetValue(packet.Hash.Value, out commandType);
+        else if (!string.IsNullOrEmpty(packet.Name))
+            commandRegistry.NameMap.TryGetValue(packet.Name, out commandType);
+
+        if (commandType is null)
+            return; // send "command not found" packet?
+
+        HandleCommandServer(player!, commandType, packet.Arguments);
+    }
+
+    public bool HandleCommandServer(Player player, Type commandType, IReadOnlyList<string> Arguments)
+    {
+        ICaller caller = new Data.Commands.Callers.Player(player);
+        Data.Commands.Descriptor commandDescriptor = commandRegistry.Descriptors[commandType];
+
+        if (commandDescriptor.executionType != EExecutionType.Remote)
+            return false;
+
+        if (commandDescriptor.callerPolicy.IsAllowed(caller))
+        {
+            ICommand command = commandProvider.Create(commandType);
+
+            command.Execute(
+                new Contexts.Commands.Context()
+                {
+                    Caller = new Data.Commands.Callers.Player(Player._mainPlayer),
+                    Arguments = Arguments
+                }
+            );
+        }
+
+        return true;
     }
 }

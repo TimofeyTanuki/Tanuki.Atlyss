@@ -7,6 +7,7 @@ using Tanuki.Atlyss.API.Core.Commands;
 
 namespace Tanuki.Atlyss.Core.Commands;
 
+[CommandMetadata(EExecutionType.Local, typeof(Policies.Commands.Caller.Player))]
 public sealed class Help : ICommand
 {
     private static readonly ICallerPolicy callerPolicy = new Policies.Commands.Caller.Player();
@@ -19,7 +20,7 @@ public sealed class Help : ICommand
     public ICallerPolicy CallerPolicy => callerPolicy;
     public EExecutionType ExecutionType => executionType;
 
-    public void ClientCallback(IContext context)
+    public void Execute(IContext context)
     {
         IReadOnlyList<string> arguments = context.Arguments;
 

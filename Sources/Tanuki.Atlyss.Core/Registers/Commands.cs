@@ -12,11 +12,12 @@ namespace Tanuki.Atlyss.Core.Registers;
 public sealed class Commands
 {
     private readonly ManualLogSource manualLogSource;
+    private readonly Providers.CommandCallerPolicies commandCallerPolicyProvider;
+    private readonly Data.Settings.Commands commandSettings;
     private readonly Dictionary<string, Type> nameMap = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<ulong, Type> hashMap = [];
     private readonly Dictionary<Type, Data.Commands.Descriptor> descriptors = [];
     private readonly Dictionary<Assembly, HashSet<Type>> assemblyCommands = [];
-    private readonly Data.Settings.Commands commandSettings;
 
     public Action<Type>? OnCommandRegistered;
     public Action<Type>? OnCommandDeregistered;
@@ -40,10 +41,15 @@ public sealed class Commands
     public IReadOnlyDictionary<Assembly, HashSet<Type>> AssemblyCommands => assemblyCommands;
     public IReadOnlyDictionary<ulong, Type> HashMap => hashMap;
 
-    internal Commands(ManualLogSource manualLogSource, Data.Settings.Commands settings)
+    internal Commands(
+        ManualLogSource manualLogSource,
+        Providers.CommandCallerPolicies commandCallerPolicyProvider,
+        Data.Settings.Commands settings
+    )
     {
         this.manualLogSource = manualLogSource;
-        this.commandSettings = settings;
+        this.commandCallerPolicyProvider = commandCallerPolicyProvider;
+        commandSettings = settings;
     }
 
     public Dictionary<string, Serialization.Commands.Configuration>? TryReadConfiguration(string path)
@@ -191,7 +197,7 @@ public sealed class Commands
 
         if (hashMap.ContainsKey(hash))
         {
-            manualLogSource.LogWarning($"Failed to register command {command.FullName} because its Hash {hash} is already in use.");
+            manualLogSource.LogWarning($"Failed to register command {command.FullName} because its hash {hash} is already in use.");
             return false;
         }
 
@@ -206,8 +212,28 @@ public sealed class Commands
 
         assemblyCommands.Add(command);
 
+        CommandMetadataAttribute? commandMetadata = command.GetCustomAttribute<CommandMetadataAttribute>();
+
+        EExecutionType executionType;
+        ICallerPolicy callerPolicy;
+
+        if (commandMetadata is null)
+        {
+            executionType = EExecutionType.Local;
+            callerPolicy = commandCallerPolicyProvider.GetOrCreate<Policies.Commands.Caller.Free>();
+        }
+        else
+        {
+            executionType = commandMetadata.ExecutionType;
+            Type? callerPolicyType = commandMetadata.CallerPolicy;
+            callerPolicy =
+                callerPolicyType is null ?
+                commandCallerPolicyProvider.GetOrCreate<Policies.Commands.Caller.Free>() :
+                commandCallerPolicyProvider.GetOrCreate(callerPolicyType);
+        }
+
         hashMap[hash] = command;
-        descriptors[command] = new(hash, null);
+        descriptors[command] = new(hash, executionType, callerPolicy, null);
 
         OnCommandRegistered?.Invoke(command);
 

@@ -56,4 +56,18 @@ public sealed class Packets
 
         typedDescriptor.PacketHandlers.Remove(handler);
     }
+
+    public void ChangeMuteState<TPacket>(bool isMuted)
+        where TPacket : Packet, new()
+    {
+        Type type = typeof(TPacket);
+
+        if (!packetRegistry.PacketDescriptors.TryGetValue(type, out Descriptor descriptor))
+        {
+            manualLogSource.LogError($"Failed to change mute status for packet {type.FullName} because it isn't registered.");
+            return;
+        }
+
+        descriptor.isMuted = isMuted;
+    }
 }

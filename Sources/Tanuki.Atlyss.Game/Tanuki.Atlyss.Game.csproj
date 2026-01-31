@@ -12,6 +12,7 @@
     <Reference Include="$(GameDataManagedDir)UnityEngine.PhysicsModule.dll" Private="False" />
     <Reference Include="$(GameDataManagedDir)UnityEngine.UI.dll" Private="False" />
     <Reference Include="$(GameDataManagedDir)Mirror.dll" Private="False" />
+    <Reference Include="$(GameDataManagedDir)com.rlabrecque.steamworks.net.dll" Private="False" />
     <Reference Include="$(BepInExCoreDir)BepInEx.dll" Private="False" />
     <Reference Include="$(BepInExCoreDir)0Harmony.dll" Private="False" />
   </ItemGroup>

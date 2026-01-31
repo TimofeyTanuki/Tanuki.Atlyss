@@ -117,6 +117,9 @@ public sealed class Packets
 
         Descriptor descriptor = packetRegistry.PacketDescriptors[packetType];
 
+        if (descriptor.isMuted)
+            return;
+
         try
         {
             descriptor.ProcessPacket(packetProcessor, sender, data);

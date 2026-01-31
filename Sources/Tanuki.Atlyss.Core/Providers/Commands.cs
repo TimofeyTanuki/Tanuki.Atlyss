@@ -7,7 +7,7 @@ namespace Tanuki.Atlyss.Core.Providers;
 
 public sealed class Commands
 {
-    private readonly ConcurrentDictionary<Type, Func<ICommand>> factories = [];
+    private static readonly ConcurrentDictionary<Type, Func<ICommand>> factories = [];
 
     internal Commands() { }
 

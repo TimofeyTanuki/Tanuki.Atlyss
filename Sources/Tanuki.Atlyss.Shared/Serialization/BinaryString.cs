@@ -17,8 +17,8 @@ public sealed class BinaryString
 
     public static int WriteNullTerminated(Span<byte> buffer, ReadOnlySpan<char> value, Encoding encoding)
     {
-        int length = encoding.GetBytes(value, buffer);
-        buffer[length] = 0;
-        return length;
+        int offset = encoding.GetBytes(value, buffer);
+        buffer[offset] = 0;
+        return offset + 1;
     }
 }
