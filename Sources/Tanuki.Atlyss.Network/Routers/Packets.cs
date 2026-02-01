@@ -14,14 +14,20 @@ public sealed class Packets
     private readonly ManualLogSource manualLogSource;
     private readonly Registers.Packets packetRegistry;
     private readonly PacketProcessor packetProcessor;
+    private readonly Providers.SteamLobby steamLobbyProvider;
 
     internal int steamLocalChannel;
 
-    internal Packets(ManualLogSource manualLogSource, Registers.Packets packetRegistry, PacketProcessor packetProcessor)
+    internal Packets(
+        ManualLogSource manualLogSource,
+        Registers.Packets packetRegistry,
+        PacketProcessor packetProcessor,
+        Providers.SteamLobby steamLobbyProvider)
     {
         this.manualLogSource = manualLogSource;
         this.packetRegistry = packetRegistry;
         this.packetProcessor = packetProcessor;
+        this.steamLobbyProvider = steamLobbyProvider;
     }
 
     private bool CreatePackedPacket<TPacket>(TPacket packet, out PackedPacket packedPacket)
@@ -61,7 +67,7 @@ public sealed class Packets
         if (!CreatePackedPacket(packet, out PackedPacket packedPacket))
             return;
 
-        SteamMatchmaking.SendLobbyChatMsg(new(SteamLobby._current._currentLobbyID), packedPacket.ArraySegment.Array, packedPacket.Length);
+        SteamMatchmaking.SendLobbyChatMsg(steamLobbyProvider.SteamId, packedPacket.ArraySegment.Array, packedPacket.Length);
         packedPacket.Dispose();
     }
 

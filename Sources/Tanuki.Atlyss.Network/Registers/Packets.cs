@@ -18,7 +18,7 @@ public sealed class Packets
 
     internal Packets(ManualLogSource manualLogSource) => this.manualLogSource = manualLogSource;
 
-    public void Register<TPacket>(ICompressionProvider? compressionProvider)
+    public void Register<TPacket>(ICompressionProvider? compressionProvider = null)
         where TPacket : Packet, new()
     {
         Type type = typeof(TPacket);

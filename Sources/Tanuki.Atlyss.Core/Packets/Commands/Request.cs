@@ -84,7 +84,7 @@ public sealed class Request : Packet
         {
             Hash = null;
             Name = BinaryString.ReadNullTerminated(data[offset..], Encoding);
-            offset += Name != null ? Encoding.GetByteCount(Name) + 1 : 0;
+            offset += Name is null ? 0 : Encoding.GetByteCount(Name);
         }
 
         List<string> arguments = [];
@@ -94,7 +94,7 @@ public sealed class Request : Packet
             string? argument = BinaryString.ReadNullTerminated(data[offset..], Encoding);
 
             if (string.IsNullOrEmpty(argument))
-                continue;
+                break;
 
             arguments.Add(argument);
             offset += Encoding.GetByteCount(argument) + 1;

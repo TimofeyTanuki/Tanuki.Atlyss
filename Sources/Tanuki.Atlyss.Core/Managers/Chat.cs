@@ -4,40 +4,24 @@ public sealed class Chat
 {
     private readonly Routers.Commands commandRouter;
 
-    internal Chat(Routers.Commands commandRouter) => this.commandRouter = commandRouter;
-
-    public void Enable()
+    internal Chat(Routers.Commands commandRouter)
     {
-        Game.Patches.Player.OnStartAuthority.OnPostfix += CheckServerRuntime;
-        Game.Patches.AtlyssNetworkManager.OnStopClient.OnPostfix += DisableServerRuntime;
-        Game.Patches.ChatBehaviour.Send_ChatMessage.OnPrefix += HandleSendChatMessage;
+        this.commandRouter = commandRouter;
 
-        if (Player._mainPlayer)
-            CheckServerRuntime(null);
+        Game.Patches.Player.OnStartAuthority.OnPostfix += OnStartAuthority;
+        Game.Patches.AtlyssNetworkManager.OnStopClient.OnPrefix += OnStopClient_OnPrefix;
+        Game.Patches.ChatBehaviour.Send_ChatMessage.OnPrefix += HandleSendChatMessage;
     }
 
-    private void CheckServerRuntime(Player? _)
-    {
-        System.Console.WriteLine($"START CLIENT {Player._mainPlayer._isHostPlayer}");
+    private void OnStopClient_OnPrefix() =>
+        Game.Patches.ChatBehaviour.UserCode_Cmd_SendChatMessage__String__ChatChannel.OnPrefix -= HandleSendChatMessageCommand;
 
-        if (!Player._mainPlayer._isHostPlayer)
+    private void OnStartAuthority(Player player)
+    {
+        if (!player._isHostPlayer)
             return;
 
         Game.Patches.ChatBehaviour.UserCode_Cmd_SendChatMessage__String__ChatChannel.OnPrefix += HandleSendChatMessageCommand;
-    }
-
-    private void DisableServerRuntime()
-    {
-        System.Console.WriteLine($"STOP CLIENT");
-        Game.Patches.ChatBehaviour.UserCode_Cmd_SendChatMessage__String__ChatChannel.OnPrefix -= HandleSendChatMessageCommand;
-    }
-
-    public void Disable()
-    {
-        Game.Patches.ChatBehaviour.Send_ChatMessage.OnPrefix -= HandleSendChatMessage;
-        Game.Patches.AtlyssNetworkManager.OnStopClient.OnPostfix -= DisableServerRuntime;
-
-        DisableServerRuntime();
     }
 
     private void HandleSendChatMessage(string message, ref bool runOriginal)
@@ -54,7 +38,7 @@ public sealed class Chat
         }
     }
 
-    private void HandleSendChatMessageCommand(ChatBehaviour chatBehaviour, string message, ref bool runOriginal)
+    private void HandleSendChatMessageCommand(ChatBehaviour chatBehaviour, string message, ChatBehaviour.ChatChannel chatChannel, ref bool runOriginal)
     {
         Player player = Game.Accessors.ChatBehaviour._player(chatBehaviour);
 
@@ -63,8 +47,6 @@ public sealed class Chat
 
         if (commandRouter.HandleCommandServer(player, message))
             runOriginal = false;
-
-        System.Console.WriteLine($"XD {player._nickname} - {message}");
     }
 
     public void SendClientMessage(string message) =>

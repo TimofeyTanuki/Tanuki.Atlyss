@@ -19,8 +19,8 @@ public static class Player
             bool nicknameStrictLength = false,
             StringComparison nicknameStrictComparsion = StringComparison.InvariantCultureIgnoreCase
         ) =>
-            uint.TryParse(input, out uint netId) ? Providers.Player.Instance.GetByNetID(netId) :
-            ulong.TryParse(input, out ulong steamId) ? Providers.Player.Instance.GetBySteamId(steamId) :
+            uint.TryParse(input, out uint netId) ? Providers.Player.Instance.FindByNetID(netId) :
+            ulong.TryParse(input, out ulong steamId) ? Providers.Player.Instance.FindBySteamId(steamId) :
             GetByNickname(input, nicknameType, nicknameStrictLength, nicknameStrictComparsion);
 
         public static global::Player? GetByNickname(
@@ -31,9 +31,9 @@ public static class Player
         ) =>
             nicknameType switch
             {
-                ENicknameType.Default => Providers.Player.Instance.GetByDefaultNickname(nickname, strictLength, stringComparsion),
-                ENicknameType.Global => Providers.Player.Instance.GetByGlobalNickname(nickname, strictLength, stringComparsion),
-                ENicknameType.Any => Providers.Player.Instance.GetByAnyNickname(nickname, strictLength, stringComparsion),
+                ENicknameType.Default => Providers.Player.Instance.FindByDefaultNickname(nickname, strictLength, stringComparsion),
+                ENicknameType.Global => Providers.Player.Instance.FindByGlobalNickname(nickname, strictLength, stringComparsion),
+                ENicknameType.Any => Providers.Player.Instance.FindByAnyNickname(nickname, strictLength, stringComparsion),
                 _ => null,
             };
     }

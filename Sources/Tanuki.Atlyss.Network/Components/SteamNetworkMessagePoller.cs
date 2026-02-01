@@ -64,15 +64,13 @@ public sealed class SteamNetworkMessagePoller() : MonoBehaviour
             enabled = false;
     }
 
+
     [SuppressMessage("CodeQuality", "IDE0051")]
     private void Update()
     {
         int count = SteamNetworkingMessages.ReceiveMessagesOnChannel(LocalChannel, messageBuffer, messageBuffer.Length);
-
         if (count == 0)
             return;
-
-        Console.WriteLine($"Count: {count}");
 
         onSteamNetworkingMessages!();
 

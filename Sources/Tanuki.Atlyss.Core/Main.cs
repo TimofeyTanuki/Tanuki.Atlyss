@@ -1,9 +1,5 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
-using Steamworks;
-using System;
-using System.Text;
-using Tanuki.Atlyss.Core.Packets;
 
 namespace Tanuki.Atlyss.Core;
 
@@ -27,13 +23,8 @@ internal sealed class Main : Bases.Plugin
     public static Main Instance = null!;
     internal Network.Tanuki Network = null!;
 
-
     private bool reloadConfiguration = false;
     private ManualLogSource manualLogSource = null!;
-    private readonly TanukiServerHello tanukiServerHelloPacket = new()
-    {
-        Version = PluginInfo.VERSION
-    };
 
     public Main()
     {
@@ -53,6 +44,13 @@ internal sealed class Main : Bases.Plugin
 
     internal void Start()
     {
+        Atlyss.Network.Tanuki.Initialize();
+        Game.Providers.Player.Initialize();
+        Network = Atlyss.Network.Tanuki.Instance;
+        Network.Providers.Steam.CreateCallbacks();
+
+
+
         Data.Tanuki.Providers providers = new()
         {
             commands = new(),
@@ -68,7 +66,16 @@ internal sealed class Main : Bases.Plugin
 
         Data.Tanuki.Routers routers = new()
         {
-            commands = new(manualLogSource, new(['"', '\"', '`']), providers.settings.CommandSection, registers.commands, providers.commands)
+            commands = new(
+                Network.Registers.Packets,
+                Network.Managers.Packets,
+                new(['"', '\"', '`']),
+                providers.settings.CommandSection,
+                registers.commands,
+                providers.commands,
+                Network.Providers.SteamLobby,
+                Network.Routers.Packet
+            )
         };
 
         Data.Tanuki.Managers managers = new()
@@ -77,61 +84,23 @@ internal sealed class Main : Bases.Plugin
             chat = new(routers.commands)
         };
 
+        Data.Tanuki.Services services = new()
+        {
+            tanukiServer = new(Network, routers.commands, providers.settings, Network.Routers.Packet)
+        };
+
         Tanuki.instance = new()
         {
             managers = managers,
             providers = providers,
             registers = registers,
-            routers = routers
+            routers = routers,
+            services = services
         };
 
         managers.plugins.OnBeforePluginsLoad += HandleSettingsRefresh;
-
-        Atlyss.Network.Tanuki.Initialize();
-
-        Network = Atlyss.Network.Tanuki.Instance;
-
-        Network.Providers.Steam.CreateCallbacks();
-
-        Network.Providers.SteamLobby.OnLobbyChanged += OnNetworkProviderSteamLobbyLobbyChanged;
-        Game.Providers.Player.OnPlayerInitialized += OnPlayerInitialized;
-        Game.Patches.Player.OnStartAuthority.OnPostfix += OnPlayerStartAuthority;
-
-        Network.Registers.Packets.Register<TanukiServerHello>(null);
-        Network.Registers.Packets.Register<Packets.Commands.Request>(null);
-        Network.Managers.Packets.AddHandler<TanukiServerHello>(TanukiServerHelloPacketHandler);
-        Network.Managers.Packets.AddHandler<Packets.Commands.Request>(routers.commands.HandleIncomingPacket);
-        Network.Managers.Packets.ChangeMuteState<Packets.Commands.Request>(true);
-
         registers.plugins.Refresh();
         managers.plugins.LoadPlugins();
-    }
-
-    private void OnPlayerStartAuthority(Player player)
-    {
-        Console.WriteLine("OnPlayerStartAuthority1111");
-
-        Tanuki.instance.routers.commands.ServerPrefix = tanukiServerHelloPacket.ServerCommandPrefix;
-        Network.Managers.Packets.ChangeMuteState<Packets.Commands.Request>(false);
-    }
-
-    private void OnPlayerInitialized(Player player)
-    {
-        manualLogSource.LogInfo($"Player_OnPlayerInitialized\nisNetworkActive: {AtlyssNetworkManager._current.isNetworkActive}\nplayer == Player._mainPlayer: {player == Player._mainPlayer}");
-        if (AtlyssNetworkManager._current.isNetworkActive)
-            return;
-
-        if (player == Player._mainPlayer)
-            return;
-
-        Network.Routers.Packets packetRouter = Network.Routers.Packet;
-
-        if (!ulong.TryParse(player._steamID, out ulong steamId))
-            return;
-
-        bool success = packetRouter.SendPacketToUser(new(steamId), tanukiServerHelloPacket, out EResult result);
-
-        manualLogSource.LogInfo($"Hello packet sent to {steamId}, success: {success}, result: {result}");
     }
 
     private void HandleSettingsRefresh()
@@ -149,69 +118,32 @@ internal sealed class Main : Bases.Plugin
 
     private void ConfigureNetwork()
     {
-        Providers.Settings settingsProvider = Tanuki.instance.providers.settings;
-        Data.Settings.Network settingsProviderNetworkSection = settingsProvider.NetworkSection;
+        Providers.Settings settingProvider = Tanuki.instance.providers.settings;
+        Data.Settings.Network settingProviderNetworkSection = settingProvider.NetworkSection;
 
         Network.Managers.Network networkManager = Network.Managers.Network;
-        networkManager.SteamLocalChannel = settingsProviderNetworkSection.mainSteamMessageChannel;
-        networkManager.PreventLobbyOwnerRateLimiting = settingsProviderNetworkSection.preventLobbyOwnerRateLimiting;
+        networkManager.SteamLocalChannel = settingProviderNetworkSection.mainSteamMessageChannel;
+        networkManager.PreventLobbyOwnerRateLimiting = settingProviderNetworkSection.preventLobbyOwnerRateLimiting;
 
         Network.Services.RateLimiter rateLimiter = networkManager.RateLimiter;
-        rateLimiter.Bandwidth = settingsProviderNetworkSection.rateLimiterBandwidth;
-        rateLimiter.Window = settingsProviderNetworkSection.rateLimiterWindow;
+        rateLimiter.Bandwidth = settingProviderNetworkSection.rateLimiterBandwidth;
+        rateLimiter.Window = settingProviderNetworkSection.rateLimiterWindow;
 
         Network.Components.SteamNetworkMessagePoller steamNetworkMessagePoller = networkManager.SteamNetworkMessagesPoller;
-        steamNetworkMessagePoller.MessageBufferSize = settingsProviderNetworkSection.steamNetworkMessagePollerBuffer;
-
-        tanukiServerHelloPacket.ServerCommandPrefix = settingsProvider.CommandSection.serverPrefix;
+        steamNetworkMessagePoller.MessageBufferSize = settingProviderNetworkSection.steamNetworkMessagePollerBuffer;
     }
 
     protected override void Load()
     {
         ConfigureNetwork();
 
-        Tanuki.Instance.managers.chat.Enable();
-
-        if (!Network.Providers.SteamLobby.SteamId.Equals(CSteamID.Nil))
-        {
-            if (AtlyssNetworkManager._current.isNetworkActive)
-            {
-                Network.Routers.Packet.SendPacketToLobbyChat(tanukiServerHelloPacket);
-                Network.Managers.Packets.ChangeMuteState<Packets.Commands.Request>(false);
-            }
-
-            Network.Managers.Network.SteamNetworkMessagesPoller.enabled = true;
-        }
+        Tanuki.instance.routers.commands.Refresh();
+        Tanuki.instance.services.tanukiServer.Refresh();
     }
-
-    private void TanukiServerHelloPacketHandler(CSteamID sender, TanukiServerHello packet)
-    {
-        manualLogSource.LogInfo($"Hello packet received\nsender.IsLobby():{sender.IsLobby()}\nOwnerSteamId.Equals(sender): {Network.Providers.SteamLobby.OwnerSteamId.Equals(sender)}");
-        if (!sender.IsLobby() || !Network.Providers.SteamLobby.OwnerSteamId.Equals(sender))
-            return;
-
-        Routers.Commands commandRouter = Tanuki.instance.routers.commands;
-        manualLogSource.LogInfo($"version: {packet.Version}");
-
-        if (packet.Version != PluginInfo.VERSION)
-        {
-            commandRouter.ServerPrefix = Data.Settings.Commands.SERVER_PREFIX_DEFAULT;
-            return;
-        }
-
-        commandRouter.ServerPrefix = packet.ServerCommandPrefix;
-        manualLogSource.LogInfo($"server prefix: {packet.ServerCommandPrefix}");
-    }
-
-    private void OnNetworkProviderSteamLobbyLobbyChanged(CSteamID lobby) =>
-        Network.Managers.Network.SteamNetworkMessagesPoller.enabled = !lobby.Equals(CSteamID.Nil);
 
     protected override void Unload()
     {
-        Network.Managers.Network.SteamNetworkMessagesPoller.enabled = false;
-
         reloadConfiguration = true;
-        Tanuki.Instance.managers.chat.Disable();
         Network.Managers.Packets.ChangeMuteState<Packets.Commands.Request>(true);
     }
 }

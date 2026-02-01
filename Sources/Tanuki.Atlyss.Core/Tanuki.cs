@@ -9,11 +9,13 @@ public sealed class Tanuki
     internal Data.Tanuki.Managers managers = null!;
     internal Data.Tanuki.Providers providers = null!;
     internal Data.Tanuki.Routers routers = null!;
+    internal Data.Tanuki.Services services = null!;
 
     public Data.Tanuki.Registers Registers => registers;
     public Data.Tanuki.Managers Managers => managers;
     public Data.Tanuki.Providers Providers => providers;
     public Data.Tanuki.Routers Routers => routers;
+    public Data.Tanuki.Services Services => services;
 
     internal Tanuki() { }
 }

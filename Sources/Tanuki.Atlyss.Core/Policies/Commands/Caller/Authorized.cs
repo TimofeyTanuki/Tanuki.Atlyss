@@ -1,4 +1,6 @@
-﻿using Tanuki.Atlyss.API.Core.Commands;
+﻿/*
+
+using Tanuki.Atlyss.API.Core.Commands;
 
 namespace Tanuki.Atlyss.Core.Policies.Commands.Caller;
 
@@ -13,8 +15,10 @@ internal class Authorized : ICallerPolicy
             return false;
 
         // check permission for player.player
-        System.Console.WriteLine($"Check permission for {player.player._nickname}");
+        System.Console.WriteLine($"[NOT IMPLEMENTED] Check permission for {player.player._nickname}");
 
         return true;
     }
 }
+
+*/

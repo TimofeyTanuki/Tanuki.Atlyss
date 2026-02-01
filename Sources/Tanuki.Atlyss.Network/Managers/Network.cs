@@ -64,18 +64,18 @@ public sealed class Network
 
     private void OnLobbyChanged(CSteamID lobbyId)
     {
-        if (lobbyId.Equals(CSteamID.Nil))
+        bool isValidLobby = !lobbyId.Equals(CSteamID.Nil);
+
+        steamNetworkMessagePoller.enabled = isValidLobby;
+
+        if (isValidLobby)
             rateLimiter.Reset();
     }
 
     private bool CheckBandwidthOverflow(CSteamID sender, uint usage)
     {
-        if (sender.IsLobby() ||
-            PreventLobbyOwnerRateLimiting && sender.Equals(steamLobbyProvider.OwnerSteamId))
-        {
-            Console.WriteLine($"PREVENTED FOR {sender.m_SteamID}");
+        if (PreventLobbyOwnerRateLimiting && sender.Equals(steamLobbyProvider.OwnerSteamId))
             return false;
-        }
 
         return rateLimiter.CheckBandwidthOverflow(sender, usage);
     }
@@ -85,19 +85,18 @@ public sealed class Network
         rateLimiter.Tick();
         byte[] buffer = arrayPool.Rent(Tanuki.PACKET_MAX_SIZE);
 
-        int size = SteamMatchmaking.GetLobbyChatEntry(steamLobbyProvider.OwnerSteamId, (int)lobbyChatMsg.m_iChatID, out CSteamID sender, buffer, Tanuki.PACKET_MAX_SIZE, out EChatEntryType _);
+        int size = SteamMatchmaking.GetLobbyChatEntry(steamLobbyProvider.SteamId, (int)lobbyChatMsg.m_iChatID, out CSteamID sender, buffer, Tanuki.PACKET_MAX_SIZE, out EChatEntryType _);
 
         if (CheckBandwidthOverflow(sender, (uint)size))
             return;
 
-        packetRouter.ReceivePacket(sender, buffer);
+        packetRouter.ReceivePacket(sender, buffer.AsSpan(0, size));
         arrayPool.Return(buffer);
     }
 
     private void OnSteamNetworkingMessagesSessionRequest(SteamNetworkingMessagesSessionRequest_t steamNetworkingMessagesSessionRequest)
     {
         rateLimiter.Tick();
-        manualLogSource.LogInfo($"OnSteamNetworkingMessagesSessionRequest {steamNetworkingMessagesSessionRequest.m_identityRemote.GetSteamID64()}");
 
         if (CheckBandwidthOverflow(steamNetworkingMessagesSessionRequest.m_identityRemote.GetSteamID(), 0))
             return;
@@ -112,7 +111,6 @@ public sealed class Network
 
         steamProvider.OnSteamRelayNetworkStatus -= OnSteamRelayNetworkStatus;
         SteamNetworkingUtils.InitRelayNetworkAccess();
-        steamNetworkMessagePoller.enabled = true;
     }
 
     private void OnLobbyChatUpdate(LobbyChatUpdate_t lobbyChatUpdate)

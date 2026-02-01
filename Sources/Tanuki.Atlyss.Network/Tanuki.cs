@@ -59,7 +59,7 @@ public sealed class Tanuki
 
         Data.Tanuki.Routers routers = new()
         {
-            packet = new(manualLogSource, registers.packets, services.packetProcessor)
+            packet = new(manualLogSource, registers.packets, services.packetProcessor, providers.steamLobby)
         };
 
         GameObject gameObject = new();

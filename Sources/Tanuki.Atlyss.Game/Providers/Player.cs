@@ -30,24 +30,36 @@ public sealed class Player
 
     public static void Initialize() => Instance ??= new();
 
-    private void AddInitializingPlayer(global::Player player)
+    private void BeginPlayerInitialization(global::Player player)
     {
-        if (player.isLocalPlayer || player._isHostPlayer)
+        /*
+        if (player.)
         {
-            OnPlayerInitialized?.Invoke(player);
+            FinalizePlayerInitialization(player);
             return;
         }
-
+        */
         initializingPlayers.Add(player.netId);
     }
 
-    private void HandleInitializingPlayer(global::Player player)
+    private void HandlePlayerInitialization(global::Player player)
     {
         if (player._currentGameCondition == GameCondition.LOADING_GAME)
             return;
 
         if (!initializingPlayers.Remove(player.netId))
             return;
+
+        FinalizePlayerInitialization(player);
+    }
+
+    private void FinalizePlayerInitialization(global::Player player)
+    {
+        Console.WriteLine($"FinalizePlayerInitialization");
+        if (ulong.TryParse(player._steamID, out ulong steamId))
+            playerEntries[player.netId].steamId = new(steamId);
+
+        Console.WriteLine($"NET: {player.netId} - {playerEntries[player.netId].steamId} - {player._nickname}");
 
         OnPlayerInitialized?.Invoke(player);
     }
@@ -57,7 +69,7 @@ public sealed class Player
         if (initializingPlayers.Count == 0)
             return;
 
-        HandleInitializingPlayer(player);
+        HandlePlayerInitialization(player);
     }
 
     private void OnAtlyssNetworkManagerStopClientPrefix()
@@ -84,7 +96,8 @@ public sealed class Player
         }
 
         playerEntries.Add(player.netId, new(player));
-        AddInitializingPlayer(player);
+
+        BeginPlayerInitialization(player);
 
         OnPlayerAdded?.Invoke(player);
     }
@@ -103,7 +116,7 @@ public sealed class Player
         OnPlayerRemoved?.Invoke(player);
     }
 
-    public global::Player? GetByNetID(uint netId)
+    public global::Player? FindByNetID(uint netId)
     {
         if (playerEntries.TryGetValue(netId, out PlayerEntry playerEntry))
             return playerEntry.player;
@@ -111,7 +124,7 @@ public sealed class Player
         return null;
     }
 
-    public global::Player? GetBySteamId(ulong steamId)
+    public global::Player? FindBySteamId(ulong steamId)
     {
         foreach (PlayerEntry playerEntry in playerEntries.Values)
             if (playerEntry.steamId.m_SteamID == steamId)
@@ -120,9 +133,9 @@ public sealed class Player
         return null;
     }
 
-    public global::Player? GetBySteamId(CSteamID steamId) => GetBySteamId(steamId.m_SteamID);
+    public global::Player? FindBySteamId(CSteamID steamId) => FindBySteamId(steamId.m_SteamID);
 
-    public global::Player? GetByDefaultNickname(string nickname, bool strictLength, StringComparison stringComparsion)
+    public global::Player? FindByDefaultNickname(string nickname, bool strictLength, StringComparison stringComparsion)
     {
         foreach (PlayerEntry playerEntry in playerEntries.Values)
         {
@@ -130,12 +143,12 @@ public sealed class Player
 
             if (Nickname.Match(player._nickname, nickname, strictLength, stringComparsion))
                 return player;
-        }    
+        }
 
         return null;
     }
 
-    public global::Player? GetByGlobalNickname(string nickname, bool strictLength, StringComparison stringComparsion)
+    public global::Player? FindByGlobalNickname(string nickname, bool strictLength, StringComparison stringComparsion)
     {
         foreach (PlayerEntry playerEntry in playerEntries.Values)
         {
@@ -148,7 +161,7 @@ public sealed class Player
         return null;
     }
 
-    public global::Player? GetByAnyNickname(string nickname, bool strictLength, StringComparison stringComparsion)
+    public global::Player? FindByAnyNickname(string nickname, bool strictLength, StringComparison stringComparsion)
     {
         foreach (PlayerEntry playerEntry in playerEntries.Values)
         {

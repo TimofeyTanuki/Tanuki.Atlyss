@@ -25,22 +25,19 @@ public sealed class SteamLobby
 
     private void UpdateLobby(CSteamID newLobby)
     {
-        if (ownerSteamId.Equals(newLobby))
+        if (steamId.Equals(newLobby))
             return;
 
-        ownerSteamId = newLobby;
-        steamId = ownerSteamId.Equals(CSteamID.Nil) ? CSteamID.Nil : SteamMatchmaking.GetLobbyOwner(ownerSteamId);
+        steamId = newLobby;
+        ownerSteamId = steamId.Equals(CSteamID.Nil) ? CSteamID.Nil : SteamMatchmaking.GetLobbyOwner(steamId);
 
-        OnLobbyChanged?.Invoke(ownerSteamId);
+        OnLobbyChanged?.Invoke(steamId);
     }
 
     private void OnStopClient_OnPostfix() => UpdateLobby(CSteamID.Nil);
 
     private void SteamProvider_OnLobbyEnter(LobbyEnter_t lobbyEnter) => UpdateLobby(new(lobbyEnter.m_ulSteamIDLobby));
 
-    private void Reset_LobbyQueueParams_OnPostfix()
-    {
-        Console.WriteLine("Reset_LobbyQueueParams_OnPostfix");
+    private void Reset_LobbyQueueParams_OnPostfix() =>
         UpdateLobby(CSteamID.Nil);
-    }
 }

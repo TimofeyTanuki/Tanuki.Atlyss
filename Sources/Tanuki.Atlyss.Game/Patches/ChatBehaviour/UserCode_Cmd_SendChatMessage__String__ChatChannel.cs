@@ -6,7 +6,7 @@ namespace Tanuki.Atlyss.Game.Patches.ChatBehaviour;
 [HarmonyPatch(typeof(global::ChatBehaviour), "UserCode_Cmd_SendChatMessage__String__ChatChannel", MethodType.Normal)]
 public sealed class UserCode_Cmd_SendChatMessage__String__ChatChannel
 {
-    public delegate void PrefixHandler(global::ChatBehaviour instance, string message, ref bool runOriginal);
+    public delegate void PrefixHandler(global::ChatBehaviour instance, string message, global::ChatBehaviour.ChatChannel chatChannel, ref bool runOriginal);
 
     private static PrefixHandler? onPrefix;
 
@@ -14,7 +14,7 @@ public sealed class UserCode_Cmd_SendChatMessage__String__ChatChannel
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<Send_ChatMessage>())
+            if (Managers.Patches.EnsurePatched<UserCode_Cmd_SendChatMessage__String__ChatChannel>())
                 onPrefix += value;
         }
         remove => onPrefix -= value;
@@ -27,7 +27,7 @@ public sealed class UserCode_Cmd_SendChatMessage__String__ChatChannel
             return true;
 
         bool runOriginal = true;
-        onPrefix.Invoke(__instance, _message, ref runOriginal);
+        onPrefix.Invoke(__instance, _message, _chatChannel, ref runOriginal);
         return runOriginal;
     }
 }

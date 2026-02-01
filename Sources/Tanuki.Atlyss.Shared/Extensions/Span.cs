@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Tanuki.Atlyss.Core.Extensions;
+namespace Tanuki.Atlyss.Shared.Extensions;
 
 public static class Span
 {
