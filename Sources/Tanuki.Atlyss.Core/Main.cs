@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
+using UnityEngine;
 
 namespace Tanuki.Atlyss.Core;
 
@@ -101,6 +102,36 @@ internal sealed class Main : Bases.Plugin
         managers.plugins.OnBeforePluginsLoad += HandleSettingsRefresh;
         registers.plugins.Refresh();
         managers.plugins.LoadPlugins();
+
+
+        // test only
+
+        Game.Providers.Player.OnPlayerAdded += Player_OnPlayerAdded;
+        Game.Providers.Player.OnPlayerLoaded += Player_OnPlayerInitialized;
+    }
+
+    private void Player_OnPlayerAdded(Player player)
+    {
+        manualLogSource.LogInfo($"ADDED!!!!: {player.netId} - {player._nickname} - {player._steamID}");
+    }
+
+    private void Player_OnPlayerInitialized(Player player)
+    {
+        manualLogSource.LogInfo($"INIT!!!!: {player.netId} - {player._nickname} - {player._steamID}");
+    }
+
+    float x = 0;
+    private void FixedUpdate()
+    {
+        if (Time.unscaledTime < x)
+            return;
+
+        x = Time.unscaledTime + 1;
+        return;
+        foreach (Player p in GameObject.FindObjectsOfType<Player>())
+        {
+            manualLogSource.LogInfo($"{p.netId} - {p._nickname} - {p._steamID}");
+        }
     }
 
     private void HandleSettingsRefresh()

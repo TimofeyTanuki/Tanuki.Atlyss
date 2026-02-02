@@ -19,7 +19,7 @@ public static class Player
             bool nicknameStrictLength = false,
             StringComparison nicknameStrictComparsion = StringComparison.InvariantCultureIgnoreCase
         ) =>
-            uint.TryParse(input, out uint netId) ? Providers.Player.Instance.FindByNetID(netId) :
+            uint.TryParse(input, out uint netId) ? Providers.Player.Instance.FindByNetId(netId) :
             ulong.TryParse(input, out ulong steamId) ? Providers.Player.Instance.FindBySteamId(steamId) :
             GetByNickname(input, nicknameType, nicknameStrictLength, nicknameStrictComparsion);
 

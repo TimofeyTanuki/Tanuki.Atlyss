@@ -61,7 +61,7 @@ public sealed class TanukiServer
         bool isHost = player._isHostPlayer;
 
         if (isHost)
-            Game.Providers.Player.OnPlayerInitialized += SendTanukiServerInfo;
+            Game.Providers.Player.OnPlayerLoaded += SendTanukiServerInfo;
 
         commandRouter.ServerPrefix = settingProvider.CommandSection.serverPrefix;
 
@@ -73,10 +73,10 @@ public sealed class TanukiServer
         if (player.isLocalPlayer)
             return;
 
-        CSteamID target = Game.Providers.Player.Instance.PlayerEntries[player.netId].SteamId;
+        CSteamID target = Game.Providers.Player.Instance.Players[player.netId].SteamId;
         packetRouter.SendPacketToUser(target, tanukiServerInfo, out EResult _);
     }
 
     private void OnStopClient() =>
-        Game.Providers.Player.OnPlayerInitialized -= SendTanukiServerInfo;
+        Game.Providers.Player.OnPlayerLoaded -= SendTanukiServerInfo;
 }
