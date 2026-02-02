@@ -24,7 +24,7 @@ public sealed class Descriptor<TPacket>(ulong signature, ICompressionProvider? c
 
     public void Dispatch(CSteamID sender, TPacket packet)
     {
-        foreach (var handler in PacketHandlers)
+        foreach (Action<CSteamID, TPacket> handler in PacketHandlers)
             handler(sender, packet);
     }
 

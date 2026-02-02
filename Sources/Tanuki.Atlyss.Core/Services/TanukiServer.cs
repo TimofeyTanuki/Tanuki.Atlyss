@@ -50,8 +50,6 @@ public sealed class TanukiServer
 
     public void Refresh()
     {
-        tanukiServerInfo.ServerCommandPrefix = settingProvider.CommandSection.serverPrefix;
-
         if (Player._mainPlayer && Player._mainPlayer._isHostPlayer)
             network.Routers.Packet.SendPacketToLobbyChat(tanukiServerInfo);
     }
@@ -63,7 +61,7 @@ public sealed class TanukiServer
         if (isHost)
             Game.Providers.Player.OnPlayerLoaded += SendTanukiServerInfo;
 
-        commandRouter.ServerPrefix = settingProvider.CommandSection.serverPrefix;
+        commandRouter.ServerPrefix = null;
 
         network.Managers.Packets.ChangeMuteState<Packets.TanukiServerInfo>(isHost);
     }

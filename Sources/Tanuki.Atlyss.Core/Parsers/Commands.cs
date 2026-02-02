@@ -42,11 +42,11 @@ public class Commands(IReadOnlyList<char> quoteCharacters)
         if (commandNameMap is not null && !commandNameMap.ContainsKey(commandName))
             return false;
 
-        var parsedArguments = new List<string>();
+        List<string> parsedArguments = new();
 
         while (index < length && char.IsWhiteSpace(input[index])) index++;
 
-        var argument = new StringBuilder();
+        StringBuilder argument = new();
 
         while (index < length)
         {

@@ -21,7 +21,7 @@ public static class Name
             {
                 if (span.StartsWith(prefix.AsSpan(), StringComparison.Ordinal))
                 {
-                    span = span.Slice(prefix.Length);
+                    span = span[prefix.Length..];
 
                     prefixFound = true;
                     break;

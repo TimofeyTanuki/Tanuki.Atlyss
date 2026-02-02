@@ -1,6 +1,9 @@
-﻿using Steamworks;
+﻿using HarmonyLib;
+using Steamworks;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Text;
 using Tanuki.Atlyss.API.Core.Commands;
 
 namespace Tanuki.Atlyss.Core.Routers;
@@ -14,6 +17,8 @@ public sealed class Commands
     private readonly Providers.Commands commandProvider;
     private readonly Network.Providers.SteamLobby steamLobbyProvider;
     private readonly Network.Routers.Packets packetRouter;
+
+    private readonly MethodInfo SendChatMessageCommand = AccessTools.Method(typeof(ChatBehaviour), "UserCode_Cmd_SendChatMessage__String__ChatChannel");
 
     public string? ServerPrefix;
 
@@ -36,16 +41,9 @@ public sealed class Commands
         this.packetRouter = packetRouter;
 
         packetRegistry.Register<Packets.Commands.Request>();
-        packetRegistry.Register<Packets.Commands.NotFoundResponse>();
         packetManager.AddHandler<Packets.Commands.Request>(RequestReceived);
-        packetManager.AddHandler<Packets.Commands.NotFoundResponse>(NotFoundReceived);
 
-        Game.Patches.Player.OnStartAuthority.OnPostfix += OnStartAuthority;
-    }
-
-    private void NotFoundReceived(CSteamID sender, Packets.Commands.NotFoundResponse packet)
-    {
-        ChatBehaviour._current.New_ChatMessage("command not found, lol");
+        Game.Patches.Player.OnStartAuthority.OnPostfix += OnPlayerStartAuthority;
     }
 
     public void Refresh() =>
@@ -61,7 +59,7 @@ public sealed class Commands
         packetManager.ChangeMuteState<Packets.Commands.Request>(!isHost);
     }
 
-    private void OnStartAuthority(Player player) =>
+    private void OnPlayerStartAuthority(Player player) =>
         CheckServerRuntime();
 
     public bool HandleCommandClient(string input)
@@ -145,7 +143,7 @@ public sealed class Commands
     {
         Player? player = Game.Providers.Player.Instance.FindBySteamId(sender);
 
-        if (!player)
+        if (player is null)
             return;
 
         Type? commandType = null;
@@ -157,12 +155,26 @@ public sealed class Commands
 
         if (commandType is null)
         {
+            StringBuilder originalMessage = new();
 
-            packetRouter.SendPacketToUser(
-                sender,
-                new Packets.Commands.NotFoundResponse(),
-                out EResult _
-            );
+            if (!string.IsNullOrEmpty(ServerPrefix))
+                originalMessage.Append(ServerPrefix);
+
+            if (!string.IsNullOrEmpty(packet.Name))
+                originalMessage.Append(packet.Name);
+
+            if (packet.Arguments.Count > 0)
+            {
+                foreach (string argument in packet.Arguments)
+                {
+                    originalMessage.Append(' ');
+                    originalMessage.Append(argument);
+                }
+            }
+
+            if (originalMessage.Length > 0)
+                SendChatMessageCommand.Invoke(player._chatBehaviour, [originalMessage.ToString(), player._chatBehaviour._setChatChannel]);
+
             return;
         }
 
