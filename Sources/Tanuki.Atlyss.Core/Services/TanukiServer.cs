@@ -71,7 +71,7 @@ public sealed class TanukiServer
         if (player.isLocalPlayer)
             return;
 
-        CSteamID target = Game.Providers.Player.Instance.Players[player.netId].SteamId;
+        CSteamID target = Game.Providers.Player.Instance.PlayerEntries[player.netId].SteamId;
         packetRouter.SendPacketToUser(target, tanukiServerInfo, out EResult _);
     }
 

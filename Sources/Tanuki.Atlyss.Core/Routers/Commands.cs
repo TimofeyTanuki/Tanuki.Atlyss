@@ -143,7 +143,7 @@ public sealed class Commands
     {
         Player? player = Game.Providers.Player.Instance.FindBySteamId(sender);
 
-        if (!player)
+        if (player is null)
             return;
 
         Type? commandType = null;
@@ -155,7 +155,7 @@ public sealed class Commands
 
         if (commandType is not null)
         {
-            HandleCommandServer(player!, commandType, packet.Arguments);
+            HandleCommandServer(player, commandType, packet.Arguments);
             return;
         }
 
