@@ -18,7 +18,7 @@ public sealed class Commands
     private readonly Network.Providers.SteamLobby steamLobbyProvider;
     private readonly Network.Routers.Packets packetRouter;
 
-    private readonly MethodInfo SendChatMessageCommand = AccessTools.Method(typeof(ChatBehaviour), "UserCode_Cmd_SendChatMessage__String__ChatChannel");
+    private static readonly MethodInfo SendChatMessageCommand = AccessTools.Method(typeof(ChatBehaviour), "UserCode_Cmd_SendChatMessage__String__ChatChannel");
 
     public string? ServerPrefix;
 
@@ -129,7 +129,7 @@ public sealed class Commands
     {
         IReadOnlyDictionary<string, Type> nameMap = commandRegistry.NameMap;
 
-        if (commandParser.TryParse(commandSettings.serverPrefix, input, out string? commandName, out IReadOnlyList<string>? commandArguments, nameMap))
+        if (commandParser.TryParse(ServerPrefix!, input, out string? commandName, out IReadOnlyList<string>? commandArguments, nameMap))
         {
             Type commandType = nameMap[commandName];
 
@@ -143,7 +143,7 @@ public sealed class Commands
     {
         Player? player = Game.Providers.Player.Instance.FindBySteamId(sender);
 
-        if (player is null)
+        if (!player)
             return;
 
         Type? commandType = null;
@@ -153,32 +153,25 @@ public sealed class Commands
         else if (!string.IsNullOrEmpty(packet.Name))
             commandRegistry.NameMap.TryGetValue(packet.Name, out commandType);
 
-        if (commandType is null)
+        if (commandType is not null)
         {
-            StringBuilder originalMessage = new();
-
-            if (!string.IsNullOrEmpty(ServerPrefix))
-                originalMessage.Append(ServerPrefix);
-
-            if (!string.IsNullOrEmpty(packet.Name))
-                originalMessage.Append(packet.Name);
-
-            if (packet.Arguments.Count > 0)
-            {
-                foreach (string argument in packet.Arguments)
-                {
-                    originalMessage.Append(' ');
-                    originalMessage.Append(argument);
-                }
-            }
-
-            if (originalMessage.Length > 0)
-                SendChatMessageCommand.Invoke(player._chatBehaviour, [originalMessage.ToString(), player._chatBehaviour._setChatChannel]);
-
+            HandleCommandServer(player!, commandType, packet.Arguments);
             return;
         }
 
-        HandleCommandServer(player!, commandType, packet.Arguments);
+        if (string.IsNullOrEmpty(packet.Name) ||
+            commandRegistry.NameMap.ContainsKey(packet.Name))
+            return;
+
+        StringBuilder originalMessage = new();
+
+        originalMessage.Append(ServerPrefix);
+        originalMessage.Append(packet.Name);
+
+        foreach (string argument in packet.Arguments)
+            originalMessage.Append(' ' + argument);
+
+        SendChatMessageCommand.Invoke(player._chatBehaviour, [originalMessage.ToString(), player._chatBehaviour._setChatChannel]);
     }
 
     public bool HandleCommandServer(Player player, Type commandType, IReadOnlyList<string> Arguments)
