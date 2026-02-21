@@ -9,22 +9,12 @@ namespace Tanuki.Atlyss.Game.Providers;
 
 public sealed class Player
 {
-    private static Player instance = null!;
-
     private readonly Dictionary<uint, Entry> playerEntries = [];
     private readonly Dictionary<ulong, uint> steamIdMap = [];
     private readonly HashSet<uint> loadingPlayers = [];
 
     private bool playerObservationState = false;
     private bool lastNetworkServerState = false;
-
-    /// <summary>
-    /// Gets the singleton instance of <see cref="Player"/>.
-    /// </summary>
-    /// <remarks>
-    /// The instance is available after <see cref="Initialize"/> has been called.
-    /// </remarks>
-    public static Player Instance => instance;
 
     /// <summary>
     /// Invoked once when a new network player starts on the client.
@@ -68,22 +58,11 @@ public sealed class Player
     /// </summary>
     public IReadOnlyCollection<uint> LoadingPlayers => loadingPlayers;
 
-    private Player()
+    internal Player()
     {
         Patches.AtlyssNetworkManager.OnStopClient.OnPrefix += OnAtlyssNetworkManagerStop;
         Patches.NetworkBehaviour.OnStartClient.OnPostfix += OnNetworkBehaviourStartClient;
         Patches.NetworkBehaviour.OnStopClient.OnPrefix += OnNetworkBehaviourStopClient;
-    }
-
-    /// <summary>
-    /// Initializes the <see cref="Player"/> singleton instance.
-    /// </summary>
-    public static void Initialize()
-    {
-        if (instance is not null)
-            return;
-
-        instance = new();
     }
 
     private void BeginPlayerInitialization(uint netId)

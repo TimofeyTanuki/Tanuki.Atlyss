@@ -1,6 +1,6 @@
 ﻿<Project>
 
-  <Target Name="AssemblyInfoClass_OverrideVersion" BeforeTargets="BeforeBuild">
+  <Target Name="PluginInfo_OverrideVersion" BeforeTargets="BeforeBuild">
 
     <PropertyGroup>
       <File>$(ProjectDir)PluginInfo.cs</File>

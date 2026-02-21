@@ -8,6 +8,7 @@ public sealed class TanukiServer
     private readonly Routers.Commands commandRouter;
     private readonly Providers.Settings settingProvider;
     private readonly Network.Routers.Packets packetRouter;
+    private readonly Game.Providers.Player playerProvider;
 
     private readonly Network.Providers.SteamLobby steamLobbyProvider;
 
@@ -20,13 +21,15 @@ public sealed class TanukiServer
         Network.Tanuki network,
         Routers.Commands commandRouter,
         Providers.Settings settingProvider,
-        Network.Routers.Packets packetRouter)
+        Network.Routers.Packets packetRouter,
+        Game.Providers.Player playerProvider)
     {
         this.network = network;
         this.commandRouter = commandRouter;
         steamLobbyProvider = network.Providers.SteamLobby;
         this.settingProvider = settingProvider;
         this.packetRouter = packetRouter;
+        this.playerProvider = playerProvider;
 
         network.Registers.Packets.Register<Packets.TanukiServerInfo>();
         network.Managers.Packets.AddHandler<Packets.TanukiServerInfo>(TanukiServerInfoReceived);
@@ -71,7 +74,7 @@ public sealed class TanukiServer
         if (player.isLocalPlayer)
             return;
 
-        CSteamID target = Game.Providers.Player.Instance.PlayerEntries[player.netId].SteamId;
+        CSteamID target = playerProvider.PlayerEntries[player.netId].SteamId;
         packetRouter.SendPacketToUser(target, tanukiServerInfo, out EResult _);
     }
 

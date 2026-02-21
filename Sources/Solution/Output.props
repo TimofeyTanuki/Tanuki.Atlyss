@@ -1,7 +1,7 @@
 <Project>
   
   <PropertyGroup>
-    <OutputPath>$(BepInExPluginDir)\</OutputPath>
+    <OutputPath>$(OutputPluginsDir)</OutputPath>
     <DebugType>none</DebugType>
     <GenerateDependencyFile>false</GenerateDependencyFile>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>

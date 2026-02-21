@@ -5,12 +5,13 @@ using System.Collections.Generic;
 
 namespace Tanuki.Atlyss.Game.Managers;
 
-internal class Patches
+public sealed class Patches
 {
     private static readonly Harmony harmony = new("97a2ac6772114ac9bfac3f83f85910e7");
     private static readonly ManualLogSource manualLogSource = new("Tanuki.Atlyss.Game");
-
     private static readonly HashSet<Type> appliedPatches = [];
+
+    internal Patches() { }
 
     public static bool EnsurePatched<T>()
     {

@@ -1,4 +1,5 @@
 ﻿using BepInEx.Logging;
+using System;
 using UnityEngine;
 
 namespace Tanuki.Atlyss.Network;
@@ -8,6 +9,8 @@ public sealed class Tanuki
     public const int PACKET_SIGNATURE_SIZE = sizeof(ulong);
     public const int PACKET_MAX_SIZE = 4096;
     public const int PACKET_DATA_MAX_SIZE = PACKET_MAX_SIZE - PACKET_SIGNATURE_SIZE;
+
+    public static Action? OnInitialized;
 
     private static Tanuki instance = null!;
     public static Tanuki Instance => instance;
@@ -64,7 +67,7 @@ public sealed class Tanuki
 
         GameObject gameObject = new();
         Components.SteamNetworkMessagePoller steamNetworkMessagePoller = gameObject.AddComponent<Components.SteamNetworkMessagePoller>();
-        Object.DontDestroyOnLoad(gameObject);
+        UnityEngine.Object.DontDestroyOnLoad(gameObject);
 
         Data.Tanuki.Managers managers = new()
         {
@@ -90,5 +93,7 @@ public sealed class Tanuki
             routers = routers,
             gameObject = gameObject
         };
+
+        OnInitialized?.Invoke();
     }
 }

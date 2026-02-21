@@ -21,10 +21,12 @@ namespace Tanuki.Atlyss.Core;
 internal sealed class Main : Bases.Plugin
 {
     public static Main Instance = null!;
-    internal Network.Tanuki Network = null!;
 
     private bool reloadConfiguration = false;
     private ManualLogSource manualLogSource = null!;
+
+    private Tanuki tanukiCore = null!;
+    private Network.Tanuki tanukiNetwork = null!;
 
     public Main()
     {
@@ -44,61 +46,17 @@ internal sealed class Main : Bases.Plugin
 
     internal void Start()
     {
-        Atlyss.Network.Tanuki.Initialize();
-        Game.Providers.Player.Initialize();
-        Network = Atlyss.Network.Tanuki.Instance;
-        Network.Providers.Steam.CreateCallbacks();
+        Game.Tanuki.Initialize();
 
-        Data.Tanuki.Providers providers = new()
-        {
-            commands = new(),
-            settings = new(),
-            commandCallerPolicies = new()
-        };
+        Network.Tanuki.Initialize();
+        tanukiNetwork = Network.Tanuki.Instance;
 
-        Data.Tanuki.Registers registers = new()
-        {
-            commands = new(manualLogSource, providers.commandCallerPolicies, providers.settings.CommandSection),
-            plugins = new()
-        };
+        Tanuki.Initialize(Game.Tanuki.Instance, tanukiNetwork, manualLogSource);
 
-        Data.Tanuki.Routers routers = new()
-        {
-            commands = new(
-                Network.Registers.Packets,
-                Network.Managers.Packets,
-                new(['"', '\"', '`']),
-                providers.settings.CommandSection,
-                registers.commands,
-                providers.commands,
-                Network.Providers.SteamLobby,
-                Network.Routers.Packet
-            )
-        };
-
-        Data.Tanuki.Managers managers = new()
-        {
-            plugins = new(manualLogSource, registers.plugins),
-            chat = new(routers.commands)
-        };
-
-        Data.Tanuki.Services services = new()
-        {
-            tanukiServer = new(Network, routers.commands, providers.settings, Network.Routers.Packet)
-        };
-
-        Tanuki.instance = new()
-        {
-            managers = managers,
-            providers = providers,
-            registers = registers,
-            routers = routers,
-            services = services
-        };
-
-        managers.plugins.OnBeforePluginsLoad += HandleSettingsRefresh;
-        registers.plugins.Refresh();
-        managers.plugins.LoadPlugins();
+        tanukiCore = Tanuki.instance;
+        tanukiCore.managers.plugins.OnBeforePluginsLoad += HandleSettingsRefresh;
+        tanukiCore.registers.plugins.Refresh();
+        tanukiCore.managers.plugins.LoadPlugins();
     }
 
     private void HandleSettingsRefresh()
@@ -119,7 +77,7 @@ internal sealed class Main : Bases.Plugin
         Providers.Settings settingProvider = Tanuki.instance.providers.settings;
         Data.Settings.Network settingProviderNetworkSection = settingProvider.NetworkSection;
 
-        Network.Managers.Network networkManager = Network.Managers.Network;
+        Network.Managers.Network networkManager = tanukiNetwork.Managers.Network;
         networkManager.SteamLocalChannel = settingProviderNetworkSection.mainSteamMessageChannel;
         networkManager.PreventLobbyOwnerRateLimiting = settingProviderNetworkSection.preventLobbyOwnerRateLimiting;
 
@@ -142,6 +100,6 @@ internal sealed class Main : Bases.Plugin
     protected override void Unload()
     {
         reloadConfiguration = true;
-        Network.Managers.Packets.ChangeMuteState<Packets.Commands.Request>(true);
+        tanukiNetwork.Managers.Packets.ChangeMuteState<Packets.Commands.Request>(true);
     }
 }

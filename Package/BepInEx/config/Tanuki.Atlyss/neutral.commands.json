@@ -1,5 +1,5 @@
 {
-  "Tanuki.Atlyss.Bootstrap.Commands.Reload": {
+  "Tanuki.Atlyss.Core.Commands.Reload": {
     "Names": [
       "reload",
       "tanuki-reload"
@@ -7,7 +7,7 @@
     "Help": "Reload the specified plugins.",
     "Syntax": "[names separated by spaces]"
   },
-  "Tanuki.Atlyss.Bootstrap.Commands.Help": {
+  "Tanuki.Atlyss.Core.Commands.Help": {
     "Names": [
       "help",
       "tanuki-help"

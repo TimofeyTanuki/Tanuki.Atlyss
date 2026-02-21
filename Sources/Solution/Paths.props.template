@@ -4,10 +4,19 @@
     <GameRootDir>..\ATLYSS\</GameRootDir>
     <BepInExRootDir>..\ATLYSS\BepInEx\</BepInExRootDir>
 
-    <BepInExPluginsDir>$(BepInExRootDir)plugins\</BepInExPluginsDir>
-    <BepInExCoreDir>$(BepInExRootDir)core\</BepInExCoreDir>
     <GameDataManagedDir>$(GameRootDir)ATLYSS_Data\Managed\</GameDataManagedDir>
-    <BepInExPluginDir>$(BepInExPluginsDir)Tanuki-Tanuki_Atlyss\Tanuki_Atlyss\</BepInExPluginDir>
+
+    <BepInExPluginsDir>$(BepInExRootDir)plugins\</BepInExPluginsDir>
+    <BepInExConfigDir>$(BepInExRootDir)config\</BepInExConfigDir>
+    <BepInExCoreDir>$(BepInExRootDir)core\</BepInExCoreDir>
+
+    <OutputConfigDir>$(BepInExConfigDir)Tanuki.Atlyss\</OutputConfigDir>
+    <OutputPluginsDir>$(BepInExPluginsDir)Tanuki-Tanuki_Atlyss\Tanuki_Atlyss\</OutputPluginsDir>
+
+    <PackageDir>$([System.IO.Path]::GetFullPath('$(SolutionDir)..\Package'))\</PackageDir>
+    <PackageBepInExDir>$(PackageDir)BepInEx\</PackageBepInExDir>
+    <PackagePluginsDir>$(PackageBepInExDir)plugins\Tanuki.Atlyss\</PackagePluginsDir>
+    <PackageConfigDir>$(PackageBepInExDir)config\Tanuki.Atlyss\</PackageConfigDir>
   </PropertyGroup>
 
 </Project>

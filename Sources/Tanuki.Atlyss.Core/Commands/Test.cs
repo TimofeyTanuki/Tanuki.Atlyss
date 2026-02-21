@@ -1,4 +1,5 @@
-﻿using Tanuki.Atlyss.API.Core.Commands;
+﻿/*
+using Tanuki.Atlyss.API.Core.Commands;
 
 namespace Tanuki.Atlyss.Core.Commands;
 
@@ -16,3 +17,4 @@ public sealed class Test : ICommand
         HostConsole._current.Init_ServerMessage(message);
     }
 }
+*/

@@ -18,6 +18,8 @@ public sealed class Commands
     private readonly Network.Providers.SteamLobby steamLobbyProvider;
     private readonly Network.Routers.Packets packetRouter;
 
+    private readonly Game.Providers.Player playerProvider;
+
     private static readonly MethodInfo SendChatMessageCommand = AccessTools.Method(typeof(ChatBehaviour), "UserCode_Cmd_SendChatMessage__String__ChatChannel");
 
     public string? ServerPrefix;
@@ -30,7 +32,8 @@ public sealed class Commands
         Registers.Commands commandRegistry,
         Providers.Commands commandProvider,
         Network.Providers.SteamLobby steamLobbyProvider,
-        Network.Routers.Packets packetRouter)
+        Network.Routers.Packets packetRouter,
+        Game.Providers.Player playerProvider)
     {
         this.packetManager = packetManager;
         this.commandParser = commandParser;
@@ -39,6 +42,7 @@ public sealed class Commands
         this.commandProvider = commandProvider;
         this.steamLobbyProvider = steamLobbyProvider;
         this.packetRouter = packetRouter;
+        this.playerProvider = playerProvider;
 
         packetRegistry.Register<Packets.Commands.Request>();
         packetManager.AddHandler<Packets.Commands.Request>(RequestReceived);
@@ -141,7 +145,7 @@ public sealed class Commands
 
     public void RequestReceived(CSteamID sender, Packets.Commands.Request packet)
     {
-        Player? player = Game.Providers.Player.Instance.FindBySteamId(sender);
+        Player? player = playerProvider.FindBySteamId(sender);
 
         if (player is null)
             return;
