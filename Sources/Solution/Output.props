@@ -1,7 +1,7 @@
 <Project>
   
   <PropertyGroup>
-    <OutputPath>$(OutputPluginsDir)</OutputPath>
+    <OutputPath>$(SolutionDir)\bin\$(Configuration)</OutputPath>
     <DebugType>none</DebugType>
     <GenerateDependencyFile>false</GenerateDependencyFile>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>

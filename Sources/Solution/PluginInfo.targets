@@ -1,19 +1,17 @@
 ﻿<Project>
 
-  <Target Name="PluginInfo_OverrideVersion" BeforeTargets="BeforeBuild">
-
+  <Target Name="PluginInfo_OverrideVersion" BeforeTargets="BeforeBuild" Condition="Exists('$(ProjectDir)PluginInfo.cs')">
     <PropertyGroup>
       <File>$(ProjectDir)PluginInfo.cs</File>
-      <PluginInfoContent>$([System.IO.File]::ReadAllText('$(File)'))</PluginInfoContent>
-      <UpdatedPluginInfoContent>$([System.Text.RegularExpressions.Regex]::Replace($(PluginInfoContent), '(VERSION\s*=\s*")([^"]*)(")', '${1}$(Version)${3}'))</UpdatedPluginInfoContent>
+      <FileContent>$([System.IO.File]::ReadAllText('$(File)'))</FileContent>
+      <NewFileContent>$([System.Text.RegularExpressions.Regex]::Replace($(FileContent), '(VERSION\s*=\s*")([^"]*)(")', '${1}$(Version)${3}'))</NewFileContent>
     </PropertyGroup>
-
+    
     <WriteLinesToFile
       File="$(File)"
-      Lines="$(UpdatedPluginInfoContent)"
       Overwrite="true"
-      Encoding="UTF-8" />
-
+      Encoding="UTF-8"
+      Condition="'$(FileContent)' != '$(NewFileContent)' "/>
   </Target>
 
 </Project>

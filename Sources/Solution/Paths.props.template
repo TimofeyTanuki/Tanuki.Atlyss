@@ -11,7 +11,7 @@
     <BepInExCoreDir>$(BepInExRootDir)core\</BepInExCoreDir>
 
     <OutputConfigDir>$(BepInExConfigDir)Tanuki.Atlyss\</OutputConfigDir>
-    <OutputPluginsDir>$(BepInExPluginsDir)Tanuki-Tanuki_Atlyss\Tanuki_Atlyss\</OutputPluginsDir>
+    <OutputPluginsDir>$(BepInExPluginsDir)Tanuki.Atlyss\</OutputPluginsDir>
 
     <PackageDir>$([System.IO.Path]::GetFullPath('$(SolutionDir)..\Package'))\</PackageDir>
     <PackageBepInExDir>$(PackageDir)BepInEx\</PackageBepInExDir>

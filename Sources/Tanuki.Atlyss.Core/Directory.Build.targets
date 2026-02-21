@@ -1,7 +1,7 @@
-﻿<Project>
+<Project>
 
-  <Import Project="$(SolutionDir)Solution/PluginInfo.targets" />
+  <Import Project="$(SolutionDir)Directory.Build.targets"/>
   
-  <Import Project="$(SolutionDir)Directory.Build.targets" />
-
+  <Import Project="$(SolutionDir)Solution\PluginInfo.targets"/>
+  
 </Project>

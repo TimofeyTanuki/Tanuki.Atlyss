@@ -11,7 +11,10 @@
       <CopyLocalSatelliteAssemblies>False</CopyLocalSatelliteAssemblies>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\Tanuki.Atlyss.Game\Tanuki.Atlyss.Game.csproj" />
+    <ProjectReference Include="..\Tanuki.Atlyss.Game\Tanuki.Atlyss.Game.csproj">
+      <CopyLocalSatelliteAssemblies>False</CopyLocalSatelliteAssemblies>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\Tanuki.Atlyss.Shared\Tanuki.Atlyss.Shared.csproj">
       <Private>False</Private>
       <CopyLocalSatelliteAssemblies>False</CopyLocalSatelliteAssemblies>
