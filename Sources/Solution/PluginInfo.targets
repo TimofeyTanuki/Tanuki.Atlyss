@@ -9,6 +9,7 @@
     
     <WriteLinesToFile
       File="$(File)"
+      Lines="$(NewFileContent)"
       Overwrite="true"
       Encoding="UTF-8"
       Condition="'$(FileContent)' != '$(NewFileContent)' "/>
