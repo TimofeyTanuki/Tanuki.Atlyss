@@ -4,5 +4,5 @@
 
 Sources/Solution/Paths.props
 
-Package/BepInEx/plugins
+Package/BepInEx/
 Package/*.zip
