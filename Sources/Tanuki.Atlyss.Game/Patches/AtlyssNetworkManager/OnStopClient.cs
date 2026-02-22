@@ -13,7 +13,7 @@ public sealed class OnStopClient
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<OnStopClient>())
+            if (Utilities.Patches.EnsurePatched<OnStopClient>())
                 onPrefix += value;
         }
         remove => onPrefix -= value;
@@ -23,7 +23,7 @@ public sealed class OnStopClient
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<OnStopClient>())
+            if (Utilities.Patches.EnsurePatched<OnStopClient>())
                 onPostfix += value;
         }
         remove => onPostfix -= value;

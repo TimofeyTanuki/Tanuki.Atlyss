@@ -12,7 +12,7 @@ public sealed class Cmd_InitSkill
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<Cmd_InitSkill>())
+            if (Utilities.Patches.EnsurePatched<Cmd_InitSkill>())
                 onPostfix += value;
         }
         remove => onPostfix -= value;

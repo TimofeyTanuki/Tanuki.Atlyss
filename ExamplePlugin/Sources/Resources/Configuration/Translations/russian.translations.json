@@ -1,0 +1,5 @@
+{
+  "Commands.ClientCommandExample": "Команда была выполнена!\nАргументы (x{0}){1}",
+  "Commands.ClientCommandExample.Arguments": ": {0}",
+  "Commands.ServerCommandExample": "Команда была выполнена!\nИсполнитель является хост-игроком: {0}"
+}

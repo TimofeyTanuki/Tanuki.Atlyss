@@ -12,7 +12,7 @@ public sealed class OnStartClient
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<OnStartClient>())
+            if (Utilities.Patches.EnsurePatched<OnStartClient>())
                 onPostfix += value;
         }
         remove => onPostfix -= value;

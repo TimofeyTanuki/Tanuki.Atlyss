@@ -14,7 +14,7 @@ public sealed class Client_LocalPlayerControl
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<Client_LocalPlayerControl>())
+            if (Utilities.Patches.EnsurePatched<Client_LocalPlayerControl>())
                 onPrefix += value;
         }
         remove => onPrefix -= value;

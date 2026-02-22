@@ -10,10 +10,8 @@ public sealed class Tanuki
     public const int PACKET_MAX_SIZE = 4096;
     public const int PACKET_DATA_MAX_SIZE = PACKET_MAX_SIZE - PACKET_SIGNATURE_SIZE;
 
-    public static Action? OnInitialized;
-
     private static Tanuki instance = null!;
-    public static Tanuki Instance => instance;
+    private static Action? onInitialized;
 
     internal GameObject gameObject = null!;
     internal ManualLogSource manualLogSource = null!;
@@ -23,12 +21,20 @@ public sealed class Tanuki
     internal Data.Tanuki.Services services = null!;
     internal Data.Tanuki.Routers routers = null!;
 
+    public static Tanuki Instance => instance;
+
     public GameObject GameObject => gameObject;
     public Data.Tanuki.Registers Registers => registers;
     public Data.Tanuki.Providers Providers => providers;
     public Data.Tanuki.Managers Managers => managers;
     public Data.Tanuki.Services Services => services;
     public Data.Tanuki.Routers Routers => routers;
+
+    public static event Action OnInitialized
+    {
+        add { onInitialized += value; }
+        remove { onInitialized -= value; }
+    }
 
     private Tanuki() { }
 
@@ -94,6 +100,7 @@ public sealed class Tanuki
             gameObject = gameObject
         };
 
-        OnInitialized?.Invoke();
+        onInitialized?.Invoke();
+        onInitialized = null;
     }
 }

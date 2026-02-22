@@ -14,7 +14,7 @@ public sealed class New_CooldownSlot
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<New_CooldownSlot>())
+            if (Utilities.Patches.EnsurePatched<New_CooldownSlot>())
                 onPrefix += value;
         }
         remove => onPrefix -= value;

@@ -13,7 +13,7 @@ public sealed class OnGameConditionChange
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<OnGameConditionChange>())
+            if (Utilities.Patches.EnsurePatched<OnGameConditionChange>())
                 onPostfix += value;
         }
         remove => onPostfix -= value;

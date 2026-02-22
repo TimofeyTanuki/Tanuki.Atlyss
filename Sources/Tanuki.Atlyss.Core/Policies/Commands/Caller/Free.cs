@@ -2,7 +2,7 @@
 
 namespace Tanuki.Atlyss.Core.Policies.Commands.Caller;
 
-internal class Free : ICallerPolicy
+public sealed class Free : ICallerPolicy
 {
     public bool IsAllowed(ICaller caller) => true;
 }

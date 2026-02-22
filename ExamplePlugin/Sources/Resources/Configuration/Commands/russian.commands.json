@@ -1,0 +1,18 @@
+{
+  "Tanuki.Atlyss.Example.Commands.ClientCommandExample": {
+    "Names": [
+      "client-command-example",
+      "cce"
+    ],
+    "Help": null,
+    "Syntax": null
+  },
+  "Tanuki.Atlyss.Example.Commands.ServerCommandExample": {
+    "Names": [
+      "server-command-example",
+      "sce"
+    ],
+    "Help": null,
+    "Syntax": null
+  }
+}

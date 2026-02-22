@@ -13,7 +13,7 @@ public sealed class SerializeSyncVars
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<SerializeSyncVars>())
+            if (Utilities.Patches.EnsurePatched<SerializeSyncVars>())
                 onPostfix += value;
         }
         remove => onPostfix -= value;

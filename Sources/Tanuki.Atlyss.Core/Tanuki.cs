@@ -6,9 +6,7 @@ namespace Tanuki.Atlyss.Core;
 public sealed class Tanuki
 {
     internal static Tanuki instance = null!;
-    public static Tanuki Instance => instance;
-
-    public static Action? OnInitialized;
+    private static Action? onInitialized;
 
     internal Data.Tanuki.Registers registers = null!;
     internal Data.Tanuki.Managers managers = null!;
@@ -16,11 +14,19 @@ public sealed class Tanuki
     internal Data.Tanuki.Routers routers = null!;
     internal Data.Tanuki.Services services = null!;
 
+    public static Tanuki Instance => instance;
+
     public Data.Tanuki.Registers Registers => registers;
     public Data.Tanuki.Managers Managers => managers;
     public Data.Tanuki.Providers Providers => providers;
     public Data.Tanuki.Routers Routers => routers;
     public Data.Tanuki.Services Services => services;
+
+    public static event Action OnInitialized
+    {
+        add { onInitialized += value; }
+        remove { onInitialized -= value; }
+    }
 
     internal Tanuki() { }
 
@@ -85,6 +91,7 @@ public sealed class Tanuki
             services = services
         };
 
-        OnInitialized?.Invoke();
+        onInitialized?.Invoke();
+        onInitialized = null;
     }
 }

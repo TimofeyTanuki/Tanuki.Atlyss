@@ -19,7 +19,7 @@ public sealed class Player
     /// <summary>
     /// Invoked once when a new network player starts on the client.
     /// </summary>
-    public static event Action<global::Player>? OnPlayerAdded;
+    public event Action<global::Player>? OnPlayerAdded;
 
     /// <summary>
     /// Invoked once when a network player's game state changes to <see cref="GameCondition.IN_GAME"/>.
@@ -30,12 +30,12 @@ public sealed class Player
     /// <item>Called for all players, including those initialized on the server before the client.</item>
     /// </list>
     /// </remarks>
-    public static event Action<global::Player>? OnPlayerLoaded;
+    public event Action<global::Player>? OnPlayerLoaded;
 
     /// <summary>
     /// Invoked once when a network player stops on the client.
     /// </summary>
-    public static event Action<global::Player>? OnPlayerRemoved;
+    public event Action<global::Player>? OnPlayerRemoved;
 
     /// <summary>
     /// Provides a lookup of current player entries by <see cref="NetworkBehaviour.netId"/>.

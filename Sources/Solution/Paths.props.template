@@ -10,13 +10,13 @@
     <BepInExConfigDir>$(BepInExRootDir)config\</BepInExConfigDir>
     <BepInExCoreDir>$(BepInExRootDir)core\</BepInExCoreDir>
 
-    <OutputConfigDir>$(BepInExConfigDir)Tanuki.Atlyss\</OutputConfigDir>
-    <OutputPluginsDir>$(BepInExPluginsDir)Tanuki.Atlyss\</OutputPluginsDir>
+    <OutputConfigDir>$(BepInExConfigDir)$(ProductName)\</OutputConfigDir>
+    <OutputPluginsDir>$(BepInExPluginsDir)$(ProductName)\</OutputPluginsDir>
 
     <PackageDir>$([System.IO.Path]::GetFullPath('$(SolutionDir)..\Package'))\</PackageDir>
     <PackageBepInExDir>$(PackageDir)BepInEx\</PackageBepInExDir>
-    <PackagePluginsDir>$(PackageBepInExDir)plugins\Tanuki.Atlyss\</PackagePluginsDir>
-    <PackageConfigDir>$(PackageBepInExDir)config\Tanuki.Atlyss\</PackageConfigDir>
+    <PackagePluginsDir>$(PackageBepInExDir)plugins\$(ProductName)\</PackagePluginsDir>
+    <PackageConfigDir>$(PackageBepInExDir)config\$(ProductName)\</PackageConfigDir>
   </PropertyGroup>
 
 </Project>

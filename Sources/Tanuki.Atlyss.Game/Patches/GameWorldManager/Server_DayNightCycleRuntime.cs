@@ -13,7 +13,7 @@ public sealed class Server_DayNightCycleRuntime
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<Server_DayNightCycleRuntime>())
+            if (Utilities.Patches.EnsurePatched<Server_DayNightCycleRuntime>())
                 onPostfix += value;
         }
         remove => onPostfix -= value;

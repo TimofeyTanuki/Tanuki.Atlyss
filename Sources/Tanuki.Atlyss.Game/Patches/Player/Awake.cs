@@ -13,7 +13,7 @@ public sealed class Awake
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<Awake>())
+            if (Utilities.Patches.EnsurePatched<Awake>())
                 onPostfix += value;
         }
         remove => onPostfix -= value;

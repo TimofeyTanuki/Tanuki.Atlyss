@@ -13,7 +13,7 @@ public sealed class Apply_NetworkedCharacterDisplay
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<Apply_NetworkedCharacterDisplay>())
+            if (Utilities.Patches.EnsurePatched<Apply_NetworkedCharacterDisplay>())
                 onPrefix += value;
         }
         remove => onPrefix -= value;

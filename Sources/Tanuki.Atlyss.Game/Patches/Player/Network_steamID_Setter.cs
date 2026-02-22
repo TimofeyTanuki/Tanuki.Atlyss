@@ -13,7 +13,7 @@ public sealed class Network_steamID_Setter
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<Network_steamID_Setter>())
+            if (Utilities.Patches.EnsurePatched<Network_steamID_Setter>())
                 onPostfix += value;
         }
         remove => onPostfix -= value;

@@ -13,7 +13,7 @@ public sealed class Init_ParamsCheck
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<Init_ParamsCheck>())
+            if (Utilities.Patches.EnsurePatched<Init_ParamsCheck>())
                 onPrefix += value;
         }
         remove => onPrefix -= value;

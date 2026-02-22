@@ -14,16 +14,17 @@ public sealed class DeserializeSyncVars
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<DeserializeSyncVars>())
+            if (Utilities.Patches.EnsurePatched<DeserializeSyncVars>())
                 onPrefix += value;
         }
         remove => onPrefix -= value;
     }
+
     public static event Action<global::MapInstance, NetworkReader, bool, int> OnPostfix
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<DeserializeSyncVars>())
+            if (Utilities.Patches.EnsurePatched<DeserializeSyncVars>())
                 onPostfix += value;
         }
         remove => onPostfix -= value;

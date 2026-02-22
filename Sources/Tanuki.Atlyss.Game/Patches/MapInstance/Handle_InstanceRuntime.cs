@@ -13,7 +13,7 @@ public sealed class Handle_InstanceRuntime
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<Handle_InstanceRuntime>())
+            if (Utilities.Patches.EnsurePatched<Handle_InstanceRuntime>())
                 onPostfix += value;
         }
         remove => onPostfix -= value;

@@ -13,7 +13,7 @@ public sealed class Cmd_SendChatMessage
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<Cmd_SendChatMessage>())
+            if (Utilities.Patches.EnsurePatched<Cmd_SendChatMessage>())
                 onPrefix += value;
         }
         remove => onPrefix -= value;

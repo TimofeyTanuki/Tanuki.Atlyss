@@ -1,0 +1,8 @@
+.vs/
+**/[Bb]in/*
+**/[Oo]bj/*
+
+Sources/Solution/Paths.props
+
+Package/BepInEx/
+Package/*.zip

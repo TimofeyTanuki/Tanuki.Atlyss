@@ -13,7 +13,7 @@ public sealed class Take_Damage
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<Take_Damage>())
+            if (Utilities.Patches.EnsurePatched<Take_Damage>())
                 _OnPrefix += value;
         }
         remove => _OnPrefix -= value;

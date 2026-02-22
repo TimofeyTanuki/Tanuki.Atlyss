@@ -52,8 +52,6 @@ public sealed class Chat
 
         if (commandRouter.HandleCommandClient(message))
             runOriginal = false;
-
-        System.Console.WriteLine("RUN? " + runOriginal);
     }
 
     private void OnPlayerMessageReceived(ChatBehaviour instance, string message, bool isEmoteMessage, ChatBehaviour.ChatChannel chatChannel, ref bool runOriginal)

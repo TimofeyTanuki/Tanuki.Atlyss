@@ -13,7 +13,7 @@ public sealed class Enable_GroundCheckToVelocityZero
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<Enable_GroundCheckToVelocityZero>())
+            if (Utilities.Patches.EnsurePatched<Enable_GroundCheckToVelocityZero>())
                 onPostfix += value;
         }
         remove => onPostfix -= value;

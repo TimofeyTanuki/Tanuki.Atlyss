@@ -12,7 +12,7 @@ public sealed class OnStartAuthority
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<OnStartAuthority>())
+            if (Utilities.Patches.EnsurePatched<OnStartAuthority>())
                 onPostfix += value;
         }
         remove => onPostfix -= value;

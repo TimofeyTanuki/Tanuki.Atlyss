@@ -3,15 +3,13 @@ using HarmonyLib;
 using System;
 using System.Collections.Generic;
 
-namespace Tanuki.Atlyss.Game.Managers;
+namespace Tanuki.Atlyss.Game.Utilities;
 
-public sealed class Patches
+public static class Patches
 {
     private static readonly Harmony harmony = new("97a2ac6772114ac9bfac3f83f85910e7");
     private static readonly ManualLogSource manualLogSource = new("Tanuki.Atlyss.Game");
     private static readonly HashSet<Type> appliedPatches = [];
-
-    internal Patches() { }
 
     public static bool EnsurePatched<T>()
     {

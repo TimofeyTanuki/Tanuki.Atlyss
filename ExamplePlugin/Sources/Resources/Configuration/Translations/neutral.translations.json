@@ -1,0 +1,5 @@
+{
+  "Commands.ClientCommandExample": "The command has been executed!\nArguments (x{0}){1}",
+  "Commands.ClientCommandExample.Arguments": ": {0}",
+  "Commands.ServerCommandExample": "The command has been executed!\nThe caller is the host player: {0}"
+}

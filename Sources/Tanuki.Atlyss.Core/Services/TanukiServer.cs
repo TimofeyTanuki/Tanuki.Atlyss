@@ -62,7 +62,7 @@ public sealed class TanukiServer
         bool isHost = player._isHostPlayer;
 
         if (isHost)
-            Game.Providers.Player.OnPlayerLoaded += SendTanukiServerInfo;
+            playerProvider.OnPlayerLoaded += SendTanukiServerInfo;
 
         commandRouter.ServerPrefix = null;
 
@@ -79,5 +79,5 @@ public sealed class TanukiServer
     }
 
     private void OnStopClient() =>
-        Game.Providers.Player.OnPlayerLoaded -= SendTanukiServerInfo;
+        playerProvider.OnPlayerLoaded -= SendTanukiServerInfo;
 }

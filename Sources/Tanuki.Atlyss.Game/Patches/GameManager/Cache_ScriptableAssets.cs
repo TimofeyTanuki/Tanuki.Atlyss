@@ -13,7 +13,7 @@ public sealed class Cache_ScriptableAssets
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<Cache_ScriptableAssets>())
+            if (Utilities.Patches.EnsurePatched<Cache_ScriptableAssets>())
                 onPostfix += value;
         }
         remove => onPostfix -= value;

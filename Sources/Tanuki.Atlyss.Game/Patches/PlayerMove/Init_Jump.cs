@@ -12,7 +12,7 @@ public sealed class Init_Jump
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<Init_Jump>())
+            if (Utilities.Patches.EnsurePatched<Init_Jump>())
                 onPostfix += value;
         }
         remove => onPostfix -= value;

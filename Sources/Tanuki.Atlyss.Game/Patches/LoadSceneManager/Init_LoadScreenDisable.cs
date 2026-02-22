@@ -13,7 +13,7 @@ public sealed class Init_LoadScreenDisable
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<Init_LoadScreenDisable>())
+            if (Utilities.Patches.EnsurePatched<Init_LoadScreenDisable>())
                 onPostfix += value;
         }
         remove => onPostfix -= value;

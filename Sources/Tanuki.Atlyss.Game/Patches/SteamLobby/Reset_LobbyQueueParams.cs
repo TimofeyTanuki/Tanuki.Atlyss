@@ -13,7 +13,7 @@ public sealed class Reset_LobbyQueueParams
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<Reset_LobbyQueueParams>())
+            if (Utilities.Patches.EnsurePatched<Reset_LobbyQueueParams>())
                 onPostfix += value;
         }
         remove => onPostfix -= value;

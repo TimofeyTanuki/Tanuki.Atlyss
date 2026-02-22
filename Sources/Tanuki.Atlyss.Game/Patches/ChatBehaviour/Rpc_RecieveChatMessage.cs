@@ -14,7 +14,7 @@ public sealed class Rpc_RecieveChatMessage
     {
         add
         {
-            if (Managers.Patches.EnsurePatched<Rpc_RecieveChatMessage>())
+            if (Utilities.Patches.EnsurePatched<Rpc_RecieveChatMessage>())
                 onPrefix += value;
         }
         remove => onPrefix -= value;
