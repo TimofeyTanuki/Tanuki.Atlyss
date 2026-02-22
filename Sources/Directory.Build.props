@@ -7,7 +7,7 @@
   <PropertyGroup>
     <Company>Tanuki</Company>
     <Copyright>Copyright © Tanuki 2026</Copyright>
-    <Version>3.0.4</Version>
+    <Version>3.0.0</Version>
   </PropertyGroup>
 
   <Import Project="$(SolutionDir)Solution/Paths.props" />
