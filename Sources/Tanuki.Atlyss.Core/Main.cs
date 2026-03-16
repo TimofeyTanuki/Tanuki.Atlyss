@@ -94,7 +94,11 @@ internal sealed class Main : Bases.Plugin
         ConfigureNetwork();
 
         Tanuki.instance.routers.commands.Refresh();
-        Tanuki.instance.services.tanukiServer.Refresh();
+
+        Player player = Player._mainPlayer;
+
+        if (player && player._isHostPlayer && !AtlyssNetworkManager._current._soloMode)
+            Tanuki.instance.services.tanukiServer.SendTanukiServerInfo();
     }
 
     protected override void Unload()

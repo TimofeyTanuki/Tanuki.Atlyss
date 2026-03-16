@@ -51,18 +51,18 @@ public sealed class TanukiServer
                 commandRouter.ServerPrefix = packet.ServerCommandPrefix;
     }
 
-    public void Refresh()
-    {
-        if (Player._mainPlayer && Player._mainPlayer._isHostPlayer)
-            network.Routers.Packet.SendPacketToLobbyChat(tanukiServerInfo);
-    }
+    public void SendTanukiServerInfo() =>
+        network.Routers.Packet.SendPacketToLobbyChat(tanukiServerInfo);
 
     private void OnStartAuthority(Player player)
     {
         bool isHost = player._isHostPlayer;
 
         if (isHost)
+        {
+            tanukiServerInfo.ServerCommandPrefix = settingProvider.CommandSection.serverPrefix;
             playerProvider.OnPlayerLoaded += SendTanukiServerInfo;
+        }
 
         commandRouter.ServerPrefix = null;
 

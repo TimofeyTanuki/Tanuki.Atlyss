@@ -221,28 +221,60 @@ public sealed class Player
     /// <returns><see cref="global::Player"/> if found; otherwise, <see langword="null"/>.</returns>
     public global::Player? FindBySteamId(CSteamID steamId) => FindBySteamId(steamId.m_SteamID);
 
+    public global::Player? FindByExactDefaultNickname(string match, StringComparison stringComparison = StringComparison.OrdinalIgnoreCase)
+    {
+        foreach (Entry entry in playerEntries.Values)
+            if (Nickname.ExactMatch(entry.Player._nickname, match, stringComparison))
+                return entry.Player;
+
+        return null;
+    }
+
+    public global::Player? FindBySimilarDefaultNickname(string match, StringComparison stringComparison = StringComparison.OrdinalIgnoreCase)
+    {
+        foreach (Entry entry in playerEntries.Values)
+            if (Nickname.SimilarMatch(entry.Player._nickname, match, stringComparison))
+                return entry.Player;
+
+        return null;
+    }
+
     /// <summary>
     /// Finds a player by their <see cref="global::Player._nickname"/>.
     /// </summary>
-    /// <param name="nickname">
+    /// <param name="match">
     /// The nickname to search for.
     /// </param>
-    /// <param name="strictLength">
-    /// Whether to match the length strictly.
+    /// <param name="exactMatch">
+    /// Whether the nickname must match exactly.
     /// </param>
-    /// <param name="stringComparsion">
+    /// <param name="stringComparison">
     /// <see cref="StringComparison"/> method to use.
     /// </param>
     /// <returns><see cref="global::Player"/> if found; otherwise, <see langword="null"/>.</returns>
-    public global::Player? FindByDefaultNickname(string nickname, bool strictLength, StringComparison stringComparsion)
-    {
-        foreach (Entry playerEntry in playerEntries.Values)
-        {
-            global::Player player = playerEntry.Player;
 
-            if (Nickname.Match(player._nickname, nickname, strictLength, stringComparsion))
-                return player;
-        }
+    public global::Player? FindByDefaultNickname(
+        string match,
+        bool exactMatch = false,
+        StringComparison stringComparison = StringComparison.OrdinalIgnoreCase
+    ) =>
+        exactMatch ?
+            FindByExactDefaultNickname(match, stringComparison) : FindBySimilarDefaultNickname(match, stringComparison);
+
+    public global::Player? FindByExactGlobalNickname(string match, StringComparison stringComparison = StringComparison.OrdinalIgnoreCase)
+    {
+        foreach (Entry entry in playerEntries.Values)
+            if (Nickname.ExactMatch(entry.Player._globalNickname, match, stringComparison))
+                return entry.Player;
+
+        return null;
+    }
+
+    public global::Player? FindBySimilarGlobalNickname(string match, StringComparison stringComparison = StringComparison.OrdinalIgnoreCase)
+    {
+        foreach (Entry entry in playerEntries.Values)
+            if (Nickname.SimilarMatch(entry.Player._globalNickname, match, stringComparison))
+                return entry.Player;
 
         return null;
     }
@@ -250,25 +282,40 @@ public sealed class Player
     /// <summary>
     /// Finds a player by their <see cref="global::Player._globalNickname"/>.
     /// </summary>
-    /// <param name="nickname">
+    /// <param name="match">
     /// The nickname to search for.
     /// </param>
-    /// <param name="strictLength">
-    /// Whether to match the length strictly.
+    /// <param name="exactMatch">
+    /// Whether the nickname must match exactly.
     /// </param>
-    /// <param name="stringComparsion">
+    /// <param name="stringComparison">
     /// <see cref="StringComparison"/> method to use.
     /// </param>
     /// <returns><see cref="global::Player"/> if found; otherwise, <see langword="null"/>.</returns>
-    public global::Player? FindByGlobalNickname(string nickname, bool strictLength, StringComparison stringComparsion)
-    {
-        foreach (Entry playerEntry in playerEntries.Values)
-        {
-            global::Player player = playerEntry.Player;
+    public global::Player? FindByGlobalNickname(
+        string match,
+        bool exactMatch = false,
+        StringComparison stringComparison = StringComparison.OrdinalIgnoreCase
+    ) =>
+        exactMatch ?
+            FindByExactDefaultNickname(match, stringComparison) : FindBySimilarDefaultNickname(match, stringComparison);
 
-            if (Nickname.Match(player._globalNickname, nickname, strictLength, stringComparsion))
-                return player;
-        }
+    public global::Player? FindByExactAnyNickname(string match, StringComparison stringComparison = StringComparison.OrdinalIgnoreCase)
+    {
+        foreach (Entry entry in playerEntries.Values)
+            if (Nickname.ExactMatch(entry.Player._nickname, match, stringComparison) ||
+                Nickname.ExactMatch(entry.Player._globalNickname, match, stringComparison))
+                return entry.Player;
+
+        return null;
+    }
+
+    public global::Player? FindBySimilarAnyNickname(string match, StringComparison stringComparison = StringComparison.OrdinalIgnoreCase)
+    {
+        foreach (Entry entry in playerEntries.Values)
+            if (Nickname.SimilarMatch(entry.Player._nickname, match, stringComparison) ||
+                Nickname.SimilarMatch(entry.Player._globalNickname, match, stringComparison))
+                return entry.Player;
 
         return null;
     }
@@ -276,29 +323,23 @@ public sealed class Player
     /// <summary>
     /// Finds a player by their <see cref="global::Player._nickname"/> or <see cref="global::Player._globalNickname"/>.
     /// </summary>
-    /// <param name="nickname">
+    /// <param name="match">
     /// The nickname to search for.
     /// </param>
-    /// <param name="strictLength">
-    /// Whether to match the length strictly.
+    /// <param name="exactMatch">
+    /// Whether the nickname must match exactly.
     /// </param>
-    /// <param name="stringComparsion">
+    /// <param name="stringComparison">
     /// <see cref="StringComparison"/> method to use.
     /// </param>
     /// <returns><see cref="global::Player"/> if found; otherwise, <see langword="null"/>.</returns>
-    public global::Player? FindByAnyNickname(string nickname, bool strictLength, StringComparison stringComparsion)
-    {
-        foreach (Entry playerEntry in playerEntries.Values)
-        {
-            global::Player player = playerEntry.Player;
-
-            if (Nickname.Match(player._nickname, nickname, strictLength, stringComparsion) ||
-                Nickname.Match(player._globalNickname, nickname, strictLength, stringComparsion))
-                return player;
-        }
-
-        return null;
-    }
+    public global::Player? FindByAnyNickname(
+        string match,
+        bool exactMatch,
+        StringComparison stringComparison = StringComparison.OrdinalIgnoreCase
+    ) =>
+        exactMatch ?
+            FindByExactAnyNickname(match, stringComparison) : FindBySimilarAnyNickname(match, stringComparison);
 
     /// <summary>
     /// Finds a player automatically by input, which can be a <see cref="NetworkBehaviour.netId"/>, <see cref="CSteamID.m_SteamID"/> or nickname.
@@ -317,18 +358,18 @@ public sealed class Player
     /// <param name="nicknameType">
     /// Which <see cref="ENicknameType"/> to search.
     /// </param>
-    /// <param name="nicknameStrictLength">
-    /// Whether to match the nickname length strictly.
+    /// <param name="nicknameExactMatch">
+    /// Whether the nickname must match exactly.
     /// </param>
-    /// <param name="nicknameStrictComparsion">
+    /// <param name="nicknameStringComparison">
     /// <see cref="StringComparison"/> method to use for nickname.
     /// </param>
     /// <returns><see cref="global::Player"/> if found; otherwise, <see langword="null"/>.</returns>
-    public global::Player? FindByAutoRecognition(
+    public global::Player? FindByFlexibleInput(
         string input,
         ENicknameType nicknameType = ENicknameType.Any,
-        bool nicknameStrictLength = false,
-        StringComparison nicknameStrictComparsion = StringComparison.InvariantCultureIgnoreCase
+        bool nicknameExactMatch = false,
+        StringComparison nicknameStringComparison = StringComparison.OrdinalIgnoreCase
     )
     {
         global::Player? player = null;
@@ -341,7 +382,7 @@ public sealed class Player
         if (player is not null)
             return player;
 
-        return FindByNickname(input, nicknameType, nicknameStrictLength, nicknameStrictComparsion);
+        return FindByNickname(input, nicknameType, nicknameExactMatch, nicknameStringComparison);
     }
 
     /// <summary>
@@ -350,26 +391,26 @@ public sealed class Player
     /// <param name="nickname">
     /// The nickname to search for.
     /// </param>
-    /// <param name="nicknameType">
+    /// <param name="type">
     /// Which <see cref="ENicknameType"/> to search.
     /// </param>
-    /// <param name="strictLength">
-    /// Whether to match the length strictly.
+    /// <param name="exactMatch">
+    /// Whether the nickname must match exactly.
     /// </param>
-    /// <param name="stringComparsion">
+    /// <param name="stringComparison">
     /// <see cref="StringComparison"/> method to use.
     /// </param>
     public global::Player? FindByNickname(
         string nickname,
-        ENicknameType nicknameType = ENicknameType.Any,
-        bool strictLength = false,
-        StringComparison stringComparsion = StringComparison.InvariantCultureIgnoreCase
+        ENicknameType type = ENicknameType.Any,
+        bool exactMatch = false,
+        StringComparison stringComparison = StringComparison.OrdinalIgnoreCase
     ) =>
-        nicknameType switch
+        type switch
         {
-            ENicknameType.Default => FindByDefaultNickname(nickname, strictLength, stringComparsion),
-            ENicknameType.Global => FindByGlobalNickname(nickname, strictLength, stringComparsion),
-            ENicknameType.Any => FindByAnyNickname(nickname, strictLength, stringComparsion),
+            ENicknameType.Default => FindByDefaultNickname(nickname, exactMatch, stringComparison),
+            ENicknameType.Global => FindByGlobalNickname(nickname, exactMatch, stringComparison),
+            ENicknameType.Any => FindByAnyNickname(nickname, exactMatch, stringComparison),
             _ => null,
         };
 }

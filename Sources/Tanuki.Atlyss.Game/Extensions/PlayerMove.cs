@@ -13,7 +13,7 @@ public static class PlayerMove
             instance._playerController.enabled = true;
         }
 
-        public void Teleport(Vector3 Position) =>
-            instance.Teleport(Position, instance.transform.rotation);
+        public void Teleport(Vector3 position) =>
+            instance.Teleport(position, instance.transform.rotation);
     }
 }

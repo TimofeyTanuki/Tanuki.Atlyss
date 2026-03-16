@@ -1,15 +1,25 @@
 ﻿using System.Collections.Generic;
+using Tanuki.Atlyss.API.Collections;
 using Tanuki.Atlyss.API.Core.Commands;
 using Tanuki.Atlyss.API.Core.Plugins;
 
 namespace Tanuki.Atlyss.Core.Commands;
 
 [CommandMetadata(EExecutionSide.Client, typeof(Policies.Commands.Caller.Player))]
-public sealed class Reload : ICommand
+internal sealed class Reload : ICommand
 {
-    private readonly Registers.Plugins pluginRegistry = Tanuki.Instance.registers.Plugins;
-    private readonly Managers.Plugins pluginManager = Tanuki.Instance.managers.Plugins;
-    private readonly Main main = Main.Instance;
+    private readonly Registers.Plugins pluginRegistry;
+    private readonly Managers.Plugins pluginManager;
+    private readonly Managers.Chat chatManager;
+    private readonly TranslationSet translationSet;
+
+    public Reload()
+    {
+        pluginRegistry = Tanuki.Instance.registers.plugins;
+        pluginManager = Tanuki.Instance.managers.plugins;
+        chatManager = Tanuki.instance.managers.chat;
+        translationSet = Main.Instance.translationSet;
+    }
 
     public void Execute(IContext context)
     {
@@ -17,7 +27,7 @@ public sealed class Reload : ICommand
 
         if (arguments.Count == 0)
         {
-            ChatBehaviour._current.New_ChatMessage(main.Translate("Commands.Reload.Full"));
+            chatManager.SendClientMessage(translationSet.Translate("Commands.Reload.Full"));
             pluginManager.ReloadPlugins();
             return;
         }
@@ -48,15 +58,15 @@ public sealed class Reload : ICommand
 
         if (plugins.Count == 0)
         {
-            ChatBehaviour._current.New_ChatMessage(main.Translate("Commands.Reload.PluginsNotFound"));
+            chatManager.SendClientMessage(translationSet.Translate("Commands.Reload.PluginsNotFound"));
             return;
         }
 
-        ChatBehaviour._current.New_ChatMessage(
-            main.Translate(
+        chatManager.SendClientMessage(
+            translationSet.Translate(
                 "Commands.Reload.Plugins",
                 string.Join(
-                    main.Translate("Commands.Reload.Plugins.Separator"),
+                    translationSet.Translate("Commands.Reload.Plugins.Separator"),
                     pluginNames
                 )
             )

@@ -8,11 +8,10 @@ public static class PlayerInventory
         {
             foreach (ItemData itemData in instance._heldItems)
             {
-                if (itemData._slotNumber != slot ||
-                    itemData._isEquipped != isEquipped)
+                if (itemData._slotNumber != slot || itemData._isEquipped != isEquipped)
                     continue;
 
-                ScriptableItem scriptableItem = GameManager._current.Locate_Item(itemData._itemName);
+                ScriptableItem scriptableItem = global::GameManager._current.Locate_Item(itemData._itemName);
 
                 if (!scriptableItem)
                     continue;
