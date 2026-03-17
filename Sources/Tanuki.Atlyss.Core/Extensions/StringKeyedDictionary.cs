@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Tanuki.Atlyss.Game.Extensions;
+namespace Tanuki.Atlyss.Core.Extensions;
 
 public static class StringKeyedDictionary
 {
-    extension<T>(IDictionary<string, T> instance)
+    extension<T>(IReadOnlyDictionary<string, T> instance)
     {
         public bool TryGetValueByExactKey(string key, out T value, StringComparison stringComparison = StringComparison.OrdinalIgnoreCase)
         {
