@@ -8,12 +8,12 @@ namespace Tanuki.Atlyss.Core.Commands;
 [CommandMetadata(EExecutionSide.Client, typeof(Policies.Commands.Caller.Player))]
 internal sealed class Reload : ICommand
 {
-    private readonly Registers.Plugins pluginRegistry;
-    private readonly Managers.Plugins pluginManager;
-    private readonly Managers.Chat chatManager;
-    private readonly TranslationSet translationSet;
+    private static readonly Registers.Plugins pluginRegistry;
+    private static readonly Managers.Plugins pluginManager;
+    private static readonly Managers.Chat chatManager;
+    private static readonly TranslationSet translationSet;
 
-    public Reload()
+    static Reload()
     {
         pluginRegistry = Tanuki.Instance.registers.plugins;
         pluginManager = Tanuki.Instance.managers.plugins;

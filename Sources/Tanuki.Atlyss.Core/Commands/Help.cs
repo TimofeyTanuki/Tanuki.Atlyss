@@ -11,12 +11,12 @@ namespace Tanuki.Atlyss.Core.Commands;
 [CommandMetadata(EExecutionSide.Client, typeof(Policies.Commands.Caller.Player))]
 internal sealed class Help : ICommand
 {
-    private readonly Registers.Plugins pluginRegistry;
-    private readonly Registers.Commands commandRegistry;
-    private readonly Managers.Chat chatManager;
-    private readonly TranslationSet translationSet;
+    private static readonly Registers.Plugins pluginRegistry;
+    private static readonly Registers.Commands commandRegistry;
+    private static readonly Managers.Chat chatManager;
+    private static readonly TranslationSet translationSet;
 
-    public Help()
+    static Help()
     {
         pluginRegistry = Tanuki.Instance.Registers.Plugins;
         commandRegistry = Tanuki.Instance.Registers.Commands;
