@@ -47,7 +47,7 @@ public sealed class TanukiServer
             return;
 
         if (!string.IsNullOrEmpty(packet.ServerCommandPrefix))
-            if (packet.ServerCommandPrefix.Length > 0 && packet.ServerCommandPrefix.Length < Data.Settings.Commands.PREFIX_MAX_LENGTH)
+            if (packet.ServerCommandPrefix.Length > 0 && packet.ServerCommandPrefix.Length < Types.Settings.Commands.PREFIX_MAX_LENGTH)
                 commandRouter.ServerPrefix = packet.ServerCommandPrefix;
     }
 

@@ -12,7 +12,7 @@ public sealed class Commands
 {
     private readonly Network.Managers.Packets packetManager;
     private readonly Parsers.Commands commandParser;
-    private readonly Data.Settings.Commands commandSettings;
+    private readonly Types.Settings.Commands commandSettings;
     private readonly Registers.Commands commandRegistry;
     private readonly Providers.Commands commandProvider;
     private readonly Network.Providers.SteamLobby steamLobbyProvider;
@@ -28,7 +28,7 @@ public sealed class Commands
         Network.Registers.Packets packetRegistry,
         Network.Managers.Packets packetManager,
         Parsers.Commands commandParser,
-        Data.Settings.Commands commandSettings,
+        Types.Settings.Commands commandSettings,
         Registers.Commands commandRegistry,
         Providers.Commands commandProvider,
         Network.Providers.SteamLobby steamLobbyProvider,
@@ -73,11 +73,11 @@ public sealed class Commands
         if (commandParser.TryParse(commandSettings.ClientPrefix, input, out string? commandName, out IReadOnlyList<string>? commandArguments, nameMap))
         {
             Type commandType = nameMap[commandName];
-            Data.Commands.Descriptor commandDescriptor = commandRegistry.Descriptors[commandType];
+            Types.Commands.Descriptor commandDescriptor = commandRegistry.Descriptors[commandType];
 
             if (commandDescriptor.executionSide == EExecutionSide.Client || Player._mainPlayer._isHostPlayer)
             {
-                ICaller caller = new Data.Commands.Callers.Player(Player._mainPlayer);
+                ICaller caller = new Types.Commands.Callers.Player(Player._mainPlayer);
 
                 if (commandDescriptor.callerPolicy.IsAllowed(caller))
                 {
@@ -180,8 +180,8 @@ public sealed class Commands
 
     public bool HandleCommandServer(Player player, Type commandType, IReadOnlyList<string> Arguments)
     {
-        ICaller caller = new Data.Commands.Callers.Player(player);
-        Data.Commands.Descriptor commandDescriptor = commandRegistry.Descriptors[commandType];
+        ICaller caller = new Types.Commands.Callers.Player(player);
+        Types.Commands.Descriptor commandDescriptor = commandRegistry.Descriptors[commandType];
 
         if (commandDescriptor.executionSide != EExecutionSide.Server)
             return false;
@@ -193,7 +193,7 @@ public sealed class Commands
             command.Execute(
                 new Contexts.Commands.Context()
                 {
-                    Caller = new Data.Commands.Callers.Player(player),
+                    Caller = new Types.Commands.Callers.Player(player),
                     Arguments = Arguments
                 }
             );

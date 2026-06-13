@@ -1,6 +1,6 @@
 ﻿using Steamworks;
 using System.Collections.Generic;
-using Tanuki.Atlyss.Network.Data.Packets;
+using Tanuki.Atlyss.Network.Types.Packets;
 using UnityEngine;
 
 namespace Tanuki.Atlyss.Network.Services;

@@ -15,20 +15,20 @@ public sealed class Tanuki
 
     internal GameObject gameObject = null!;
     internal ManualLogSource manualLogSource = null!;
-    internal Data.Tanuki.Registers registers = null!;
-    internal Data.Tanuki.Providers providers = null!;
-    internal Data.Tanuki.Managers managers = null!;
-    internal Data.Tanuki.Services services = null!;
-    internal Data.Tanuki.Routers routers = null!;
+    internal Types.Tanuki.Registers registers = null!;
+    internal Types.Tanuki.Providers providers = null!;
+    internal Types.Tanuki.Managers managers = null!;
+    internal Types.Tanuki.Services services = null!;
+    internal Types.Tanuki.Routers routers = null!;
 
     public static Tanuki Instance => instance;
 
     public GameObject GameObject => gameObject;
-    public Data.Tanuki.Registers Registers => registers;
-    public Data.Tanuki.Providers Providers => providers;
-    public Data.Tanuki.Managers Managers => managers;
-    public Data.Tanuki.Services Services => services;
-    public Data.Tanuki.Routers Routers => routers;
+    public Types.Tanuki.Registers Registers => registers;
+    public Types.Tanuki.Providers Providers => providers;
+    public Types.Tanuki.Managers Managers => managers;
+    public Types.Tanuki.Services Services => services;
+    public Types.Tanuki.Routers Routers => routers;
 
     public static event Action OnInitialized
     {
@@ -43,39 +43,41 @@ public sealed class Tanuki
         if (instance is not null)
             return;
 
-        ManualLogSource manualLogSource = new("Tanuki.Atlyss.Network");
+        string moduleName = "Tanuki.Atlyss.Network";
+
+        ManualLogSource manualLogSource = new(moduleName);
         BepInEx.Logging.Logger.Sources.Add(manualLogSource);
 
-        Data.Tanuki.Registers registers = new()
+        Types.Tanuki.Registers registers = new()
         {
             packets = new(manualLogSource)
         };
 
         Providers.Steam steamProvider = new();
 
-        Data.Tanuki.Providers providers = new()
+        Types.Tanuki.Providers providers = new()
         {
             steam = steamProvider,
             steamLobby = new(steamProvider),
             packet = new()
         };
 
-        Data.Tanuki.Services services = new()
+        Types.Tanuki.Services services = new()
         {
             packetProcessor = new(providers.packet),
             rateLimiter = new()
         };
 
-        Data.Tanuki.Routers routers = new()
+        Types.Tanuki.Routers routers = new()
         {
             packet = new(manualLogSource, registers.packets, services.packetProcessor, providers.steamLobby)
         };
 
-        GameObject gameObject = new();
-        Components.SteamNetworkMessagePoller steamNetworkMessagePoller = gameObject.AddComponent<Components.SteamNetworkMessagePoller>();
+        GameObject gameObject = new(moduleName);
         UnityEngine.Object.DontDestroyOnLoad(gameObject);
+        Components.SteamNetworkMessagePoller steamNetworkMessagePoller = gameObject.AddComponent<Components.SteamNetworkMessagePoller>();
 
-        Data.Tanuki.Managers managers = new()
+        Types.Tanuki.Managers managers = new()
         {
             packets = new(manualLogSource, registers.packets),
             network = new(

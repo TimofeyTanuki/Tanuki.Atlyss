@@ -2,7 +2,7 @@
 using Steamworks;
 using System;
 using System.Collections.Generic;
-using Tanuki.Atlyss.Game.Data.Player;
+using Tanuki.Atlyss.Game.Types.Player;
 using Tanuki.Atlyss.Game.Utilities.Player;
 
 namespace Tanuki.Atlyss.Game.Providers;

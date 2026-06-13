@@ -64,7 +64,7 @@ internal sealed class Help : ICommand
 
             foreach (Type command in assemblyCommands.Value)
             {
-                if (!commandRegistry.Descriptors.TryGetValue(command, out Data.Commands.Descriptor registryEntry))
+                if (!commandRegistry.Descriptors.TryGetValue(command, out Types.Commands.Descriptor registryEntry))
                     continue;
 
                 Serialization.Commands.Configuration? configuration = registryEntry.Configuration;

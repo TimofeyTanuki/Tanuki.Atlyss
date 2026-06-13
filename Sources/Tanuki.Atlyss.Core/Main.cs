@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
+using UnityEngine;
 
 namespace Tanuki.Atlyss.Core;
 
@@ -52,11 +53,10 @@ internal sealed class Main : Bases.Plugin
         tanukiNetwork = Network.Tanuki.Instance;
 
         Tanuki.Initialize(Game.Tanuki.Instance, tanukiNetwork, manualLogSource);
-
         tanukiCore = Tanuki.instance;
-        tanukiCore.managers.plugins.OnBeforePluginsLoad += HandleSettingsRefresh;
+        tanukiCore.managers.plugin.OnBeforePluginsLoad += HandleSettingsRefresh;
         tanukiCore.registers.plugins.Refresh();
-        tanukiCore.managers.plugins.LoadPlugins();
+        tanukiCore.managers.plugin.LoadPlugins();
     }
 
     private void HandleSettingsRefresh()
@@ -75,7 +75,7 @@ internal sealed class Main : Bases.Plugin
     private void ConfigureNetwork()
     {
         Providers.Settings settingProvider = Tanuki.instance.providers.settings;
-        Data.Settings.Network settingProviderNetworkSection = settingProvider.NetworkSection;
+        Types.Settings.Network settingProviderNetworkSection = settingProvider.NetworkSection;
 
         Network.Managers.Network networkManager = tanukiNetwork.Managers.Network;
         networkManager.SteamLocalChannel = settingProviderNetworkSection.mainSteamMessageChannel;

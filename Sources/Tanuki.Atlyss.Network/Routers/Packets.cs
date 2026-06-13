@@ -4,8 +4,8 @@ using System;
 using System.Buffers.Binary;
 using System.Runtime.InteropServices;
 using Tanuki.Atlyss.API.Network.Packets;
-using Tanuki.Atlyss.Network.Data.Packets;
 using Tanuki.Atlyss.Network.Services;
+using Tanuki.Atlyss.Network.Types.Packets;
 
 namespace Tanuki.Atlyss.Network.Routers;
 

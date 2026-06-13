@@ -8,6 +8,10 @@ namespace Tanuki.Atlyss.Network.Components;
 
 public sealed class SteamNetworkMessagePoller() : MonoBehaviour
 {
+    private static SteamNetworkMessagePoller instance = null!;
+
+    public static SteamNetworkMessagePoller Instance => instance;
+
     private IntPtr[] messageBuffer = null!;
     private int messageBufferSize = 0;
     public int LocalChannel;
@@ -52,8 +56,19 @@ public sealed class SteamNetworkMessagePoller() : MonoBehaviour
     }
 
     [SuppressMessage("CodeQuality", "IDE0051")]
-    private void Awake() =>
+    private void Awake()
+    {
+        if (instance is not null && instance != this)
+        {
+            instance = this;
+            return;
+        }
+
+        instance = this;
+
         enabled = false;
+        DontDestroyOnLoad(this);
+    }
 
     [SuppressMessage("CodeQuality", "IDE0051")]
     private void OnEnable()

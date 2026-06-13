@@ -3,7 +3,7 @@ using System.Buffers;
 using System.Buffers.Binary;
 using Tanuki.Atlyss.API.Network.Compression;
 using Tanuki.Atlyss.API.Network.Packets;
-using Tanuki.Atlyss.Network.Data.Packets;
+using Tanuki.Atlyss.Network.Types.Packets;
 
 namespace Tanuki.Atlyss.Network.Services;
 

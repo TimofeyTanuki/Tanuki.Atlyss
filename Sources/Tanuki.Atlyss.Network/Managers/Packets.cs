@@ -2,7 +2,7 @@
 using Steamworks;
 using System;
 using Tanuki.Atlyss.API.Network.Packets;
-using Tanuki.Atlyss.Network.Data.Packets;
+using Tanuki.Atlyss.Network.Types.Packets;
 
 namespace Tanuki.Atlyss.Network.Managers;
 

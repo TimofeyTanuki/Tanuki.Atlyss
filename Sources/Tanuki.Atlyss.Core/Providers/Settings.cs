@@ -7,13 +7,13 @@ namespace Tanuki.Atlyss.Core.Providers;
 
 public sealed class Settings
 {
-    private readonly Data.Settings.Translations translationSection = new();
-    private readonly Data.Settings.Commands commandSection = new();
-    private readonly Data.Settings.Network networkSection = new();
+    private readonly Types.Settings.Translations translationSection = new();
+    private readonly Types.Settings.Commands commandSection = new();
+    private readonly Types.Settings.Network networkSection = new();
 
-    public Data.Settings.Translations TranslationSection => translationSection;
-    public Data.Settings.Commands CommandSection => commandSection;
-    public Data.Settings.Network NetworkSection => networkSection;
+    public Types.Settings.Translations TranslationSection => translationSection;
+    public Types.Settings.Commands CommandSection => commandSection;
+    public Types.Settings.Network NetworkSection => networkSection;
 
     internal Settings() { }
 
@@ -69,16 +69,16 @@ public sealed class Settings
         commandSection.serverPrefix = Configuration.Instance.Commands.ServerPrefix.Value;
 
         if (commandSection.ClientPrefix.Length == 0 ||
-            commandSection.ClientPrefix.Length > Data.Settings.Commands.PREFIX_MAX_LENGTH)
+            commandSection.ClientPrefix.Length > Types.Settings.Commands.PREFIX_MAX_LENGTH)
         {
-            commandSection.clientPrefix = Data.Settings.Commands.CLIENT_PREFIX_DEFAULT;
+            commandSection.clientPrefix = Types.Settings.Commands.CLIENT_PREFIX_DEFAULT;
             Configuration.Instance.Commands.ClientPrefix.Value = commandSection.ClientPrefix;
         }
 
         if (commandSection.ServerPrefix.Length == 0 ||
-            commandSection.ServerPrefix.Length > Data.Settings.Commands.PREFIX_MAX_LENGTH)
+            commandSection.ServerPrefix.Length > Types.Settings.Commands.PREFIX_MAX_LENGTH)
         {
-            commandSection.serverPrefix = Data.Settings.Commands.SERVER_PREFIX_DEFAULT;
+            commandSection.serverPrefix = Types.Settings.Commands.SERVER_PREFIX_DEFAULT;
             Configuration.Instance.Commands.ServerPrefix.Value = commandSection.ServerPrefix;
         }
 

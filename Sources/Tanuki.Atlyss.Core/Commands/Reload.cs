@@ -9,14 +9,14 @@ namespace Tanuki.Atlyss.Core.Commands;
 internal sealed class Reload : ICommand
 {
     private static readonly Registers.Plugins pluginRegistry;
-    private static readonly Managers.Plugins pluginManager;
+    private static readonly Managers.Plugin pluginManager;
     private static readonly Managers.Chat chatManager;
     private static readonly TranslationSet translationSet;
 
     static Reload()
     {
         pluginRegistry = Tanuki.Instance.registers.plugins;
-        pluginManager = Tanuki.Instance.managers.plugins;
+        pluginManager = Tanuki.Instance.managers.plugin;
         chatManager = Tanuki.instance.managers.chat;
         translationSet = Main.Instance.translationSet;
     }

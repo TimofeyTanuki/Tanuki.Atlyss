@@ -13,10 +13,10 @@ public sealed class Commands
 {
     private readonly ManualLogSource manualLogSource;
     private readonly Providers.CommandCallerPolicies commandCallerPolicyProvider;
-    private readonly Data.Settings.Commands commandSettings;
+    private readonly Types.Settings.Commands commandSettings;
     private readonly Dictionary<string, Type> nameMap = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<ulong, Type> hashMap = [];
-    private readonly Dictionary<Type, Data.Commands.Descriptor> descriptors = [];
+    private readonly Dictionary<Type, Types.Commands.Descriptor> descriptors = [];
     private readonly Dictionary<Assembly, HashSet<Type>> assemblyCommands = [];
 
     public Action<Type>? OnCommandRegistered;
@@ -30,7 +30,7 @@ public sealed class Commands
     /// <summary>
     /// Provides a lookup of <see cref="Serialization.Commands.Configuration"/> objects by their corresponding command <see cref="Type"/>.
     /// </summary>
-    public IReadOnlyDictionary<Type, Data.Commands.Descriptor> Descriptors => descriptors;
+    public IReadOnlyDictionary<Type, Types.Commands.Descriptor> Descriptors => descriptors;
 
     /// <summary>
     /// Provides a lookup of commands grouped by their <see cref="Assembly"/>.
@@ -44,7 +44,7 @@ public sealed class Commands
     internal Commands(
         ManualLogSource manualLogSource,
         Providers.CommandCallerPolicies commandCallerPolicyProvider,
-        Data.Settings.Commands settings
+        Types.Settings.Commands settings
     )
     {
         this.manualLogSource = manualLogSource;
@@ -244,7 +244,7 @@ public sealed class Commands
 
     public void DeregisterCommand(Type сommandType)
     {
-        if (!descriptors.TryGetValue(сommandType, out Data.Commands.Descriptor entry))
+        if (!descriptors.TryGetValue(сommandType, out Types.Commands.Descriptor entry))
             return;
 
         Serialization.Commands.Configuration? configuration = entry.configuration;

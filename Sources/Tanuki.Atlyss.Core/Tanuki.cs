@@ -8,19 +8,19 @@ public sealed class Tanuki
     internal static Tanuki instance = null!;
     private static Action? onInitialized;
 
-    internal Data.Tanuki.Registers registers = null!;
-    internal Data.Tanuki.Managers managers = null!;
-    internal Data.Tanuki.Providers providers = null!;
-    internal Data.Tanuki.Routers routers = null!;
-    internal Data.Tanuki.Services services = null!;
+    internal Types.Tanuki.Registers registers = null!;
+    internal Types.Tanuki.Managers managers = null!;
+    internal Types.Tanuki.Providers providers = null!;
+    internal Types.Tanuki.Routers routers = null!;
+    internal Types.Tanuki.Services services = null!;
 
     public static Tanuki Instance => instance;
 
-    public Data.Tanuki.Registers Registers => registers;
-    public Data.Tanuki.Managers Managers => managers;
-    public Data.Tanuki.Providers Providers => providers;
-    public Data.Tanuki.Routers Routers => routers;
-    public Data.Tanuki.Services Services => services;
+    public Types.Tanuki.Registers Registers => registers;
+    public Types.Tanuki.Managers Managers => managers;
+    public Types.Tanuki.Providers Providers => providers;
+    public Types.Tanuki.Routers Routers => routers;
+    public Types.Tanuki.Services Services => services;
 
     public static event Action OnInitialized
     {
@@ -37,20 +37,20 @@ public sealed class Tanuki
 
         tanukiNetwork.Providers.Steam.CreateCallbacks();
 
-        Data.Tanuki.Providers providers = new()
+        Types.Tanuki.Providers providers = new()
         {
             commands = new(),
             settings = new(),
             commandCallerPolicies = new()
         };
 
-        Data.Tanuki.Registers registers = new()
+        Types.Tanuki.Registers registers = new()
         {
             commands = new(manualLogSource, providers.commandCallerPolicies, providers.settings.CommandSection),
             plugins = new()
         };
 
-        Data.Tanuki.Routers routers = new()
+        Types.Tanuki.Routers routers = new()
         {
             commands = new(
                 tanukiNetwork.Registers.Packets,
@@ -65,13 +65,14 @@ public sealed class Tanuki
             )
         };
 
-        Data.Tanuki.Managers managers = new()
+        Types.Tanuki.Managers managers = new()
         {
-            plugins = new(manualLogSource, registers.plugins),
-            chat = new(routers.commands)
+            plugin = new(manualLogSource, registers.plugins),
+            chat = new(routers.commands),
+            hotkey = new(BepInEx.UnityInput.Current)
         };
 
-        Data.Tanuki.Services services = new()
+        Types.Tanuki.Services services = new()
         {
             tanukiServer = new(
                 tanukiNetwork,
