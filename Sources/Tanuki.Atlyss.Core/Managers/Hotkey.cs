@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Tanuki.Atlyss.Core.Types.Managers.Hotkey;
+using UnityEngine;
 using Tanuki.Atlyss.Shared.Extensions;
 
 namespace Tanuki.Atlyss.Core.Managers;
@@ -19,14 +20,26 @@ public sealed class Hotkey
     public void Register(IReadOnlyList<KeyCondition> keyCombination, Action action)
     {
         if (keyCombination.Count == 0)
-            throw new ArgumentException("At least one key condition must be provided.", nameof(keyCombination));
+            return;
 
         if (action is null)
             throw new ArgumentNullException(nameof(action));
 
-        KeyCondition[] keyConditions = [.. keyCombination];
+        SortedSet<KeyCondition> sortedKeyConditions = [];
 
-        Array.Sort(keyConditions);
+        foreach (KeyCondition keyCondition in keyCombination)
+        {
+            if (keyCondition.Code == KeyCode.None)
+                continue;
+
+            sortedKeyConditions.Add(keyCondition);
+        }
+
+        if (sortedKeyConditions.Count == 0)
+            return;
+
+        KeyCondition[] keyConditions = new KeyCondition[sortedKeyConditions.Count];
+        sortedKeyConditions.CopyTo(keyConditions);
 
         for (int combinationDefinitionIndex = 0; combinationDefinitionIndex < hotkeyComponent.combinationDefinitions.Count; combinationDefinitionIndex++)
         {
