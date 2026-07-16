@@ -1,7 +1,6 @@
 ﻿using BepInEx;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using Tanuki.Atlyss.Core.Types.Managers.Hotkey;
 using Tanuki.Atlyss.Shared.Extensions;
 using UnityEngine;
@@ -11,17 +10,12 @@ namespace Tanuki.Atlyss.Core.Components;
 internal sealed class Hotkey() : MonoBehaviour
 {
     private const int DEFAULT_COLLECTION_CAPACITY = 4;
-
     private static Hotkey instance = null!;
 
-    public static Hotkey Instance => instance;
-
-    internal IInputSystem inputSystem = null!;
+    private IInputSystem InputSystem = null!;
     internal List<CombinationDefinition> combinationDefinitions = [];
 
-
     private readonly Dictionary<KeyCondition, List<int>> combinationMap = [];
-
     private CombinationRuntime[] combinationRuntimes = [];
     private bool[] activeMask = new bool[DEFAULT_COLLECTION_CAPACITY];
 
@@ -36,22 +30,15 @@ internal sealed class Hotkey() : MonoBehaviour
         currentCombinationTouches,
         currentCombinationsCount;
 
-    [SuppressMessage("CodeQuality", "IDE0051")]
-    private void Awake()
+    public static Hotkey GetOrCreate()
     {
-        if (instance is not null && instance != this)
-        {
-            instance = this;
-            return;
-        }
+        if (instance != null)
+            return instance;
 
-        instance = this;
-
-        enabled = false;
-        DontDestroyOnLoad(this);
+        return Main.Instance.gameObject.AddComponent<Hotkey>();
     }
 
-    internal void Rebuild()
+    public void Rebuild()
     {
         combinationMap.Clear();
 
@@ -110,9 +97,9 @@ internal sealed class Hotkey() : MonoBehaviour
 
             bool active = combinationRuntime.KeyCondition.State switch
             {
-                EKeyState.Pressed => inputSystem.GetKeyDown(combinationRuntime.KeyCondition.Code),
-                EKeyState.Held => inputSystem.GetKey(combinationRuntime.KeyCondition.Code),
-                EKeyState.Released => inputSystem.GetKeyUp(combinationRuntime.KeyCondition.Code),
+                EKeyState.Pressed => InputSystem.GetKeyDown(combinationRuntime.KeyCondition.Code),
+                EKeyState.Held => InputSystem.GetKey(combinationRuntime.KeyCondition.Code),
+                EKeyState.Released => InputSystem.GetKeyUp(combinationRuntime.KeyCondition.Code),
                 _ => false
             };
 
@@ -192,7 +179,20 @@ internal sealed class Hotkey() : MonoBehaviour
             activeMask[activeCombinations[combinationIndex]] = false;
     }
 
-    [SuppressMessage("CodeQuality", "IDE0051")]
+#pragma warning disable IDE0051
+    private void Start() => InputSystem = UnityInput.Current;
+
+    private void Awake()
+    {
+        if (instance is null)
+            return;
+
+        instance = this;
+        enabled = false;
+
+        DontDestroyOnLoad(this);
+    }
+
     private void Update()
     {
         FindActiveCombinations();
@@ -200,4 +200,5 @@ internal sealed class Hotkey() : MonoBehaviour
         ProcessActiveCombinations();
         ResetActiveMatches();
     }
+#pragma warning restore IDE0051
 }

@@ -69,7 +69,7 @@ public sealed class Tanuki
         {
             plugin = new(manualLogSource, registers.plugins),
             chat = new(routers.commands),
-            hotkey = new(BepInEx.UnityInput.Current)
+            hotkey = new()
         };
 
         Types.Tanuki.Services services = new()

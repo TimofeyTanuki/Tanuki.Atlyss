@@ -2,15 +2,19 @@
 
 public sealed class Network
 {
-    internal int mainSteamMessageChannel;
-    internal uint rateLimiterBandwidth;
-    internal float rateLimiterWindow;
-    internal bool preventLobbyOwnerRateLimiting;
     internal ushort steamNetworkMessagePollerBuffer;
+    internal ENetworkRateLimiter rateLimiter;
+    internal bool preventLobbyOwnerRateLimiting;
+    internal NetworkWindowRateLimiter windowRateLimiter;
 
-    public int MainSteamMessageChannel => mainSteamMessageChannel;
-    public uint RateLimiterBandwidth => rateLimiterBandwidth;
-    public float RateLimiterWindow => rateLimiterWindow;
-    public bool PreventLobbyOwnerRateLimiting => preventLobbyOwnerRateLimiting;
     public ushort SteamNetworkMessagePollerBuffer => steamNetworkMessagePollerBuffer;
+    public ENetworkRateLimiter RateLimiter => rateLimiter;
+    public bool PreventLobbyOwnerRateLimiting => preventLobbyOwnerRateLimiting;
+    public NetworkWindowRateLimiter WindowRateLimiter => windowRateLimiter;
+
+    internal Network()
+    {
+        rateLimiter = ENetworkRateLimiter.Disabled;
+        windowRateLimiter = new();
+    }
 }

@@ -1,9 +1,8 @@
-﻿using BepInEx;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Tanuki.Atlyss.Core.Types.Managers.Hotkey;
-using UnityEngine;
 using Tanuki.Atlyss.Shared.Extensions;
+using UnityEngine;
 
 namespace Tanuki.Atlyss.Core.Managers;
 
@@ -11,11 +10,8 @@ public sealed class Hotkey
 {
     private readonly Components.Hotkey hotkeyComponent;
 
-    internal Hotkey(IInputSystem inputSystem)
-    {
-        hotkeyComponent = Main.Instance.gameObject.AddComponent<Components.Hotkey>();
-        hotkeyComponent.inputSystem = inputSystem;
-    }
+    internal Hotkey() =>
+        hotkeyComponent = Components.Hotkey.GetOrCreate();
 
     public void Register(IReadOnlyList<KeyCondition> keyCombination, Action action)
     {

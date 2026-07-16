@@ -87,18 +87,8 @@ public sealed class Settings
 
     private void RefreshNetworkSection()
     {
-        networkSection.mainSteamMessageChannel = Configuration.Instance.Network.MainSteamMessageChannel.Value;
-
-        if (Configuration.Instance.Network.RateLimiterWindow.Value < 0)
-            Configuration.Instance.Network.RateLimiterWindow.Value = 0;
-
-        networkSection.rateLimiterWindow = Configuration.Instance.Network.RateLimiterWindow.Value;
-
-        if (Configuration.Instance.Network.RateLimiterBandwidth.Value < 0)
-            Configuration.Instance.Network.RateLimiterBandwidth.Value = 0;
-
-        networkSection.rateLimiterBandwidth = Configuration.Instance.Network.RateLimiterBandwidth.Value;
-
+        networkSection.windowRateLimiter.window = Configuration.Instance.Network.WindowRateLimiter_Window.Value;
+        networkSection.windowRateLimiter.bandwidth = Configuration.Instance.Network.WindowRateLimiter_Bandwidth.Value;
         networkSection.preventLobbyOwnerRateLimiting = Configuration.Instance.Network.PreventLobbyOwnerRateLimiting.Value;
         networkSection.steamNetworkMessagePollerBuffer = Configuration.Instance.Network.SteamNetworkMessagePollerBuffer.Value;
     }

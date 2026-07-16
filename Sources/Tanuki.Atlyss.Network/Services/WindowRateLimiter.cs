@@ -1,26 +1,25 @@
 ﻿using Steamworks;
 using System.Collections.Generic;
+using Tanuki.Atlyss.Network.Types;
 using Tanuki.Atlyss.Network.Types.Packets;
 using UnityEngine;
 
 namespace Tanuki.Atlyss.Network.Services;
 
-public sealed class RateLimiter
+public sealed class WindowRateLimiter(float window, uint bandwidth) : IRateLimiter
 {
     private readonly Dictionary<ulong, RateLimitEntry> entries = [];
-    public float Window;
-    public uint Bandwidth;
 
     private float nextRefresh = 0;
 
-    public void Tick()
+    public void Refresh()
     {
         float time = Time.unscaledTime;
 
         if (nextRefresh > time)
             return;
 
-        nextRefresh = time + Window;
+        nextRefresh = time + window;
     }
 
     public bool CheckBandwidthOverflow(CSteamID sender, uint usage)
@@ -41,7 +40,7 @@ public sealed class RateLimiter
 
         entry.Usage += usage;
 
-        return entry.Usage > Bandwidth;
+        return entry.Usage > bandwidth;
     }
 
     public void Reset(ulong sender) => entries.Remove(sender);

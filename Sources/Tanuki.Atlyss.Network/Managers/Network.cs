@@ -15,32 +15,20 @@ public sealed class Network
     private readonly ManualLogSource manualLogSource;
     private readonly Steam steamProvider;
     private readonly Providers.SteamLobby steamLobbyProvider;
-    private readonly SteamNetworkMessagePoller steamNetworkMessagePoller;
+    private readonly SteamNetworkingMessagePoller steamNetworkMessagePoller;
     private readonly Registers.Packets packetRegistry;
-    private readonly Services.RateLimiter rateLimiter;
+    private readonly Types.Tanuki.Services services;
     private readonly Routers.Packets packetRouter;
 
-    private int steamLocalChannel;
     public bool PreventLobbyOwnerRateLimiting;
-
-    public Services.RateLimiter RateLimiter => rateLimiter;
-    public SteamNetworkMessagePoller SteamNetworkMessagesPoller => steamNetworkMessagePoller;
-    public int SteamLocalChannel
-    {
-        get => steamLocalChannel;
-        set
-        {
-            steamLocalChannel = value;
-            packetRouter.steamLocalChannel = SteamNetworkMessagesPoller.LocalChannel = value;
-        }
-    }
+    public SteamNetworkingMessagePoller SteamNetworkMessagesPoller => steamNetworkMessagePoller;
 
     internal Network(ManualLogSource manualLogSource,
         Steam steamProvider,
         Providers.SteamLobby steamLobbyProvider,
-        SteamNetworkMessagePoller steamNetworkMessagePoller,
+        SteamNetworkingMessagePoller steamNetworkMessagePoller,
         Registers.Packets packetRegistry,
-        Services.RateLimiter rateLimiter,
+        Types.Tanuki.Services services,
         Routers.Packets packetRouter)
     {
         this.manualLogSource = manualLogSource;
@@ -48,11 +36,10 @@ public sealed class Network
         this.steamLobbyProvider = steamLobbyProvider;
         this.steamNetworkMessagePoller = steamNetworkMessagePoller;
         this.packetRegistry = packetRegistry;
-        this.rateLimiter = rateLimiter;
+        this.services = services;
         this.packetRouter = packetRouter;
 
-        steamNetworkMessagePoller.onSteamNetworkingMessages = OnSteamNetworkingMessages;
-        steamNetworkMessagePoller.steamNetworkingMessageHandler = SteamNetworkMessageHandler;
+        steamNetworkMessagePoller.OnSteamNetworkingMessageReceived += SteamNetworkMessageHandler;
 
         steamProvider.OnLobbyChatUpdate += OnLobbyChatUpdate;
         steamProvider.OnSteamRelayNetworkStatus += OnSteamRelayNetworkStatus;
@@ -69,7 +56,7 @@ public sealed class Network
         steamNetworkMessagePoller.enabled = isValidLobby;
 
         if (isValidLobby)
-            rateLimiter.Reset();
+            services.rateLimiter?.Reset();
     }
 
     private bool CheckBandwidthOverflow(CSteamID sender, uint usage)
@@ -77,12 +64,12 @@ public sealed class Network
         if (PreventLobbyOwnerRateLimiting && sender.Equals(steamLobbyProvider.OwnerSteamId))
             return false;
 
-        return rateLimiter.CheckBandwidthOverflow(sender, usage);
+        return services.rateLimiter?.CheckBandwidthOverflow(sender, usage) ?? false;
     }
 
     private void OnLobbyChatMsg(LobbyChatMsg_t lobbyChatMsg)
     {
-        rateLimiter.Tick();
+        services.rateLimiter?.Refresh();
         byte[] buffer = arrayPool.Rent(Tanuki.PACKET_MAX_SIZE);
 
         int size = SteamMatchmaking.GetLobbyChatEntry(steamLobbyProvider.SteamId, (int)lobbyChatMsg.m_iChatID, out CSteamID sender, buffer, Tanuki.PACKET_MAX_SIZE, out EChatEntryType _);
@@ -96,7 +83,7 @@ public sealed class Network
 
     private void OnSteamNetworkingMessagesSessionRequest(SteamNetworkingMessagesSessionRequest_t steamNetworkingMessagesSessionRequest)
     {
-        rateLimiter.Tick();
+        services.rateLimiter?.Refresh();
 
         if (CheckBandwidthOverflow(steamNetworkingMessagesSessionRequest.m_identityRemote.GetSteamID(), 0))
             return;
@@ -118,17 +105,16 @@ public sealed class Network
         EChatMemberStateChange state = (EChatMemberStateChange)lobbyChatUpdate.m_rgfChatMemberStateChange;
 
         if ((state & EChatMemberStateChange.k_EChatMemberStateChangeLeft) != 0)
-            rateLimiter.Reset(lobbyChatUpdate.m_ulSteamIDUserChanged);
+            services.rateLimiter?.Reset(lobbyChatUpdate.m_ulSteamIDUserChanged);
     }
-
-    private void OnSteamNetworkingMessages() =>
-        rateLimiter.Tick();
 
     private void SteamNetworkMessageHandler(SteamNetworkingMessage_t steamNetworkingMessage)
     {
+        services.rateLimiter?.Refresh();
+
         CSteamID sender = steamNetworkingMessage.m_identityPeer.GetSteamID();
 
-        if (rateLimiter.CheckBandwidthOverflow(sender, (uint)steamNetworkingMessage.m_cbSize))
+        if (CheckBandwidthOverflow(sender, (uint)steamNetworkingMessage.m_cbSize))
         {
             SteamNetworkingMessages.CloseSessionWithUser(ref steamNetworkingMessage.m_identityPeer);
             return;

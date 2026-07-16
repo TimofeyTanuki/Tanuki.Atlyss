@@ -16,8 +16,6 @@ public sealed class Packets
     private readonly PacketProcessor packetProcessor;
     private readonly Providers.SteamLobby steamLobbyProvider;
 
-    internal int steamLocalChannel;
-
     internal Packets(
         ManualLogSource manualLogSource,
         Registers.Packets packetRegistry,
@@ -109,7 +107,7 @@ public sealed class Packets
     }
 
     public bool SendPacketToUser<TPacket>(CSteamID target, TPacket packet, out EResult steamResult)
-        where TPacket : Packet, new() => SendPacketToUser(target, packet, steamLocalChannel, out steamResult);
+        where TPacket : Packet, new() => SendPacketToUser(target, packet, Tanuki.STEAM_NETWORKING_MESSAGE_CHANNEL, out steamResult);
 
     public void ReceivePacket(CSteamID sender, ReadOnlySpan<byte> data)
     {

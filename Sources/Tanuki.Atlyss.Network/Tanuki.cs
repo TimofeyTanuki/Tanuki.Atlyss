@@ -6,6 +6,10 @@ namespace Tanuki.Atlyss.Network;
 
 public sealed class Tanuki
 {
+    public const string MODULE_NAME = "Tanuki.Atlyss.Network";
+
+    public const int STEAM_NETWORKING_MESSAGE_CHANNEL = 130523;
+
     public const int PACKET_SIGNATURE_SIZE = sizeof(ulong);
     public const int PACKET_MAX_SIZE = 4096;
     public const int PACKET_DATA_MAX_SIZE = PACKET_MAX_SIZE - PACKET_SIGNATURE_SIZE;
@@ -23,7 +27,6 @@ public sealed class Tanuki
 
     public static Tanuki Instance => instance;
 
-    public GameObject GameObject => gameObject;
     public Types.Tanuki.Registers Registers => registers;
     public Types.Tanuki.Providers Providers => providers;
     public Types.Tanuki.Managers Managers => managers;
@@ -38,14 +41,12 @@ public sealed class Tanuki
 
     private Tanuki() { }
 
-    public static void Initialize()
+    public static void Initialize(GameObject owner)
     {
         if (instance is not null)
             return;
 
-        string moduleName = "Tanuki.Atlyss.Network";
-
-        ManualLogSource manualLogSource = new(moduleName);
+        ManualLogSource manualLogSource = new(MODULE_NAME);
         BepInEx.Logging.Logger.Sources.Add(manualLogSource);
 
         Types.Tanuki.Registers registers = new()
@@ -65,7 +66,7 @@ public sealed class Tanuki
         Types.Tanuki.Services services = new()
         {
             packetProcessor = new(providers.packet),
-            rateLimiter = new()
+            rateLimiter = null
         };
 
         Types.Tanuki.Routers routers = new()
@@ -73,9 +74,8 @@ public sealed class Tanuki
             packet = new(manualLogSource, registers.packets, services.packetProcessor, providers.steamLobby)
         };
 
-        GameObject gameObject = new(moduleName);
-        UnityEngine.Object.DontDestroyOnLoad(gameObject);
-        Components.SteamNetworkMessagePoller steamNetworkMessagePoller = gameObject.AddComponent<Components.SteamNetworkMessagePoller>();
+        Components.SteamNetworkingMessagePoller steamNetworkMessagePoller = owner.AddComponent<Components.SteamNetworkingMessagePoller>();
+        steamNetworkMessagePoller.MessageChannel = STEAM_NETWORKING_MESSAGE_CHANNEL;
 
         Types.Tanuki.Managers managers = new()
         {
@@ -86,7 +86,7 @@ public sealed class Tanuki
                 providers.steamLobby,
                 steamNetworkMessagePoller,
                 registers.packets,
-                services.rateLimiter,
+                services,
                 routers.packet
             )
         };
@@ -98,8 +98,7 @@ public sealed class Tanuki
             providers = providers,
             registers = registers,
             services = services,
-            routers = routers,
-            gameObject = gameObject
+            routers = routers
         };
 
         onInitialized?.Invoke();

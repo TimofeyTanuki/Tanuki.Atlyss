@@ -1,22 +1,7 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
-using UnityEngine;
 
 namespace Tanuki.Atlyss.Core;
-
-/*
- * GLOBAL TODO
- *
- * PERMISSION GROUPS
- *   sth like this:
- *     default:
- *       immortality
- *     group1 (assignable by steamid):
- *       immortality
- *       health
- *
- * random foxyjumpscare plugin is ready but i want to sync it with host so need networking :(
- */
 
 [BepInPlugin(PluginInfo.GUID, PluginInfo.NAME, PluginInfo.VERSION)]
 internal sealed class Main : Bases.Plugin
@@ -31,7 +16,12 @@ internal sealed class Main : Bases.Plugin
 
     public Main()
     {
+        if (Instance is not null)
+            return;
+
+        Instance = this;
         Name = PluginInfo.NAME;
+
         Configuration.Initialize();
     }
 
@@ -49,7 +39,7 @@ internal sealed class Main : Bases.Plugin
     {
         Game.Tanuki.Initialize();
 
-        Network.Tanuki.Initialize();
+        Network.Tanuki.Initialize(gameObject);
         tanukiNetwork = Network.Tanuki.Instance;
 
         Tanuki.Initialize(Game.Tanuki.Instance, tanukiNetwork, manualLogSource);
@@ -78,14 +68,22 @@ internal sealed class Main : Bases.Plugin
         Types.Settings.Network settingProviderNetworkSection = settingProvider.NetworkSection;
 
         Network.Managers.Network networkManager = tanukiNetwork.Managers.Network;
-        networkManager.SteamLocalChannel = settingProviderNetworkSection.mainSteamMessageChannel;
         networkManager.PreventLobbyOwnerRateLimiting = settingProviderNetworkSection.preventLobbyOwnerRateLimiting;
 
-        Network.Services.RateLimiter rateLimiter = networkManager.RateLimiter;
-        rateLimiter.Bandwidth = settingProviderNetworkSection.rateLimiterBandwidth;
-        rateLimiter.Window = settingProviderNetworkSection.rateLimiterWindow;
+        Network.Types.Tanuki.Services tanukiNetworkServices = Network.Tanuki.Instance.Services;
 
-        Network.Components.SteamNetworkMessagePoller steamNetworkMessagePoller = networkManager.SteamNetworkMessagesPoller;
+        switch (settingProviderNetworkSection.rateLimiter)
+        {
+            case Types.Settings.ENetworkRateLimiter.Disabled:
+                tanukiNetworkServices.RateLimiter = null;
+                break;
+            case Types.Settings.ENetworkRateLimiter.Window:
+                Network.Services.WindowRateLimiter windowRateLimiter = new(settingProviderNetworkSection.windowRateLimiter.window, settingProviderNetworkSection.windowRateLimiter.bandwidth);
+                tanukiNetworkServices.RateLimiter = windowRateLimiter;
+                break;
+        }
+
+        Network.Components.SteamNetworkingMessagePoller steamNetworkMessagePoller = networkManager.SteamNetworkMessagesPoller;
         steamNetworkMessagePoller.MessageBufferSize = settingProviderNetworkSection.steamNetworkMessagePollerBuffer;
     }
 
