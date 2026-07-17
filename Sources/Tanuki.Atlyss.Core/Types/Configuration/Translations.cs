@@ -1,6 +1,6 @@
 ﻿using BepInEx.Configuration;
 
-namespace Tanuki.Atlyss.Core.Data.Configuration;
+namespace Tanuki.Atlyss.Core.Types.Configuration;
 
 internal sealed class Translations(ConfigFile configFile)
 {

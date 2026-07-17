@@ -5,22 +5,42 @@ namespace Tanuki.Atlyss.Core;
 
 public sealed class Tanuki
 {
-    internal static Tanuki instance = null!;
+    private static Tanuki instance = null!;
     private static Action? onInitialized;
 
-    internal Types.Tanuki.Registers registers = null!;
-    internal Types.Tanuki.Managers managers = null!;
-    internal Types.Tanuki.Providers providers = null!;
-    internal Types.Tanuki.Routers routers = null!;
-    internal Types.Tanuki.Services services = null!;
+    private Types.Tanuki.Registers registers = null!;
+    private Types.Tanuki.Managers managers = null!;
+    private Types.Tanuki.Providers providers = null!;
+    private Types.Tanuki.Routers routers = null!;
+    private Types.Tanuki.Services services = null!;
 
     public static Tanuki Instance => instance;
 
-    public Types.Tanuki.Registers Registers => registers;
-    public Types.Tanuki.Managers Managers => managers;
-    public Types.Tanuki.Providers Providers => providers;
-    public Types.Tanuki.Routers Routers => routers;
-    public Types.Tanuki.Services Services => services;
+    public Types.Tanuki.Registers Registers
+    {
+        get => registers;
+        internal set => registers = value;
+    }
+    public Types.Tanuki.Managers Managers
+    {
+        get => managers;
+        internal set => managers = value;
+    }
+    public Types.Tanuki.Providers Providers
+    {
+        get => providers;
+        internal set => providers = value;
+    }
+    public Types.Tanuki.Routers Routers
+    {
+        get => routers;
+        internal set => routers = value;
+    }
+    public Types.Tanuki.Services Services
+    {
+        get => services;
+        internal set => services = value;
+    }
 
     public static event Action OnInitialized
     {
@@ -39,26 +59,26 @@ public sealed class Tanuki
 
         Types.Tanuki.Providers providers = new()
         {
-            commands = new(),
-            settings = new(),
-            commandCallerPolicies = new()
+            Commands = new(),
+            Settings = new(),
+            CommandCallerPolicies = new()
         };
 
         Types.Tanuki.Registers registers = new()
         {
-            commands = new(manualLogSource, providers.commandCallerPolicies, providers.settings.CommandSection),
-            plugins = new()
+            Commands = new(manualLogSource, providers.CommandCallerPolicies, providers.Settings.CommandSection),
+            Plugins = new()
         };
 
         Types.Tanuki.Routers routers = new()
         {
-            commands = new(
+            Commands = new(
                 tanukiNetwork.Registers.Packets,
                 tanukiNetwork.Managers.Packets,
                 new(['"', '\"', '`']),
-                providers.settings.CommandSection,
-                registers.commands,
-                providers.commands,
+                providers.Settings.CommandSection,
+                registers.Commands,
+                providers.Commands,
                 tanukiNetwork.Providers.SteamLobby,
                 tanukiNetwork.Routers.Packet,
                 tanukiGame.Providers.Player
@@ -67,17 +87,17 @@ public sealed class Tanuki
 
         Types.Tanuki.Managers managers = new()
         {
-            plugin = new(manualLogSource, registers.plugins),
-            chat = new(routers.commands),
-            hotkey = new()
+            Plugin = new(manualLogSource, registers.Plugins),
+            Chat = new(routers.Commands),
+            Hotkey = new()
         };
 
         Types.Tanuki.Services services = new()
         {
-            tanukiServer = new(
+            TanukiServer = new(
                 tanukiNetwork,
-                routers.commands,
-                providers.settings,
+                routers.Commands,
+                providers.Settings,
                 tanukiNetwork.Routers.Packet,
                 tanukiGame.Providers.Player
             )

@@ -6,9 +6,9 @@ internal sealed class Configuration
 {
     public static Configuration Instance = null!;
 
-    public Data.Configuration.Translations Language = null!;
-    public Data.Configuration.Commands Commands = null!;
-    public Data.Configuration.Network Network = null!;
+    public Types.Configuration.Translations Language = null!;
+    public Types.Configuration.Commands Commands = null!;
+    public Types.Configuration.Network Network = null!;
 
     private Configuration() { }
 
@@ -16,8 +16,8 @@ internal sealed class Configuration
 
     public void Load(ConfigFile ConfigFile)
     {
-        Language = new Data.Configuration.Translations(ConfigFile);
-        Commands = new Data.Configuration.Commands(ConfigFile);
-        Network = new Data.Configuration.Network(ConfigFile);
+        Language = new Types.Configuration.Translations(ConfigFile);
+        Commands = new Types.Configuration.Commands(ConfigFile);
+        Network = new Types.Configuration.Network(ConfigFile);
     }
 }

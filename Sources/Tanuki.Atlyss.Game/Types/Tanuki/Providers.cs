@@ -2,7 +2,13 @@
 
 public sealed class Providers
 {
-    internal Game.Providers.Player player = null!;
+    private Game.Providers.Player player = null!;
 
-    public Game.Providers.Player Player => player;
+    public Game.Providers.Player Player
+    {
+        get => player;
+        internal set => player = value;
+    }
+
+    internal Providers() { }
 }

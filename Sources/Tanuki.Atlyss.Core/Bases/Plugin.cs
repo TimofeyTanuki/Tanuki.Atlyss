@@ -18,7 +18,9 @@ public abstract class Plugin : BaseUnityPlugin, IPlugin
     public event Action? OnUnloaded;
 
     protected string configurationDirectory = null!;
-    public JsonTranslationSet translationSet;
+    private readonly JsonTranslationSet translationSet;
+
+    public JsonTranslationSet TranslationSet => translationSet;
 
     protected Plugin()
     {

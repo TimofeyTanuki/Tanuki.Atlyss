@@ -4,6 +4,12 @@ using UnityEngine;
 
 namespace Tanuki.Atlyss.Network;
 
+/// <summary>
+/// This module is initialized automatically from the core.
+/// </summary>
+/// <remarks>
+/// Manually calling <see cref="Initialize"/> isn't recommended.
+/// </remarks>
 public sealed class Tanuki
 {
     public const string MODULE_NAME = "Tanuki.Atlyss.Network";
@@ -19,11 +25,12 @@ public sealed class Tanuki
 
     internal GameObject gameObject = null!;
     internal ManualLogSource manualLogSource = null!;
-    internal Types.Tanuki.Registers registers = null!;
-    internal Types.Tanuki.Providers providers = null!;
-    internal Types.Tanuki.Managers managers = null!;
-    internal Types.Tanuki.Services services = null!;
-    internal Types.Tanuki.Routers routers = null!;
+
+    private Types.Tanuki.Registers registers = null!;
+    private Types.Tanuki.Providers providers = null!;
+    private Types.Tanuki.Managers managers = null!;
+    private Types.Tanuki.Services services = null!;
+    private Types.Tanuki.Routers routers = null!;
 
     public static Tanuki Instance => instance;
 
@@ -43,6 +50,9 @@ public sealed class Tanuki
 
     public static void Initialize(GameObject owner)
     {
+        if (!owner)
+            return;
+
         if (instance is not null)
             return;
 

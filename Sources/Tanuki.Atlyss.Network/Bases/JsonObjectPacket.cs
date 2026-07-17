@@ -5,9 +5,12 @@ using Tanuki.Atlyss.API.Network.Packets;
 
 namespace Tanuki.Atlyss.Network.Bases;
 
-/*
- * JOPa
- */
+/// <summary>
+/// A packet based on the JSON format. The object and its fields must be serializable using <see cref="JsonConvert.SerializeObject(object?)"/>.
+/// </summary>
+/// <remarks>
+/// This is a packet for lazy people who don't want to deal with serialization.
+/// </remarks>
 public abstract class JsonObjectPacket<T> : Packet
 {
     private static readonly JsonSerializerSettings jsonSerializerSettings = new()

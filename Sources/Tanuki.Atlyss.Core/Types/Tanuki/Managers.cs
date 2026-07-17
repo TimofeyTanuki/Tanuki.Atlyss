@@ -2,13 +2,25 @@
 
 public sealed class Managers
 {
-    internal Core.Managers.Plugin plugin = null!;
-    internal Core.Managers.Chat chat = null!;
-    internal Core.Managers.Hotkey hotkey = null!;
+    private Core.Managers.Plugin plugin = null!;
+    private Core.Managers.Chat chat = null!;
+    private Core.Managers.Hotkey hotkey = null!;
 
-    public Core.Managers.Plugin Plugin => plugin;
-    public Core.Managers.Chat Chat => chat;
-    public Core.Managers.Hotkey Hotkey => hotkey;
+    public Core.Managers.Plugin Plugin
+    {
+        get => plugin;
+        internal set => plugin = value;
+    }
+    public Core.Managers.Chat Chat
+    {
+        get => chat;
+        internal set => chat = value;
+    }
+    public Core.Managers.Hotkey Hotkey
+    {
+        get => hotkey;
+        internal set => hotkey = value;
+    }
 
     internal Managers() { }
 }

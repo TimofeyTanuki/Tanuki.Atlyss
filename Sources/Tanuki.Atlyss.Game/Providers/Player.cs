@@ -134,7 +134,7 @@ public sealed class Player
 
         FinalizePlayerInitialization(netId);
 
-        playerEntries[netId].steamId = new CSteamID(steamId);
+        playerEntries[netId].SteamId = new CSteamID(steamId);
         steamIdMap[steamId] = netId;
 
         OnPlayerLoaded?.Invoke(player);
@@ -183,7 +183,7 @@ public sealed class Player
             return;
 
         playerEntries.Remove(netId);
-        steamIdMap.Remove(playerEntry.steamId.m_SteamID);
+        steamIdMap.Remove(playerEntry.SteamId.m_SteamID);
 
         FinalizePlayerInitialization(netId);
 
@@ -298,7 +298,7 @@ public sealed class Player
         StringComparison stringComparison = StringComparison.OrdinalIgnoreCase
     ) =>
         exactMatch ?
-            FindByExactDefaultNickname(match, stringComparison) : FindBySimilarDefaultNickname(match, stringComparison);
+            FindByExactGlobalNickname(match, stringComparison) : FindByExactGlobalNickname(match, stringComparison);
 
     public global::Player? FindByExactAnyNickname(string match, StringComparison stringComparison = StringComparison.OrdinalIgnoreCase)
     {

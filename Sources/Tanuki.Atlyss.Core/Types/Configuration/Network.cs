@@ -1,7 +1,7 @@
 ﻿using BepInEx.Configuration;
 using Tanuki.Atlyss.Core.Types.Settings;
 
-namespace Tanuki.Atlyss.Core.Data.Configuration;
+namespace Tanuki.Atlyss.Core.Types.Configuration;
 
 internal sealed class Network(ConfigFile configFile)
 {
@@ -12,7 +12,7 @@ internal sealed class Network(ConfigFile configFile)
             SECTION_NAME,
             "RateLimiter",
             ENetworkRateLimiter.Window,
-            "The type of rate limiter to use."
+            "Skips rate limiter configuration, disables rate limiting, or enables a window-based rate limiter."
         );
 
     public ConfigEntry<ushort> SteamNetworkMessagePollerBuffer =

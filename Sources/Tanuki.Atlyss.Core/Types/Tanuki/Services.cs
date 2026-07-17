@@ -2,8 +2,13 @@
 
 public sealed class Services
 {
-    public Core.Services.TanukiServer tanukiServer = null!;
-    public Core.Services.TanukiServer TanukiServer => tanukiServer;
+    private Core.Services.TanukiServer tanukiServer = null!;
+
+    public Core.Services.TanukiServer TanukiServer
+    {
+        get => tanukiServer;
+        internal set => tanukiServer = value;
+    }
 
     internal Services() { }
 }

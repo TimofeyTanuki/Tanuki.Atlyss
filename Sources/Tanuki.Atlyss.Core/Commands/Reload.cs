@@ -15,10 +15,10 @@ internal sealed class Reload : ICommand
 
     static Reload()
     {
-        pluginRegistry = Tanuki.Instance.registers.plugins;
-        pluginManager = Tanuki.Instance.managers.plugin;
-        chatManager = Tanuki.instance.managers.chat;
-        translationSet = Main.Instance.translationSet;
+        pluginRegistry = Tanuki.Instance.Registers.Plugins;
+        pluginManager = Tanuki.Instance.Managers.Plugin;
+        chatManager = Tanuki.Instance.Managers.Chat;
+        translationSet = Main.Instance.TranslationSet;
     }
 
     public void Execute(IContext context)

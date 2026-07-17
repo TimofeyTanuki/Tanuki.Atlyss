@@ -21,7 +21,7 @@ internal sealed class Help : ICommand
         pluginRegistry = Tanuki.Instance.Registers.Plugins;
         commandRegistry = Tanuki.Instance.Registers.Commands;
         chatManager = Tanuki.Instance.Managers.Chat;
-        translationSet = Main.Instance.translationSet;
+        translationSet = Main.Instance.TranslationSet;
     }
 
     public void Execute(IContext context)

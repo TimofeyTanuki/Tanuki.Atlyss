@@ -43,10 +43,10 @@ internal sealed class Main : Bases.Plugin
         tanukiNetwork = Network.Tanuki.Instance;
 
         Tanuki.Initialize(Game.Tanuki.Instance, tanukiNetwork, manualLogSource);
-        tanukiCore = Tanuki.instance;
-        tanukiCore.managers.plugin.OnBeforePluginsLoad += HandleSettingsRefresh;
-        tanukiCore.registers.plugins.Refresh();
-        tanukiCore.managers.plugin.LoadPlugins();
+        tanukiCore = Tanuki.Instance;
+        tanukiCore.Managers.Plugin.OnBeforePluginsLoad += HandleSettingsRefresh;
+        tanukiCore.Registers.Plugins.Refresh();
+        tanukiCore.Managers.Plugin.LoadPlugins();
     }
 
     private void HandleSettingsRefresh()
@@ -59,12 +59,12 @@ internal sealed class Main : Bases.Plugin
             reloadConfiguration = false;
         }
 
-        Tanuki.Instance.providers.settings.Refresh();
+        Tanuki.Instance.Providers.Settings.Refresh();
     }
 
     private void ConfigureNetwork()
     {
-        Providers.Settings settingProvider = Tanuki.instance.providers.settings;
+        Providers.Settings settingProvider = Tanuki.Instance.Providers.Settings;
         Types.Settings.Network settingProviderNetworkSection = settingProvider.NetworkSection;
 
         Network.Managers.Network networkManager = tanukiNetwork.Managers.Network;
@@ -91,12 +91,12 @@ internal sealed class Main : Bases.Plugin
     {
         ConfigureNetwork();
 
-        Tanuki.instance.routers.commands.Refresh();
+        Tanuki.Instance.Routers.Commands.Refresh();
 
         Player player = Player._mainPlayer;
 
         if (player && player._isHostPlayer && !AtlyssNetworkManager._current._soloMode)
-            Tanuki.instance.services.tanukiServer.SendTanukiServerInfo();
+            Tanuki.Instance.Services.TanukiServer.SendTanukiServerInfo();
     }
 
     protected override void Unload()

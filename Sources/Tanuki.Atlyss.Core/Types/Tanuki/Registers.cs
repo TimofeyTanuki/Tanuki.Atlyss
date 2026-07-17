@@ -2,11 +2,19 @@
 
 public sealed class Registers
 {
-    public Core.Registers.Commands commands = null!;
-    public Core.Registers.Plugins plugins = null!;
+    private Core.Registers.Commands commands = null!;
+    private Core.Registers.Plugins plugins = null!;
 
-    public Core.Registers.Commands Commands => commands;
-    public Core.Registers.Plugins Plugins => plugins;
+    public Core.Registers.Commands Commands
+    {
+        get => commands;
+        internal set => commands = value;
+    }
+    public Core.Registers.Plugins Plugins
+    {
+        get => plugins;
+        internal set => plugins = value;
+    }
 
     internal Registers() { }
 }

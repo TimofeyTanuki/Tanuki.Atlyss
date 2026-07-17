@@ -2,6 +2,7 @@
 
 public enum ENetworkRateLimiter
 {
-    Disabled,
-    Window
+    Skip = 0,
+    Disabled = 1,
+    Window = 2
 }

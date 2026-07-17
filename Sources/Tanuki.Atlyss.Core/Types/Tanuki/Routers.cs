@@ -2,9 +2,13 @@
 
 public sealed class Routers
 {
-    internal Core.Routers.Commands commands = null!;
+    private Core.Routers.Commands commands = null!;
 
-    public Core.Routers.Commands Commands => commands;
+    public Core.Routers.Commands Commands
+    {
+        get => commands;
+        internal set => commands = value;
+    }
 
     internal Routers() { }
 }
