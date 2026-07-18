@@ -27,7 +27,7 @@ internal sealed class Reload : ICommand
 
         if (arguments.Count == 0)
         {
-            chatManager.SendClientMessage(translationSet.Translate("Commands.Reload.Full"));
+            chatManager.AddMessage(translationSet.Translate("Commands.Reload.Full"));
             pluginManager.ReloadPlugins();
             return;
         }
@@ -58,11 +58,11 @@ internal sealed class Reload : ICommand
 
         if (plugins.Count == 0)
         {
-            chatManager.SendClientMessage(translationSet.Translate("Commands.Reload.PluginsNotFound"));
+            chatManager.AddMessage(translationSet.Translate("Commands.Reload.PluginsNotFound"));
             return;
         }
 
-        chatManager.SendClientMessage(
+        chatManager.AddMessage(
             translationSet.Translate(
                 "Commands.Reload.Plugins",
                 string.Join(

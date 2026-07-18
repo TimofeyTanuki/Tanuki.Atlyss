@@ -122,10 +122,10 @@ internal sealed class Help : ICommand
 
         if (message.Length == 0)
         {
-            chatManager.SendClientMessage(translationSet.Translate("Commands.Help.PluginsNotFound"));
+            chatManager.AddMessage(translationSet.Translate("Commands.Help.PluginsNotFound"));
             return;
         }
 
-        chatManager.SendClientMessage(message.ToString());
+        chatManager.AddMessage(message.ToString());
     }
 }

@@ -13,25 +13,6 @@ public sealed class Chat
         Game.Patches.Player.OnStartAuthority.OnPostfix += OnPlayerStartAuthority;
         Game.Patches.AtlyssNetworkManager.OnStopClient.OnPrefix += OnAtlyssNetworkManagerStop;
         Game.Patches.ChatBehaviour.Cmd_SendChatMessage.OnPrefix += OnPlayerChatted;
-
-        Game.Patches.ChatBehaviour.Send_ChatMessage.OnPrefix += Send_ChatMessage_OnPrefix;
-        Game.Patches.ChatBehaviour.Cmd_SendChatMessage.OnPrefix += Cmd_SendChatMessage_OnPrefix;
-        Game.Patches.ChatBehaviour.Rpc_RecieveChatMessage.OnPrefix += Rpc_RecieveChatMessage_OnPrefix;
-    }
-
-    private void Rpc_RecieveChatMessage_OnPrefix(ChatBehaviour instance, string message, bool isEmoteMessage, ChatBehaviour.ChatChannel chatChannel, ref bool runOriginal)
-    {
-        Console.WriteLine($"Rpc_RecieveChatMessage_OnPrefix ({instance.netId}, {isEmoteMessage}, {chatChannel}):\n{message}");
-    }
-
-    private void Cmd_SendChatMessage_OnPrefix(string message, ChatBehaviour.ChatChannel chatChannel, ref bool runOriginal)
-    {
-        Console.WriteLine($"Cmd_SendChatMessage_OnPrefix:\n{message}");
-    }
-
-    private void Send_ChatMessage_OnPrefix(string message, ref bool runOriginal)
-    {
-        Console.WriteLine($"Send_ChatMessage_OnPrefix:\n{message}");
     }
 
     private void OnAtlyssNetworkManagerStop() =>
@@ -68,9 +49,9 @@ public sealed class Chat
             runOriginal = false;
     }
 
-    public void SendClientMessage(string message) =>
+    public void AddMessage(string message) =>
         Player._mainPlayer._chatBehaviour.New_ChatMessage(message);
 
-    public void SendServerMessage(Player player, string message) =>
+    public void SendMessage(Player player, string message) =>
         player._chatBehaviour.Target_RecieveMessage(message);
 }
