@@ -4,7 +4,7 @@ namespace Tanuki.Atlyss.Game.Extensions;
 
 public static class PlayerMoveExtensions
 {
-    extension(global::PlayerMove instance)
+    extension(PlayerMove instance)
     {
         public void Teleport(Vector3 position, Quaternion rotation)
         {

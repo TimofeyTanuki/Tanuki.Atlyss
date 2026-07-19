@@ -2,7 +2,7 @@
 
 public static class PlayerInventoryExtensions
 {
-    extension(global::PlayerInventory instance)
+    extension(PlayerInventory instance)
     {
         public ItemData? GetItem(int slot, bool isEquipped, ItemType itemType)
         {
@@ -11,7 +11,7 @@ public static class PlayerInventoryExtensions
                 if (itemData._slotNumber != slot || itemData._isEquipped != isEquipped)
                     continue;
 
-                ScriptableItem scriptableItem = global::GameManager._current.Locate_Item(itemData._itemName);
+                ScriptableItem scriptableItem = GameManager._current.Locate_Item(itemData._itemName);
 
                 if (!scriptableItem)
                     continue;
