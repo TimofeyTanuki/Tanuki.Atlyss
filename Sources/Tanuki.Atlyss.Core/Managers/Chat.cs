@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Tanuki.Atlyss.Core.Managers;
+﻿namespace Tanuki.Atlyss.Core.Managers;
 
 public sealed class Chat
 {

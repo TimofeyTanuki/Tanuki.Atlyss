@@ -1,5 +1,6 @@
 ﻿using Steamworks;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
@@ -58,15 +59,17 @@ public sealed class SteamNetworkingMessagePoller() : MonoBehaviour
         }
     }
 
-#pragma warning disable IDE0051
+    [SuppressMessage("CodeQuality", "IDE0051")]
     private void Awake() => enabled = false;
 
+    [SuppressMessage("CodeQuality", "IDE0051")]
     private void OnEnable()
     {
         if (messageBufferSize == 0 || onSteamNetworkingMessage is null)
             enabled = false;
     }
 
+    [SuppressMessage("CodeQuality", "IDE0051")]
     private void Update()
     {
         int count = SteamNetworkingMessages.ReceiveMessagesOnChannel(messageChannel, messageBuffer, messageBuffer.Length);
@@ -89,5 +92,4 @@ public sealed class SteamNetworkingMessagePoller() : MonoBehaviour
             }
         }
     }
-#pragma warning restore IDE0051
 }

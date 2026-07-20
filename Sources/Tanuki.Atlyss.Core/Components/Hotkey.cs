@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Tanuki.Atlyss.Core.Types.Managers.Hotkey;
 using Tanuki.Atlyss.Shared.Extensions;
 using UnityEngine;
@@ -179,9 +180,10 @@ internal sealed class Hotkey() : MonoBehaviour
             activeMask[activeCombinations[combinationIndex]] = false;
     }
 
-#pragma warning disable IDE0051
+    [SuppressMessage("CodeQuality", "IDE0051")]
     private void Start() => InputSystem = UnityInput.Current;
 
+    [SuppressMessage("CodeQuality", "IDE0051")]
     private void Awake()
     {
         if (instance is null)
@@ -193,6 +195,7 @@ internal sealed class Hotkey() : MonoBehaviour
         DontDestroyOnLoad(this);
     }
 
+    [SuppressMessage("CodeQuality", "IDE0051")]
     private void Update()
     {
         FindActiveCombinations();
@@ -200,5 +203,4 @@ internal sealed class Hotkey() : MonoBehaviour
         ProcessActiveCombinations();
         ResetActiveMatches();
     }
-#pragma warning restore IDE0051
 }
