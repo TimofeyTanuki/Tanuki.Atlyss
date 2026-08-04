@@ -261,10 +261,8 @@ public sealed class Commands
 
     public void DeregisterCommand<T>() => DeregisterCommand(typeof(T));
 
-    public void RegisterAssembly(Assembly assembly, string? configurationFile)
+    public void RegisterFromAssembly(Assembly assembly, string? configurationFile)
     {
-        Dictionary<string, Type> pluginCommands = [];
-
         Type[] assemblyTypes;
         try
         {
@@ -275,6 +273,8 @@ public sealed class Commands
             manualLogSource.LogError($"Failed to retrieve types from assembly {assembly.GetName().Name}\nException:\n{exception.Message}\nStack trace:\n{exception.StackTrace}");
             return;
         }
+
+        Dictionary<string, Type> pluginCommands = [];
 
         Type commandInterfaceType = typeof(ICommand);
 
@@ -302,7 +302,7 @@ public sealed class Commands
             ProcessConfigurationFile(pluginCommands, configurationFile);
     }
 
-    public void DeregisterAssembly(Assembly assembly)
+    public void DeregisterFromAssembly(Assembly assembly)
     {
         if (!this.assemblyCommands.TryGetValue(assembly, out HashSet<Type> assemblyCommands))
             return;

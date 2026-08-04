@@ -69,9 +69,9 @@ public abstract class Plugin : BaseUnityPlugin, IPlugin
 
         ProcessTranslationSet();
 
-        Tanuki.Instance.Registers.Commands.DeregisterAssembly(GetType().Assembly);
+        Tanuki.Instance.Registers.Commands.DeregisterFromAssembly(GetType().Assembly);
 
-        Tanuki.Instance.Registers.Commands.RegisterAssembly(
+        Tanuki.Instance.Registers.Commands.RegisterFromAssembly(
             GetType().Assembly,
             Utilities.Translations.LanguageFileSelector.GetPreferredFile(
                 Tanuki.Instance.Providers.Settings.TranslationSection.PreferredLanguageOrder,
@@ -100,7 +100,7 @@ public abstract class Plugin : BaseUnityPlugin, IPlugin
     {
         OnUnload?.Invoke();
 
-        Tanuki.Instance.Registers.Commands.DeregisterAssembly(GetType().Assembly);
+        Tanuki.Instance.Registers.Commands.DeregisterFromAssembly(GetType().Assembly);
 
         try
         {
