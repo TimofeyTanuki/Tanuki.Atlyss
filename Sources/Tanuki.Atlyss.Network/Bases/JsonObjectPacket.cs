@@ -9,7 +9,7 @@ namespace Tanuki.Atlyss.Network.Bases;
 /// A packet based on the JSON format. The object and its fields must be serializable using <see cref="JsonConvert.SerializeObject(object?)"/>.
 /// </summary>
 /// <remarks>
-/// This is a packet for lazy people who don't want to deal with serialization.
+/// This is a packet for lazy people who don't want to deal with manual serialization.
 /// </remarks>
 public abstract class JsonObjectPacket<T> : Packet
 {
@@ -25,7 +25,7 @@ public abstract class JsonObjectPacket<T> : Packet
     private byte[]? serialized;
     private int serializedLength;
 
-    public T? Data;
+    private T? Data;
 
     private void SerializeData()
     {
