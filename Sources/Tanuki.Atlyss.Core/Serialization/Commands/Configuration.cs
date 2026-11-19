@@ -16,15 +16,15 @@ public sealed class Configuration
     [JsonProperty("Syntax")]
     public string? syntax;
 
-    public static Configuration CreateFromType(Type type, IReadOnlyList<string> prefixRestrictions)
+    public static Configuration CreateFromType(Type type, string restrictedPrefix)
     {
         Configuration configuration = new()
         {
-            names = [Utilities.Commands.Name.Normalize(type.FullName, prefixRestrictions)]
+            names = [Utilities.Commands.Name.Normalize(type.FullName, restrictedPrefix)]
         };
 
         return configuration;
     }
 
-    public static Configuration CreateFromType<T>(IReadOnlyList<string> prefixRestrictions) => CreateFromType(typeof(T), prefixRestrictions);
+    public static Configuration CreateFromType<T>(string restrictedPrefix) => CreateFromType(typeof(T), restrictedPrefix);
 }

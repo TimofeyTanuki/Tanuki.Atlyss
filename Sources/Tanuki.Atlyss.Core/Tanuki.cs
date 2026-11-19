@@ -92,24 +92,16 @@ public sealed class Tanuki
             Hotkey = new()
         };
 
-        Types.Tanuki.Services services = new()
-        {
-            TanukiServer = new(
-                tanukiNetwork,
-                routers.Commands,
-                providers.Settings,
-                tanukiNetwork.Routers.Packet,
-                tanukiGame.Providers.Player
-            )
-        };
-
         instance = new()
         {
             managers = managers,
             providers = providers,
             registers = registers,
             routers = routers,
-            services = services
+            services = new()
+            {
+                ServerHello = new(tanukiNetwork, tanukiNetwork.Routers.Packet, tanukiGame.Providers.Player)
+            }
         };
 
         onInitialized?.Invoke();

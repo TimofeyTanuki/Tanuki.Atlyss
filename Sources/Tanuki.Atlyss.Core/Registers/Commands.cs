@@ -85,7 +85,7 @@ public sealed class Commands
 
     private uint ProcessExistingConfiguration(Dictionary<string, Type> pluginCommands, Dictionary<string, Serialization.Commands.Configuration> commandConfigurations)
     {
-        string[] prefixes = [commandSettings.ClientPrefix, commandSettings.ServerPrefix];
+        string[] prefixes = [commandSettings.Prefix, commandSettings.prefix];
 
         uint changes = 0;
 
@@ -102,7 +102,7 @@ public sealed class Commands
             {
                 manualLogSource.LogInfo($"Command configuration entry for {command.FullName} has been restored.");
 
-                configuration = Serialization.Commands.Configuration.CreateFromType(command, commandSettings.Prefixes);
+                configuration = Serialization.Commands.Configuration.CreateFromType(command, commandSettings.prefix);
                 commandConfigurations[commandConfigurationKey] = configuration;
                 changes++;
             }
@@ -119,7 +119,7 @@ public sealed class Commands
                 for (int nameIndex = configuration.names.Count - 1; nameIndex >= 0; nameIndex--)
                 {
                     string? name = configuration.names[nameIndex];
-                    string normalizedName = Utilities.Commands.Name.Normalize(name, commandSettings.Prefixes);
+                    string normalizedName = Utilities.Commands.Name.Normalize(name, commandSettings.prefix);
 
                     if (string.IsNullOrEmpty(normalizedName))
                     {
@@ -165,7 +165,7 @@ public sealed class Commands
         {
             manualLogSource.LogInfo($"Command configuration entry for {pluginCommand.Key} has been created.");
 
-            Serialization.Commands.Configuration newCommandConfiguration = Serialization.Commands.Configuration.CreateFromType(pluginCommand.Value, commandSettings.Prefixes);
+            Serialization.Commands.Configuration newCommandConfiguration = Serialization.Commands.Configuration.CreateFromType(pluginCommand.Value, commandSettings.prefix);
             commandConfigurations.Add(pluginCommand.Key, newCommandConfiguration);
 
             descriptors[pluginCommand.Value].configuration = newCommandConfiguration;

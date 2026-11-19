@@ -42,7 +42,7 @@ public class Commands(IReadOnlyList<char> quoteCharacters)
         if (commandNameMap is not null && !commandNameMap.ContainsKey(commandName))
             return false;
 
-        List<string> parsedArguments = new();
+        List<string> parsedArguments = [];
 
         while (index < length && char.IsWhiteSpace(input[index])) index++;
 

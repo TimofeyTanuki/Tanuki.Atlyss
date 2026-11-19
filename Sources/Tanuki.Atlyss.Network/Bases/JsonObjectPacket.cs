@@ -11,7 +11,7 @@ namespace Tanuki.Atlyss.Network.Bases;
 /// <remarks>
 /// This is a packet for lazy people who don't want to deal with manual serialization.
 /// </remarks>
-public abstract class JsonObjectPacket<T> : Packet
+public abstract class JsonObjectPacket<T> : Packet where T : JsonObjectPacket<T>
 {
     private static readonly JsonSerializerSettings jsonSerializerSettings = new()
     {
@@ -25,17 +25,16 @@ public abstract class JsonObjectPacket<T> : Packet
     private byte[]? serialized;
     private int serializedLength;
 
-    private T? Data;
-
     private void SerializeData()
     {
-        serialized ??= Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(Data, jsonSerializerSettings));
+        serialized ??= Encoding.UTF8.GetBytes(JsonConvert.SerializeObject((T)this, jsonSerializerSettings));
         serializedLength = serialized.Length;
     }
 
     public override int GetMaxSize()
     {
         SerializeData();
+
         return serializedLength;
     }
 
@@ -55,6 +54,6 @@ public abstract class JsonObjectPacket<T> : Packet
     public override void Deserialize(ReadOnlySpan<byte> data)
     {
         serialized = null;
-        Data = JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(data), jsonSerializerSettings);
+        JsonConvert.PopulateObject(Encoding.UTF8.GetString(data), this, jsonSerializerSettings);
     }
 }

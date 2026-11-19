@@ -1,9 +1,6 @@
-﻿using HarmonyLib;
-using Steamworks;
+﻿using Steamworks;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
 using Tanuki.Atlyss.API.Core.Commands;
 
 namespace Tanuki.Atlyss.Core.Routers;
@@ -20,9 +17,7 @@ public sealed class Commands
 
     private readonly Game.Providers.Player playerProvider;
 
-    private static readonly MethodInfo SendChatMessageCommand = AccessTools.Method(typeof(ChatBehaviour), "UserCode_Cmd_SendChatMessage__String__ChatChannel");
-
-    public string? ServerPrefix;
+    public bool serverSupportsRequests;
 
     internal Commands(
         Network.Registers.Packets packetRegistry,
@@ -70,7 +65,7 @@ public sealed class Commands
     {
         IReadOnlyDictionary<string, Type> nameMap = commandRegistry.NameMap;
 
-        if (commandParser.TryParse(commandSettings.ClientPrefix, input, out string? commandName, out IReadOnlyList<string>? commandArguments, nameMap))
+        if (commandParser.TryParse(commandSettings.Prefix, input, out string? commandName, out IReadOnlyList<string>? commandArguments, nameMap))
         {
             Type commandType = nameMap[commandName];
             Types.Commands.Descriptor commandDescriptor = commandRegistry.Descriptors[commandType];
@@ -82,9 +77,8 @@ public sealed class Commands
                 if (commandDescriptor.callerPolicy.IsAllowed(caller))
                 {
                     ICommand command = commandProvider.Create(commandType);
-
                     command.Execute(
-                        new Contexts.Commands.Context()
+                        new Contexts.Commands.Context
                         {
                             Caller = caller,
                             Arguments = commandArguments
@@ -92,36 +86,14 @@ public sealed class Commands
                     );
                 }
             }
-            else
+            else if (serverSupportsRequests)
             {
                 packetRouter.SendPacketToUser(
                     steamLobbyProvider.OwnerSteamId,
-                    new Packets.Commands.Request()
-                    {
-                        Hash = commandDescriptor.Hash,
-                        Arguments = commandArguments
-                    },
+                    new Packets.Commands.Request { Hash = commandDescriptor.Hash, Arguments = commandArguments },
                     out EResult _
                 );
             }
-
-            return true;
-        }
-
-        if (Player._mainPlayer._isHostPlayer || string.IsNullOrEmpty(ServerPrefix))
-            return false;
-
-        if (commandParser.TryParse(ServerPrefix, input, out commandName, out commandArguments))
-        {
-            packetRouter.SendPacketToUser(
-                steamLobbyProvider.OwnerSteamId,
-                new Packets.Commands.Request()
-                {
-                    Name = commandName,
-                    Arguments = commandArguments
-                },
-                out EResult _
-            );
 
             return true;
         }
@@ -133,14 +105,11 @@ public sealed class Commands
     {
         IReadOnlyDictionary<string, Type> nameMap = commandRegistry.NameMap;
 
-        if (commandParser.TryParse(ServerPrefix!, input, out string? commandName, out IReadOnlyList<string>? commandArguments, nameMap))
-        {
-            Type commandType = nameMap[commandName];
+        if (!commandParser.TryParse(commandSettings.Prefix, input, out string? commandName, out IReadOnlyList<string>? commandArguments, nameMap))
+            return false;
 
-            return HandleCommandServer(player, commandType, commandArguments);
-        }
-
-        return false;
+        Type commandType = nameMap[commandName];
+        return HandleCommandServer(player, commandType, commandArguments);
     }
 
     public void RequestReceived(CSteamID sender, Packets.Commands.Request packet)
@@ -157,28 +126,13 @@ public sealed class Commands
         else if (!string.IsNullOrEmpty(packet.Name))
             commandRegistry.NameMap.TryGetValue(packet.Name, out commandType);
 
-        if (commandType is not null)
-        {
-            HandleCommandServer(player, commandType, packet.Arguments);
-            return;
-        }
-
-        if (string.IsNullOrEmpty(packet.Name) ||
-            commandRegistry.NameMap.ContainsKey(packet.Name))
+        if (commandType is null)
             return;
 
-        StringBuilder originalMessage = new();
-
-        originalMessage.Append(ServerPrefix);
-        originalMessage.Append(packet.Name);
-
-        foreach (string argument in packet.Arguments)
-            originalMessage.Append(' ' + argument);
-
-        SendChatMessageCommand.Invoke(player._chatBehaviour, [originalMessage.ToString(), player._chatBehaviour._setChatChannel]);
+        HandleCommandServer(player, commandType, packet.Arguments);
     }
 
-    public bool HandleCommandServer(Player player, Type commandType, IReadOnlyList<string> Arguments)
+    public bool HandleCommandServer(Player player, Type commandType, IReadOnlyList<string> arguments)
     {
         ICaller caller = new Types.Commands.Callers.Player(player);
         Types.Commands.Descriptor commandDescriptor = commandRegistry.Descriptors[commandType];
@@ -189,12 +143,11 @@ public sealed class Commands
         if (commandDescriptor.callerPolicy.IsAllowed(caller))
         {
             ICommand command = commandProvider.Create(commandType);
-
             command.Execute(
-                new Contexts.Commands.Context()
+                new Contexts.Commands.Context
                 {
-                    Caller = new Types.Commands.Callers.Player(player),
-                    Arguments = Arguments
+                    Caller = caller,
+                    Arguments = arguments
                 }
             );
         }

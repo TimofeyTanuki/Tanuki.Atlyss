@@ -65,24 +65,14 @@ public sealed class Settings
 
     private void RefreshCommandsSection()
     {
-        commandSection.clientPrefix = Configuration.Instance.Commands.ClientPrefix.Value;
-        commandSection.serverPrefix = Configuration.Instance.Commands.ServerPrefix.Value;
+        commandSection.prefix = Configuration.Instance.Commands.Prefix.Value;
 
-        if (commandSection.ClientPrefix.Length == 0 ||
-            commandSection.ClientPrefix.Length > Types.Settings.Commands.PREFIX_MAX_LENGTH)
+        if (commandSection.Prefix.Length == 0 ||
+            commandSection.Prefix.Length > Types.Settings.Commands.PREFIX_MAX_LENGTH)
         {
-            commandSection.clientPrefix = Types.Settings.Commands.CLIENT_PREFIX_DEFAULT;
-            Configuration.Instance.Commands.ClientPrefix.Value = commandSection.ClientPrefix;
+            commandSection.prefix = Types.Settings.Commands.DEFAULT_PREFIX;
+            Configuration.Instance.Commands.Prefix.Value = commandSection.Prefix;
         }
-
-        if (commandSection.ServerPrefix.Length == 0 ||
-            commandSection.ServerPrefix.Length > Types.Settings.Commands.PREFIX_MAX_LENGTH)
-        {
-            commandSection.serverPrefix = Types.Settings.Commands.SERVER_PREFIX_DEFAULT;
-            Configuration.Instance.Commands.ServerPrefix.Value = commandSection.ServerPrefix;
-        }
-
-        commandSection.prefixes = [Configuration.Instance.Commands.ClientPrefix.Value, Configuration.Instance.Commands.ServerPrefix.Value];
     }
 
     private void RefreshNetworkSection()
