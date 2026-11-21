@@ -88,7 +88,7 @@ public sealed class Tanuki
         Types.Tanuki.Managers managers = new()
         {
             Plugin = new(manualLogSource, registers.Plugins),
-            Chat = new(routers.Commands),
+            Chat = new(routers.Commands, tanukiGame.Providers.Player),
             Hotkey = new()
         };
 

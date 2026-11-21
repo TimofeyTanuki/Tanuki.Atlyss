@@ -1,12 +1,16 @@
-﻿namespace Tanuki.Atlyss.Core.Managers;
+﻿using System;
+
+namespace Tanuki.Atlyss.Core.Managers;
 
 public sealed class Chat
 {
     private readonly Routers.Commands commandRouter;
+    private Game.Providers.Player playerProvider;
 
-    internal Chat(Routers.Commands commandRouter)
+    internal Chat(Routers.Commands commandRouter, Game.Providers.Player playerProvider)
     {
         this.commandRouter = commandRouter;
+        this.playerProvider = playerProvider;
 
         Game.Patches.Player.OnStartAuthority.OnPostfix += OnPlayerStartAuthority;
         Game.Patches.AtlyssNetworkManager.OnStopClient.OnPrefix += OnAtlyssNetworkManagerStop;
@@ -52,4 +56,17 @@ public sealed class Chat
 
     public void SendMessage(Player player, string message) =>
         player._chatBehaviour.Target_RecieveMessage(message);
+
+    public void SendGlobalMessage(string message)
+    {
+        foreach (var playerEntry in playerProvider.PlayerEntries.Values)
+        {
+            Player player = playerEntry.Player;
+
+            if (!player)
+                continue;
+
+            SendMessage(player, message);
+        }
+    }
 }
